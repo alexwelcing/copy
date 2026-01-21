@@ -1,0 +1,22 @@
+{
+  "name": "Copy & Marketing Agency",
+  "description": "Full-service AI-powered copy and marketing asset generation system",
+  "version": "1.0.0",
+  "permissions": {
+    "allowedTools": ["Read", "Write", "Edit", "Bash", "Glob", "Grep", "WebFetch", "WebSearch", "Task"],
+    "deny": []
+  },
+  "hooks": {
+    "preToolCall": [],
+    "postToolCall": []
+  },
+  "skills": {
+    "directory": "../skills",
+    "autoLoad": true
+  },
+  "agency": {
+    "maxConcurrentAgents": 10,
+    "defaultWorkflow": "full-service",
+    "persistState": true
+  }
+}
