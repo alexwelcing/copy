@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Backend API
   api:
     build: .
     ports:
@@ -9,7 +10,7 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-4-20250514}
       - DEBUG=${DEBUG:-false}
-      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
     volumes:
       # Mount skills for development (changes without rebuild)
       - ./skills:/app/skills:ro
@@ -19,3 +20,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 10s
+
+  # Frontend UI
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8080
+      - ORIGIN=http://localhost:3000
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Nginx reverse proxy (optional - for production-like setup)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - frontend
+    profiles:
+      - production
