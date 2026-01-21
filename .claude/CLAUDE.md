@@ -1,100 +1,81 @@
 # Copy & Marketing Agency
 
-This is an AI-powered full-service copy and marketing asset generation system built on Claude Code.
+Marketing expertise encoded into executable skills for Claude Code.
 
-## System Architecture
+## How It Works
 
-This system combines:
-- **Marketing Skills**: Specialized prompts and frameworks for 23+ marketing disciplines
-- **Agency Orchestration**: Multi-agent coordination inspired by Gastown for complex projects
-- **Persistent Workflows**: Git-backed state tracking for long-running campaigns
+**Skills are frameworks, not prompts.** Each skill file contains:
+- Context-gathering questions
+- Proven structures and formulas
+- Psychological principles
+- Quality checklists
+- Strategic rationale
 
-## Quick Start
+Load a skill, then use it. The skill guides the thinking.
 
-### Single Task
-For individual marketing tasks, invoke a skill directly:
+## Using Skills
+
+### Load and Use
 ```
-/copywriting - Generate conversion-focused copy
-/page-cro - Analyze and optimize landing pages
-/seo-audit - Comprehensive SEO analysis
-/email-sequence - Design email campaigns
-```
-
-### Full Campaign
-For complex projects requiring multiple skills:
-```
-/agency brief "Campaign Name"
+Read skills/copywriting/SKILL.md
+# Then: "Write a landing page for [product] using this framework"
 ```
 
-The Mayor agent will analyze requirements and coordinate specialized agents.
+### Skill + Input Pattern
+The skill provides the methodology. You provide the specifics:
+- Product details
+- Target audience
+- Existing content to analyze
+- Brand constraints
+
+### Compound Skills
+Skills work together:
+1. `marketing-psychology` → identify triggers
+2. `copywriting` → write with frameworks
+3. `page-cro` → audit for conversion
+4. `copy-editing` → polish output
 
 ## Available Skills
 
-### Content Creation
-- `copywriting` - Conversion-focused web copy
-- `copy-editing` - Polish and refine existing content
-- `social-content` - Social media content strategy
-- `email-sequence` - Email marketing campaigns
+### Writing
+`copywriting` `copy-editing` `email-sequence` `social-content`
 
-### Conversion Optimization
-- `page-cro` - Landing page optimization
-- `form-cro` - Form conversion optimization
-- `signup-flow-cro` - Registration flow optimization
-- `onboarding-cro` - User onboarding optimization
-- `popup-cro` - Popup effectiveness
-- `paywall-upgrade-cro` - Subscription conversion
+### CRO
+`page-cro` `form-cro` `signup-flow-cro` `onboarding-cro` `popup-cro` `paywall-upgrade-cro`
 
-### SEO & Discovery
-- `seo-audit` - Comprehensive site audits
-- `programmatic-seo` - Scalable SEO automation
-- `schema-markup` - Structured data implementation
+### SEO
+`seo-audit` `programmatic-seo` `schema-markup`
 
-### Strategy & Growth
-- `marketing-ideas` - Brainstorming and ideation
-- `marketing-psychology` - Psychological principles
-- `pricing-strategy` - Pricing optimization
-- `launch-strategy` - Product launch planning
-- `competitor-alternatives` - Competitive positioning
-- `referral-program` - Word-of-mouth growth
-- `free-tool-strategy` - Lead generation tools
+### Strategy
+`marketing-ideas` `marketing-psychology` `pricing-strategy` `launch-strategy` `competitor-alternatives` `referral-program` `free-tool-strategy`
 
 ### Measurement
-- `ab-test-setup` - A/B testing methodology
-- `analytics-tracking` - Analytics implementation
-- `paid-ads` - Paid advertising management
+`ab-test-setup` `analytics-tracking` `paid-ads`
 
-## Agency Workflow
+## Workflows
 
-The agency uses a convoy-based workflow:
+Pre-built sequences in `workflows/`:
+- `full-service.md` - Complete campaigns
+- `quick-copy.md` - Fast turnaround copy
+- `cro-audit.md` - Conversion audits
+- `seo-campaign.md` - SEO projects
 
-1. **Brief Creation**: Define project goals, audience, and deliverables
-2. **Work Breakdown**: Mayor creates convoy with individual beads (work units)
-3. **Agent Assignment**: Specialized polecats spawn for each skill
-4. **Execution**: Agents work in parallel, persisting state through hooks
-5. **Review**: Creative review and iteration
-6. **Delivery**: Final assets compiled and presented
+## Agency System
 
-## Directory Structure
+For complex projects spanning multiple skills:
 
-```
-copy/
-├── .claude/           # Claude Code configuration
-│   ├── commands/      # Custom commands
-│   └── hooks/         # Event hooks
-├── skills/            # Marketing skill definitions
-├── agency/            # Orchestration system
-│   ├── mayor/         # Mayor agent configuration
-│   ├── rigs/          # Project containers
-│   ├── crews/         # Agent workspaces
-│   └── convoys/       # Work tracking
-├── templates/         # Reusable templates
-└── workflows/         # Predefined workflows
-```
+1. Create a rig: `agency/rigs/[project-name]/`
+2. Write a brief: `brief.md` with objectives, audience, constraints
+3. Track work in convoys: bundles of tasks with dependencies
+4. Review outputs against brief
+5. Iterate and deliver
 
-## Best Practices
+## Key Principle
 
-1. **Start with a brief**: Always define clear objectives before generating assets
-2. **Use appropriate skills**: Match the skill to the task for best results
-3. **Review and iterate**: Use the review workflow for quality control
-4. **Track everything**: Leverage convoys for visibility into complex projects
-5. **Persist state**: Use hooks to ensure work survives interruptions
+**Strategy precedes execution.** Every skill starts with understanding:
+- Who is the audience?
+- What's their awareness stage?
+- What objections will they have?
+- What proof do we have?
+
+Copy comes last. Thinking comes first.

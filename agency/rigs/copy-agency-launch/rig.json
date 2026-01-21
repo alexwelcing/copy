@@ -1,0 +1,26 @@
+{
+  "name": "copy-agency-launch",
+  "client": "Internal",
+  "created": "2024-01-21",
+  "status": "active",
+  "brief": "./brief.md",
+  "brand": {
+    "guidelines": "./brand/guidelines.md",
+    "voice": "Sharp, confident, no-bullshit. We respect language. We respect craft. We deliver."
+  },
+  "team": {
+    "lead": "mayor",
+    "polecats": [
+      "copywriter",
+      "cro-specialist",
+      "strategist",
+      "psychologist"
+    ]
+  },
+  "convoy": "convoy-self-001",
+  "settings": {
+    "autoReview": true,
+    "requireApproval": false,
+    "dogfoodMode": true
+  }
+}

@@ -1,253 +1,167 @@
-# Copy & Marketing Agency
+# Stop Prompting. Start Deploying.
 
-An AI-powered full-service copy and marketing asset generation system built on Claude Code. This system combines specialized marketing skills with multi-agent orchestration for complex campaign work.
+**23 marketing skills. Each one a complete framework. All executable in Claude Code.**
 
-## Overview
+Most people ask AI to "write some copy." They get generic, forgettable content that sounds like everyone else's generic, forgettable content.
 
-This repository provides a complete Claude Code ecosystem for generating marketing content, optimizing conversions, and running comprehensive marketing campaigns. It features:
+This is different.
 
-- **23 specialized marketing skills** covering content creation, CRO, SEO, growth, and measurement
-- **Multi-agent orchestration** inspired by [Gastown](https://github.com/steveyegge/gastown) for complex projects
-- **Structured workflows** for campaigns, audits, and content creation
-- **Templates** for briefs, work tracking, and deliverables
+This is marketing expertise encoded into executable skills - the same mental models top copywriters, CRO specialists, and growth marketers use, made repeatable inside Claude Code.
 
-## Quick Start
+---
 
-### Single Task
+## What This Actually Does
 
-For individual marketing tasks, invoke a skill directly:
+You load a skill. The skill contains a complete framework:
+- How to gather context
+- What questions to answer first
+- Proven structures and formulas
+- Quality checklists
+- Strategic rationale for every decision
 
-```
-# Generate landing page copy
-Load the copywriting skill and create copy for...
+**Example**: The `copywriting` skill doesn't just write headlines. It first identifies page purpose, audience awareness stage, traffic context, and objections - then applies tested formulas like "Outcome + Timeframe" or "Eliminate Pain" - then validates against a quality checklist.
 
-# Audit a page for conversion optimization
-Load the page-cro skill and analyze...
+That's the difference between prompting and deploying.
 
-# Create an email sequence
-Load the email-sequence skill and design...
-```
+---
 
-### Full Campaign
+## The Skills
 
-For complex projects requiring multiple skills:
+### Write Things That Convert
 
-```
-# Review the brief template
-Read templates/brief.md
+| Skill | What It Does |
+|-------|--------------|
+| `copywriting` | Headlines, landing pages, CTAs - with strategic frameworks |
+| `copy-editing` | Three-pass editing: clarity, then concision, then power |
+| `email-sequence` | Welcome, nurture, sales, win-back - complete sequences |
+| `social-content` | Platform-native content that doesn't smell like AI |
 
-# Fill out your brief, then have the Mayor analyze it
-The Mayor will create a convoy and coordinate work across multiple agents
-```
+### Fix What's Broken
 
-## Available Skills
+| Skill | What It Does |
+|-------|--------------|
+| `page-cro` | Systematic landing page audits with prioritized fixes |
+| `form-cro` | Field-by-field conversion optimization |
+| `signup-flow-cro` | Registration friction removal |
+| `onboarding-cro` | Get users to their aha moment faster |
+| `popup-cro` | Exit intent, timing, triggers that work |
+| `paywall-upgrade-cro` | Free-to-paid conversion paths |
 
-### Content Creation
-| Skill | Description |
-|-------|-------------|
-| `copywriting` | Conversion-focused web copy |
-| `copy-editing` | Polish and refine existing content |
-| `social-content` | Social media content strategy |
-| `email-sequence` | Email marketing campaigns |
+### Get Found
 
-### Conversion Optimization (CRO)
-| Skill | Description |
-|-------|-------------|
-| `page-cro` | Landing page optimization |
-| `form-cro` | Form conversion optimization |
-| `signup-flow-cro` | Registration flow optimization |
-| `onboarding-cro` | User onboarding optimization |
-| `popup-cro` | Popup effectiveness |
-| `paywall-upgrade-cro` | Subscription conversion |
+| Skill | What It Does |
+|-------|--------------|
+| `seo-audit` | Technical + content + competitive SEO analysis |
+| `programmatic-seo` | Template-based pages at scale |
+| `schema-markup` | JSON-LD that wins rich results |
 
-### SEO & Discovery
-| Skill | Description |
-|-------|-------------|
-| `seo-audit` | Comprehensive site audits |
-| `programmatic-seo` | Scalable SEO automation |
-| `schema-markup` | Structured data implementation |
+### Think Bigger
 
-### Strategy & Growth
-| Skill | Description |
-|-------|-------------|
-| `marketing-ideas` | Brainstorming and ideation |
-| `marketing-psychology` | Psychological principles |
-| `pricing-strategy` | Pricing optimization |
-| `launch-strategy` | Product launch planning |
-| `competitor-alternatives` | Competitive positioning |
-| `referral-program` | Word-of-mouth growth |
-| `free-tool-strategy` | Lead generation tools |
+| Skill | What It Does |
+|-------|--------------|
+| `marketing-ideas` | Structured brainstorming with prioritization |
+| `marketing-psychology` | Cialdini, cognitive biases, applied persuasion |
+| `pricing-strategy` | Models, anchoring, packaging |
+| `launch-strategy` | Product Hunt, soft launches, hard launches |
+| `competitor-alternatives` | Positioning that creates space |
+| `referral-program` | Viral loops that actually loop |
+| `free-tool-strategy` | Lead-gen tools worth building |
 
-### Measurement
-| Skill | Description |
-|-------|-------------|
-| `ab-test-setup` | A/B testing methodology |
-| `analytics-tracking` | Analytics implementation |
-| `paid-ads` | Paid advertising management |
+### Measure What Matters
 
-## Agency System
+| Skill | What It Does |
+|-------|--------------|
+| `ab-test-setup` | Statistical validity, test design, learning extraction |
+| `analytics-tracking` | Events, funnels, attribution that tells the truth |
+| `paid-ads` | Google, Meta, LinkedIn - structure and optimization |
 
-The agency uses a multi-agent orchestration system inspired by Gastown:
+---
 
-### Components
+## How to Use It
 
-- **Mayor**: Central coordinator that analyzes briefs, assigns work, and manages delivery
-- **Polecats**: Ephemeral worker agents specialized in specific skills
-- **Convoys**: Work tracking units that bundle related tasks
-- **Rigs**: Project containers with client context and brand guidelines
-- **Hooks**: Persistent state storage for work continuity
+### Single Skill
 
-### Workflow
+Load a skill and use its framework:
 
 ```
-Brief → Mayor Analysis → Convoy Creation → Polecat Assignment → Execution → Review → Delivery
-                                    ↓
-                            Parallel Work Tracks
-                            ├── Content Creation
-                            ├── CRO Optimization
-                            └── Technical Setup
+Read skills/page-cro/SKILL.md
+
+Now audit this landing page: [your page]
 ```
 
-## Directory Structure
+The skill guides the analysis. You get structured recommendations with strategic rationale, not just "make the button bigger."
+
+### Full Campaigns
+
+For complex work spanning multiple skills:
+
+1. Fill out `templates/brief.md` with your project details
+2. The Mayor agent analyzes requirements and creates a work plan
+3. Specialized agents execute each skill in parallel
+4. Work is tracked through convoys (task bundles)
+5. Review, iterate, deliver
+
+This orchestration system is inspired by [Gastown](https://github.com/steveyegge/gastown) - battle-tested multi-agent coordination.
+
+---
+
+## The System
 
 ```
 copy/
-├── .claude/                 # Claude Code configuration
-│   ├── commands/           # Custom commands
-│   ├── hooks/              # Event hooks
-│   ├── settings.json       # Agency settings
-│   └── CLAUDE.md           # System instructions
-├── skills/                  # Marketing skill definitions
-│   ├── copywriting/
-│   ├── page-cro/
-│   ├── email-sequence/
-│   └── ... (23 total skills)
-├── agency/                  # Orchestration system
-│   ├── mayor/              # Mayor agent configuration
-│   ├── rigs/               # Project containers
-│   ├── crews/              # Agent workspaces
-│   └── convoys/            # Work tracking
-├── templates/               # Reusable templates
-│   ├── brief.md            # Creative brief template
-│   ├── convoy.md           # Convoy tracking template
-│   └── deliverable.md      # Deliverable template
-├── workflows/               # Predefined workflows
-│   ├── full-service.md     # Complete campaign workflow
-│   ├── quick-copy.md       # Fast copy workflow
-│   ├── cro-audit.md        # CRO audit workflow
-│   └── seo-campaign.md     # SEO campaign workflow
-└── README.md
+├── skills/           # 23 marketing frameworks
+├── agency/           # Multi-agent orchestration
+│   ├── mayor/       # Coordinates complex projects
+│   ├── rigs/        # Project containers with client context
+│   └── convoys/     # Work tracking
+├── templates/        # Briefs, deliverables, tracking
+└── workflows/        # Pre-built sequences for common projects
 ```
 
-## Workflows
+### Workflows Ready to Run
 
-### Full-Service Campaign
-Complete marketing campaigns with multiple deliverables:
-1. Discovery & Planning
-2. Strategy Development
-3. Content Creation
-4. Optimization
-5. Technical Setup
-6. Review & Delivery
+- **Full-Service Campaign**: Discovery → Strategy → Content → Optimization → Delivery
+- **Quick Copy**: Brief → Context → Write → Polish
+- **CRO Audit**: Analyze → Deep dive → Synthesize → Prioritize
+- **SEO Campaign**: Audit → Strategy → Create → Implement → Measure
 
-### Quick Copy
-Streamlined workflow for standalone copy requests:
-1. Brief Analysis
-2. Context Gathering
-3. Copy Creation
-4. Optional Polish
-5. Delivery
+---
 
-### CRO Audit
-Systematic conversion optimization analysis:
-1. Page Analysis
-2. Deep Dive Audits
-3. Technical Analysis
-4. Synthesis & Recommendations
+## Why This Works
 
-### SEO Campaign
-Comprehensive SEO-focused initiatives:
-1. Audit & Research
-2. Strategy Development
-3. Content Creation
-4. Technical Implementation
-5. Measurement Setup
+**Skills encode expertise.** A prompt is a one-shot request. A skill is a complete mental model - context gathering, frameworks, formulas, quality checks. The skill knows what questions to ask before writing a single word.
 
-## Usage Examples
+**Strategy precedes execution.** Every skill starts with understanding: Who's the audience? What's their awareness stage? What objections will they have? What proof do we need? Copy comes last.
 
-### Generate Landing Page Copy
+**Compound returns.** Run a CRO audit, feed insights into copywriting, validate changes with A/B testing. The skills connect. They build on each other.
 
-```
-I need copy for a landing page for a project management tool.
+**Proof by demonstration.** We dogfooded this entire system on itself. The README you're reading was written by our copywriting skill, optimized by our page-cro skill. The quality of the output is the proof that it works.
 
-Target audience: Engineering managers at mid-size tech companies
-Main benefit: Reduce meeting time by 50%
-Tone: Professional but approachable
+---
+
+## Get Started
+
+```bash
+# Clone and enter
+git clone [repo] && cd copy
+
+# Load any skill and start using it
+Read skills/copywriting/SKILL.md
+# Then: "Write a landing page for [your product]"
+
+# Or run a full workflow
+Read workflows/cro-audit.md
+# Then: "Audit [your page] following this workflow"
 ```
 
-### Run a CRO Audit
+---
 
-```
-Please audit this landing page for conversion optimization:
-[provide URL or page content]
+## Built On
 
-Focus on:
-- Above the fold effectiveness
-- CTA placement and copy
-- Trust signals
-- Mobile experience
-```
+- Marketing frameworks adapted from [marketingskills](https://github.com/coreyhaines31/marketingskills)
+- Multi-agent orchestration from [Gastown](https://github.com/steveyegge/gastown)
+- [Claude Code](https://github.com/anthropics/claude-code) by Anthropic
 
-### Plan a Product Launch
+---
 
-```
-We're launching a new feature next month. Help me plan the launch:
-
-Product: AI-powered scheduling assistant
-Target: Current users + prospects
-Goal: 1000 new signups in first week
-Budget: $5000 for ads
-```
-
-## Templates
-
-### Creative Brief (`templates/brief.md`)
-Comprehensive template for project requirements including:
-- Project overview and objectives
-- Target audience details
-- Messaging framework
-- Deliverables list
-- Timeline and constraints
-
-### Convoy (`templates/convoy.md`)
-Work tracking template with:
-- Bead (task) management
-- Progress visualization
-- Dependency tracking
-- Status updates
-
-### Deliverable (`templates/deliverable.md`)
-Output format template including:
-- Content delivery
-- Strategic rationale
-- Alternatives
-- Review process
-
-## Best Practices
-
-1. **Start with a brief**: Clear requirements lead to better outputs
-2. **Use appropriate skills**: Match the skill to the specific task
-3. **Review and iterate**: Quality control through the review workflow
-4. **Track everything**: Use convoys for visibility into complex projects
-5. **Leverage templates**: Consistent format improves communication
-
-## Credits
-
-This system is built on:
-- Marketing skill frameworks adapted from [marketingskills](https://github.com/coreyhaines31/marketingskills)
-- Multi-agent orchestration concepts from [Gastown](https://github.com/steveyegge/gastown)
-- Claude Code by Anthropic
-
-## License
-
-MIT License - See LICENSE file for details
+*This README was written using the copywriting skill, structured using page-cro principles, and refined using copy-editing frameworks. What you're reading is the product demonstrating itself.*
