@@ -1,0 +1,54 @@
+{
+  "mayor": {
+    "name": "Agency Director",
+    "description": "Central coordinator for the Copy & Marketing Agency",
+    "version": "1.0.0"
+  },
+  "capabilities": {
+    "maxPolecats": 10,
+    "maxConvoys": 5,
+    "parallelWork": true,
+    "autoReview": true
+  },
+  "skills": {
+    "available": [
+      "copywriting",
+      "copy-editing",
+      "social-content",
+      "email-sequence",
+      "page-cro",
+      "form-cro",
+      "signup-flow-cro",
+      "onboarding-cro",
+      "popup-cro",
+      "paywall-upgrade-cro",
+      "seo-audit",
+      "programmatic-seo",
+      "schema-markup",
+      "marketing-ideas",
+      "marketing-psychology",
+      "pricing-strategy",
+      "launch-strategy",
+      "competitor-alternatives",
+      "referral-program",
+      "free-tool-strategy",
+      "ab-test-setup",
+      "analytics-tracking",
+      "paid-ads"
+    ],
+    "directory": "../../skills"
+  },
+  "workflows": {
+    "brief": {
+      "steps": ["analyze", "breakdown", "assign", "track", "review", "deliver"]
+    },
+    "review": {
+      "steps": ["collect", "evaluate", "revise", "approve"]
+    }
+  },
+  "templates": {
+    "brief": "../../templates/brief.md",
+    "convoy": "../../templates/convoy.md",
+    "deliverable": "../../templates/deliverable.md"
+  }
+}
