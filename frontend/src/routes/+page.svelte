@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { executeWork, SKILL_CATEGORIES, type WorkResult, ApiError } from '$lib/api';
+	import { getPresetsForSkill, type Preset } from '$lib/presets';
 
 	// Form state
 	let selectedCategory = 'writing';
@@ -15,6 +16,10 @@
 	let loading = false;
 	let error: string | null = null;
 	let result: WorkResult | null = null;
+
+	// Presets
+	let showPresets = false;
+	$: skillPresets = getPresetsForSkill(selectedSkill);
 
 	// Get skills for selected category
 	$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
@@ -33,6 +38,23 @@
 
 	function removeContextField(index: number) {
 		contextFields = contextFields.filter((_, i) => i !== index);
+	}
+
+	function loadPreset(preset: Preset) {
+		task = preset.task;
+		content = preset.content || '';
+
+		// Load context fields
+		if (preset.context) {
+			contextFields = Object.entries(preset.context).map(([key, value]) => ({ key, value }));
+		} else {
+			contextFields = [
+				{ key: 'product', value: '' },
+				{ key: 'audience', value: '' }
+			];
+		}
+
+		showPresets = false;
 	}
 
 	async function handleSubmit() {
@@ -74,6 +96,12 @@
 	function clearResults() {
 		result = null;
 		error = null;
+	}
+
+	function copyOutput() {
+		if (result?.output) {
+			navigator.clipboard.writeText(result.output);
+		}
 	}
 </script>
 
@@ -127,7 +155,34 @@
 
 				<!-- Task Input -->
 				<div class="form-section">
-					<h3>2. Describe Task</h3>
+					<div class="section-header">
+						<h3>2. Describe Task</h3>
+						{#if skillPresets.length > 0}
+							<button
+								type="button"
+								class="btn-secondary btn-sm"
+								on:click={() => showPresets = !showPresets}
+							>
+								{showPresets ? 'Hide' : 'Show'} Examples
+							</button>
+						{/if}
+					</div>
+
+					{#if showPresets && skillPresets.length > 0}
+						<div class="presets-list fade-in">
+							{#each skillPresets as preset}
+								<button
+									type="button"
+									class="preset-card"
+									on:click={() => loadPreset(preset)}
+								>
+									<span class="preset-name">{preset.name}</span>
+									<span class="preset-desc">{preset.task.slice(0, 80)}...</span>
+								</button>
+							{/each}
+						</div>
+					{/if}
+
 					<label for="task">What do you want the skill to do?</label>
 					<textarea
 						id="task"
@@ -201,9 +256,16 @@
 		<div class="panel results-panel">
 			<div class="results-header">
 				<h3>Results</h3>
-				{#if result}
-					<button class="btn-secondary btn-sm" on:click={clearResults}>Clear</button>
-				{/if}
+				<div class="results-actions">
+					{#if result}
+						<button class="btn-secondary btn-sm" on:click={copyOutput} title="Copy output">
+							Copy
+						</button>
+						<button class="btn-secondary btn-sm" on:click={clearResults}>
+							Clear
+						</button>
+					{/if}
+				</div>
 			</div>
 
 			{#if error}
@@ -323,6 +385,17 @@
 		margin-bottom: 1.5rem;
 	}
 
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	.section-header h3 {
+		margin: 0;
+	}
+
 	.form-section h3 {
 		font-size: 1rem;
 		margin-bottom: 1rem;
@@ -335,6 +408,48 @@
 		font-weight: 400;
 		color: var(--color-text-muted);
 		font-size: 0.875rem;
+	}
+
+	/* Presets */
+	.presets-list {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+		padding: 1rem;
+		background: var(--color-bg-tertiary);
+		border-radius: var(--radius);
+		border: 1px solid var(--color-border);
+	}
+
+	.preset-card {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		text-align: left;
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
+		padding: 0.75rem;
+		cursor: pointer;
+		transition: all 0.15s ease;
+	}
+
+	.preset-card:hover {
+		border-color: var(--color-accent);
+		background: rgba(59, 130, 246, 0.05);
+	}
+
+	.preset-name {
+		font-weight: 500;
+		font-size: 0.875rem;
+		color: var(--color-text);
+		margin-bottom: 0.25rem;
+	}
+
+	.preset-desc {
+		font-size: 0.75rem;
+		color: var(--color-text-muted);
+		line-height: 1.4;
 	}
 
 	/* Category Tabs */
@@ -472,6 +587,11 @@
 
 	.results-header h3 {
 		margin: 0;
+	}
+
+	.results-actions {
+		display: flex;
+		gap: 0.5rem;
 	}
 
 	.error-box {
