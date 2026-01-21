@@ -139,7 +139,53 @@ copy/
 
 ---
 
+## HTTP API
+
+Run the skills as a service. Deploy to Google Cloud Run or any container platform.
+
+### Quick Start
+
+```bash
+# Local
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY="your-key"
+python -m service.main
+
+# Docker
+docker build -t marketing-agency-api .
+docker run -p 8080:8080 -e ANTHROPIC_API_KEY="your-key" marketing-agency-api
+
+# Cloud Run
+export GCP_PROJECT_ID="your-project"
+./deploy/deploy.sh
+```
+
+### API Usage
+
+```bash
+# Execute any skill
+curl -X POST http://localhost:8080/work \
+  -H "Content-Type: application/json" \
+  -d '{
+    "skill": "copywriting",
+    "task": "Write a landing page headline",
+    "context": {
+      "product": "TaskFlow - AI project management",
+      "audience": "Engineering managers",
+      "benefit": "50% fewer meetings"
+    }
+  }'
+```
+
+Response includes structured output, alternatives, and recommendations parsed from the skill execution.
+
+See `service/API.md` for full documentation.
+
+---
+
 ## Get Started
+
+### Claude Code (Interactive)
 
 ```bash
 # Clone and enter
@@ -152,6 +198,17 @@ Read skills/copywriting/SKILL.md
 # Or run a full workflow
 Read workflows/cro-audit.md
 # Then: "Audit [your page] following this workflow"
+```
+
+### HTTP API (Programmatic)
+
+```bash
+# Run locally
+pip install -r requirements.txt
+python -m service.main
+
+# Test
+curl http://localhost:8080/skills
 ```
 
 ---

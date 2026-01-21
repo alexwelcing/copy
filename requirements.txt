@@ -1,0 +1,14 @@
+# Marketing Agency API Service Dependencies
+
+# Web framework
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+
+# Claude API
+anthropic>=0.18.0
+
+# Data validation
+pydantic>=2.5.0
+
+# HTTP client (for anthropic)
+httpx>=0.26.0
