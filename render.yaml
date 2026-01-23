@@ -28,10 +28,7 @@ services:
     dockerfilePath: frontend/Dockerfile
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: marketing-agency-api
-          property: host
+        value: http://marketing-agency-api:8080
       - key: API_SECRET
         fromService:
           type: web

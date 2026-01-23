@@ -30,5 +30,8 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD python -c "import httpx; httpx.get('http://localhost:8080/health')" || exit 1
 
-# Run the service
-CMD ["python", "-m", "uvicorn", "service.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the service with Gunicorn for production reliability
+# -k uvicorn.workers.UvicornWorker: Use Uvicorn for async
+# --timeout 300: Allow 5 minutes for LLM generation (critical for reliability)
+# --workers 1: Single worker for container environment (prevents OOM)
+CMD ["gunicorn", "service.main:app", "--workers", "1", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "--timeout", "300"]

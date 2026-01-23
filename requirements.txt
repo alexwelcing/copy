@@ -12,3 +12,4 @@ pydantic>=2.5.0
 
 # HTTP client (for anthropic)
 httpx>=0.26.0
+gunicorn>=21.2.0
