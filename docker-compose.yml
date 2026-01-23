@@ -23,11 +23,13 @@ services:
 
   # Frontend UI
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://localhost:8080
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_URL=http://localhost:8080
       - ORIGIN=http://localhost:3000
     depends_on:
       api:

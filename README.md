@@ -139,6 +139,23 @@ copy/
 
 ---
 
+## Easy Deployment (Fork & Run)
+
+Deploy your own private instance of the agency in minutes. You bring the keys, we bring the code.
+
+<a href="https://render.com/deploy" target="_blank">
+<img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
+</a>
+
+1. **Fork this repository** to your GitHub account.
+2. **Click the button above** (or go to Render.com and select "New + -> Blueprint").
+3. **Connect your forked repo.**
+4. **Enter your `ANTHROPIC_API_KEY`** when prompted.
+
+The system will deploy both the API and the Frontend, automatically connecting them.
+
+---
+
 ## HTTP API
 
 Run the skills as a service. Deploy to Google Cloud Run or any container platform.
