@@ -3,7 +3,21 @@ import type { RequestHandler } from './$types';
 import { env } from '$env/dynamic/private';
 
 // Get config from runtime environment
-const API_URL = env.VITE_API_URL || 'http://localhost:8080';
+let rawApiUrl = env.VITE_API_URL || 'http://localhost:8080';
+
+// Sanitize API_URL: ensure protocol and port (fixes Render env var issues)
+if (!rawApiUrl.startsWith('http://') && !rawApiUrl.startsWith('https://')) {
+	console.log(`[Proxy] API_URL '${rawApiUrl}' missing protocol. Prepending http://`);
+	rawApiUrl = `http://${rawApiUrl}`;
+}
+
+// If it's the internal service name without port, add 8080
+if (rawApiUrl === 'http://marketing-agency-api') {
+	console.log(`[Proxy] API_URL '${rawApiUrl}' missing port. Appending :8080`);
+	rawApiUrl = `${rawApiUrl}:8080`;
+}
+
+const API_URL = rawApiUrl;
 const API_SECRET = env.API_SECRET;
 
 async function proxy(request: Request, path: string) {
