@@ -18,24 +18,45 @@ async function proxy(request: Request, path: string) {
 		headers.set('Authorization', `Bearer ${API_SECRET}`);
 	}
 
-	try {
-		const response = await fetch(url, {
-			method: request.method,
-			headers,
-			body: request.body,
-			// @ts-ignore - duplex is needed for some node environments with streaming bodies
-			duplex: 'half'
-		});
+	const maxRetries = 3;
+	const baseDelay = 1000;
 
-		return new Response(response.body, {
-			status: response.status,
-			statusText: response.statusText,
-			headers: response.headers
-		});
-	} catch (e) {
-		console.error('Proxy error:', e);
-		throw error(502, 'Bad Gateway: Could not reach backend API');
+	for (let i = 0; i < maxRetries; i++) {
+		try {
+			const response = await fetch(url, {
+				method: request.method,
+				headers,
+				body: request.body,
+				// @ts-ignore
+				duplex: 'half'
+			});
+
+			// If backend is waking up (502/503/504), throw to trigger retry
+			if ([502, 503, 504].includes(response.status) && i < maxRetries - 1) {
+				throw new Error(`Backend unavailable (Status ${response.status})`);
+			}
+
+			return new Response(response.body, {
+				status: response.status,
+				statusText: response.statusText,
+				headers: response.headers
+			});
+		} catch (e) {
+			console.log(`Proxy attempt ${i + 1} failed:`, e);
+			
+			// If this was the last try, throw the error
+			if (i === maxRetries - 1) {
+				console.error('All proxy attempts failed');
+				throw error(502, 'Bad Gateway: Backend is waking up or unreachable. Please try again in a moment.');
+			}
+
+			// Wait before retrying (exponential backoff: 1s, 2s, 4s...)
+			const delay = baseDelay * Math.pow(2, i);
+			await new Promise(r => setTimeout(r, delay));
+		}
 	}
+	
+	throw error(502, 'Unreachable');
 }
 
 export const GET: RequestHandler = ({ request, params }) => {
