@@ -1,0 +1,46 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv
+venv/
+ENV/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/
+
+# Documentation and non-essential files
+*.md
+!service/API.md
+LICENSE
+
+# Agency files (not needed for API)
+agency/
+templates/
+workflows/
+
+# Deploy scripts (not needed in container)
+deploy/
+
+# Local config
+.env
+.env.local
+*.local
+
+# Docker
+docker-compose.yml
+Dockerfile
