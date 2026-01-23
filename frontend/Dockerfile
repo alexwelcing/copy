@@ -36,4 +36,4 @@ ENV ORIGIN=http://localhost:3000
 EXPOSE 3000
 
 # Run the Node.js server
-CMD ["node", "build"]
+CMD ["sh", "-c", "export ORIGIN=${RENDER_EXTERNAL_URL:-$ORIGIN} && node build"]

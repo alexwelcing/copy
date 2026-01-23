@@ -30,5 +30,3 @@ services:
           type: web
           name: marketing-agency-api
           property: host
-      - key: ORIGIN
-        value: "*"  # Needed for SvelteKit Node adapter in some environments
