@@ -2,7 +2,12 @@
  * Marketing Agency API Client
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+let apiUrl = import.meta.env.VITE_API_URL || '/api';
+// Handle cases where only hostname is provided (e.g. Render environment)
+if (apiUrl !== '/api' && !apiUrl.startsWith('http') && !apiUrl.startsWith('/')) {
+	apiUrl = `https://${apiUrl}`;
+}
+const API_BASE = apiUrl;
 
 export interface WorkRequest {
 	skill: string;

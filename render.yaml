@@ -29,6 +29,6 @@ services:
         fromService:
           type: web
           name: marketing-agency-api
-          property: url
+          property: host
       - key: ORIGIN
         value: "*"  # Needed for SvelteKit Node adapter in some environments
