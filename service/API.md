@@ -205,7 +205,7 @@ curl -X POST http://localhost:8080/work \
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `ANTHROPIC_API_KEY` | API key for Claude | Required |
-| `CLAUDE_MODEL` | Model to use | claude-sonnet-4-20250514 |
+| `CLAUDE_MODEL` | Model to use | claude-sonnet-4-5-20250929 |
 | `PORT` | Server port | 8080 |
 | `CORS_ORIGINS` | Allowed origins | * |
 | `DEBUG` | Enable debug mode | false |

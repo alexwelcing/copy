@@ -81,7 +81,7 @@ export async function executeWork(req: WorkRequest): Promise<WorkResult> {
 // Skill metadata for UI
 export const SKILL_CATEGORIES = {
 	writing: {
-		label: 'Writing',
+		label: 'Write Things That Convert',
 		description: 'Create conversion-focused content',
 		skills: {
 			copywriting: 'Headlines, landing pages, CTAs',
@@ -91,8 +91,8 @@ export const SKILL_CATEGORIES = {
 		}
 	},
 	cro: {
-		label: 'Conversion Optimization',
-		description: 'Fix what\'s broken',
+		label: "Fix What's Broken",
+		description: 'Fix conversion leaks',
 		skills: {
 			'page-cro': 'Landing page audits',
 			'form-cro': 'Form optimization',
@@ -103,8 +103,8 @@ export const SKILL_CATEGORIES = {
 		}
 	},
 	seo: {
-		label: 'SEO',
-		description: 'Get found',
+		label: 'Get Found',
+		description: 'Technical and content SEO',
 		skills: {
 			'seo-audit': 'Technical + content SEO',
 			'programmatic-seo': 'Template-based pages',
@@ -112,8 +112,8 @@ export const SKILL_CATEGORIES = {
 		}
 	},
 	strategy: {
-		label: 'Strategy',
-		description: 'Think bigger',
+		label: 'Think Bigger',
+		description: 'Strategic growth planning',
 		skills: {
 			'marketing-ideas': 'Brainstorming',
 			'marketing-psychology': 'Persuasion principles',
@@ -125,8 +125,8 @@ export const SKILL_CATEGORIES = {
 		}
 	},
 	measurement: {
-		label: 'Measurement',
-		description: 'Measure what matters',
+		label: 'Measure What Matters',
+		description: 'Analytics and testing',
 		skills: {
 			'ab-test-setup': 'A/B testing',
 			'analytics-tracking': 'Analytics setup',

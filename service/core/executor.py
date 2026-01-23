@@ -23,7 +23,7 @@ class SkillExecutor:
         """
         self.client = anthropic.Anthropic()
         self.skills_path = skills_path or Path(__file__).parent.parent.parent / "skills"
-        self.model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-20250514")
+        self.model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
         self._skill_cache: dict[str, str] = {}
 
     def load_skill(self, skill_name: SkillName) -> str:

@@ -12,110 +12,281 @@
 		{ key: 'audience', value: '' }
 	];
 
-	// Execution state
-	let loading = false;
-	let error: string | null = null;
-	let result: WorkResult | null = null;
+		// Execution state
 
-	// Presets
-	let showPresets = false;
-	$: skillPresets = getPresetsForSkill(selectedSkill);
+		let loading = false;
 
-	// Get skills for selected category
-	$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
+		let error: string | null = null;
 
-	// Reset skill when category changes
-	$: {
-		const skills = Object.keys(categorySkills);
-		if (skills.length > 0 && !skills.includes(selectedSkill)) {
-			selectedSkill = skills[0];
-		}
-	}
+		let result: WorkResult | null = null;
 
-	function addContextField() {
-		contextFields = [...contextFields, { key: '', value: '' }];
-	}
+	
 
-	function removeContextField(index: number) {
-		contextFields = contextFields.filter((_, i) => i !== index);
-	}
+		// UI State
 
-	function loadPreset(preset: Preset) {
-		task = preset.task;
-		content = preset.content || '';
+		let showPresets = false;
 
-		// Load context fields
-		if (preset.context) {
-			contextFields = Object.entries(preset.context).map(([key, value]) => ({ key, value }));
-		} else {
-			contextFields = [
-				{ key: 'product', value: '' },
-				{ key: 'audience', value: '' }
-			];
-		}
+		let showAdvanced = false;
 
-		showPresets = false;
-	}
+		let showAllPresets = false;
 
-	async function handleSubmit() {
-		if (!task.trim()) {
-			error = 'Please enter a task';
-			return;
-		}
+	
 
-		loading = true;
-		error = null;
-		result = null;
+		$: currentStep = task.trim() ? 2 : 1;
 
-		// Build context object
-		const context: Record<string, string> = {};
-		for (const field of contextFields) {
-			if (field.key.trim() && field.value.trim()) {
-				context[field.key.trim()] = field.value.trim();
+		$: isReadyToExecute = selectedSkill && task.trim();
+
+		
+
+		// Presets
+
+		$: skillPresets = getPresetsForSkill(selectedSkill);
+
+	
+
+		// Get skills for selected category
+
+		$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
+
+	
+
+		// Reset skill when category changes
+
+		$: {
+
+			const skills = Object.keys(categorySkills);
+
+			if (skills.length > 0 && !skills.includes(selectedSkill)) {
+
+				selectedSkill = skills[0];
+
 			}
+
 		}
 
-		try {
-			result = await executeWork({
-				skill: selectedSkill,
-				task: task.trim(),
-				context: Object.keys(context).length > 0 ? context : undefined,
-				content: content.trim() || undefined
-			});
-		} catch (e) {
-			if (e instanceof ApiError) {
-				error = e.detail;
+	
+
+		function addContextField() {
+
+			contextFields = [...contextFields, { key: '', value: '' }];
+
+		}
+
+	
+
+		function removeContextField(index: number) {
+
+			contextFields = contextFields.filter((_, i) => i !== index);
+
+		}
+
+	
+
+		function loadPreset(preset: Preset) {
+
+			task = preset.task;
+
+			content = preset.content || '';
+
+	
+
+			// Load context fields
+
+			if (preset.context) {
+
+				contextFields = Object.entries(preset.context).map(([key, value]) => ({ key, value }));
+
 			} else {
-				error = 'Failed to execute skill. Is the API running?';
+
+				contextFields = [
+
+					{ key: 'product', value: '' },
+
+					{ key: 'audience', value: '' }
+
+				];
+
 			}
-		} finally {
-			loading = false;
+
+	
+
+			showPresets = false;
+
 		}
-	}
 
-	function clearResults() {
-		result = null;
-		error = null;
-	}
+	
 
-	function copyOutput() {
-		if (result?.output) {
-			navigator.clipboard.writeText(result.output);
+		async function handleSubmit() {
+
+			if (!task.trim()) {
+
+				error = 'Please enter a task';
+
+				return;
+
+			}
+
+	
+
+			loading = true;
+
+			error = null;
+
+			result = null;
+
+	
+
+			// Build context object
+
+			const context: Record<string, string> = {};
+
+			for (const field of contextFields) {
+
+				if (field.key.trim() && field.value.trim()) {
+
+					context[field.key.trim()] = field.value.trim();
+
+				}
+
+			}
+
+	
+
+			try {
+
+				result = await executeWork({
+
+					skill: selectedSkill,
+
+					task: task.trim(),
+
+					context: Object.keys(context).length > 0 ? context : undefined,
+
+					content: content.trim() || undefined
+
+				});
+
+			} catch (e) {
+
+				if (e instanceof ApiError) {
+
+					error = e.detail;
+
+				} else {
+
+					error = 'Failed to execute skill. Is the API running?';
+
+				}
+
+			}
+
+			finally {
+
+				loading = false;
+
+			}
+
 		}
-	}
-</script>
 
-<svelte:head>
-	<title>Execute Skill | Marketing Agency</title>
-</svelte:head>
+	
 
-<div class="container">
-	<div class="page-header">
-		<h1>Execute a Skill</h1>
-		<p>Select a skill, describe your task, and get structured output.</p>
-	</div>
+		function clearResults() {
 
-	<div class="layout">
+			result = null;
+
+			error = null;
+
+		}
+
+	
+
+		function copyOutput() {
+
+			if (result?.output) {
+
+				navigator.clipboard.writeText(result.output);
+
+			}
+
+		}
+
+	</script>
+
+	
+
+	<svelte:head>
+
+		<title>AI Marketing Agency | Execute Expert Skills</title>
+
+	</svelte:head>
+
+	
+
+	<div class="container">
+
+		<div class="page-header">
+
+			<h1>AI Marketing Skills That Actually Work</h1>
+
+			<p class="value-prop">
+
+				Get expert-level copy, audits, and strategy in 30 seconds. 
+
+				No prompt engineering required—just describe what you need.
+
+			</p>
+
+			<div class="trust-indicators">
+
+				<div class="stat"><strong>23</strong> specialized skills</div>
+
+				<div class="stat"><strong>10-30s</strong> average execution</div>
+
+				<div class="stat"><strong>Zero</strong> AI expertise needed</div>
+
+			</div>
+
+		</div>
+
+	
+
+		<div class="progress-steps">
+
+			<div class="step" class:complete={currentStep >= 1}>
+
+				<span class="step-number">1</span>
+
+				<span class="step-label">Choose Skill</span>
+
+			</div>
+
+			<div class="step-line" class:complete={currentStep >= 2}></div>
+
+			<div class="step" class:complete={currentStep >= 2}>
+
+				<span class="step-number">2</span>
+
+				<span class="step-label">Describe Task</span>
+
+			</div>
+
+			<div class="step-line" class:complete={currentStep >= 3}></div>
+
+			<div class="step" class:complete={currentStep >= 3}>
+
+				<span class="step-number">3</span>
+
+				<span class="step-label">Get Results</span>
+
+			</div>
+
+		</div>
+
+	
+
+		<div class="layout">
+
+	
 		<!-- Input Panel -->
 		<div class="panel input-panel">
 			<form on:submit|preventDefault={handleSubmit}>
@@ -157,33 +328,37 @@
 				<div class="form-section">
 					<div class="section-header">
 						<h3>2. Describe Task</h3>
-						{#if skillPresets.length > 0}
-							<button
-								type="button"
-								class="btn-secondary btn-sm"
-								on:click={() => showPresets = !showPresets}
-							>
-								{showPresets ? 'Hide' : 'Show'} Examples
-							</button>
-						{/if}
 					</div>
 
-					{#if showPresets && skillPresets.length > 0}
-						<div class="presets-list fade-in">
-							{#each skillPresets as preset}
-								<button
-									type="button"
-									class="preset-card"
-									on:click={() => loadPreset(preset)}
-								>
-									<span class="preset-name">{preset.name}</span>
-									<span class="preset-desc">{preset.task.slice(0, 80)}...</span>
-								</button>
-							{/each}
+					{#if skillPresets.length > 0}
+						<div class="quick-start">
+							<label class="quick-start-label" for="task">
+								⚡ Quick Start (click to use)
+							</label>
+							<div class="presets-list-compact">
+								{#each (showAllPresets ? skillPresets : skillPresets.slice(0, 3)) as preset}
+									<button
+										type="button"
+										class="preset-pill"
+										on:click={() => loadPreset(preset)}
+									>
+										{preset.name}
+									</button>
+								{/each}
+								{#if skillPresets.length > 3}
+									<button 
+										type="button" 
+										class="preset-pill preset-more"
+										on:click={() => showAllPresets = !showAllPresets}
+									>
+										{showAllPresets ? 'Show Less' : `+${skillPresets.length - 3} more`}
+									</button>
+								{/if}
+							</div>
 						</div>
 					{/if}
 
-					<label for="task">What do you want the skill to do?</label>
+					<label for="task">Or describe what you need in your own words</label>
 					<textarea
 						id="task"
 						bind:value={task}
@@ -192,60 +367,76 @@
 					></textarea>
 				</div>
 
-				<!-- Context -->
-				<div class="form-section">
-					<h3>3. Add Context <span class="optional">(optional)</span></h3>
-					<p class="text-secondary mb-2">Additional context improves output quality.</p>
-
-					<div class="context-fields">
-						{#each contextFields as field, i}
-							<div class="context-field">
-								<input
-									type="text"
-									placeholder="Key (e.g., product)"
-									bind:value={field.key}
-								/>
-								<input
-									type="text"
-									placeholder="Value"
-									bind:value={field.value}
-								/>
-								<button
-									type="button"
-									class="btn-icon"
-									on:click={() => removeContextField(i)}
-									title="Remove field"
-								>
-									×
-								</button>
-							</div>
-						{/each}
-					</div>
-					<button type="button" class="btn-secondary btn-sm" on:click={addContextField}>
-						+ Add Field
+				<!-- Advanced Options Toggle -->
+				<div class="advanced-toggle-wrapper">
+					<button 
+						type="button" 
+						class="btn-text-toggle" 
+						on:click={() => showAdvanced = !showAdvanced}
+					>
+						<span>{showAdvanced ? '− Hide' : '+ Show'} Advanced Options</span>
+						<span class="text-muted-sm">(context & content analysis)</span>
 					</button>
 				</div>
 
-				<!-- Content to Analyze -->
-				<div class="form-section">
-					<h3>4. Content to Analyze <span class="optional">(optional)</span></h3>
-					<label for="content">For audits and editing, paste content here</label>
-					<textarea
-						id="content"
-						bind:value={content}
-						placeholder="Paste landing page HTML, existing copy, or other content to analyze..."
-						rows="6"
-					></textarea>
-				</div>
+				{#if showAdvanced}
+					<div class="advanced-options fade-in">
+						<!-- Context -->
+						<div class="form-section">
+							<h3>3. Add Context <span class="optional">(optional)</span></h3>
+							<p class="text-secondary mb-2">Details about your product or audience improve output quality.</p>
+
+							<div class="context-fields">
+								{#each contextFields as field, i}
+									<div class="context-field">
+										<input
+											type="text"
+											placeholder="Key (e.g., product)"
+											bind:value={field.key}
+										/>
+										<input
+											type="text"
+											placeholder="Value"
+											bind:value={field.value}
+										/>
+										<button
+											type="button"
+											class="btn-icon"
+											on:click={() => removeContextField(i)}
+											title="Remove field"
+										>
+											×
+										</button>
+									</div>
+								{/each}
+							</div>
+							<button type="button" class="btn-secondary btn-sm" on:click={addContextField}>
+								+ Add Field
+							</button>
+						</div>
+
+						<!-- Content to Analyze -->
+						<div class="form-section">
+							<h3>4. Content to Analyze <span class="optional">(optional)</span></h3>
+							<label for="content">For audits and editing, paste existing content here</label>
+							<textarea
+								id="content"
+								bind:value={content}
+								placeholder="Paste landing page HTML, existing copy, or other content to analyze..."
+								rows="6"
+							></textarea>
+						</div>
+					</div>
+				{/if}
 
 				<!-- Submit -->
 				<div class="form-actions">
-					<button type="submit" class="btn-primary btn-lg" disabled={loading || !task.trim()}>
+					<button type="submit" class="btn-primary btn-lg" disabled={!isReadyToExecute || loading}>
 						{#if loading}
 							<span class="spinner"></span>
-							Executing...
+							Generating {selectedSkill}...
 						{:else}
-							Execute Skill
+							{task.trim() ? `Generate ${selectedSkill} →` : 'Enter a Task to Continue'}
 						{/if}
 					</button>
 				</div>
@@ -324,8 +515,30 @@
 				</div>
 			{:else}
 				<div class="empty-state">
-					<p>Results will appear here after execution.</p>
-					<p class="text-muted">Select a skill and describe your task to get started.</p>
+					<div class="empty-icon">✨</div>
+					<h4>Ready to Execute</h4>
+					<p>Your results will appear here in 10-30 seconds.</p>
+					
+					<div class="empty-benefits">
+						<div class="benefit-item">
+							<span class="benefit-icon">⚡</span>
+							<span>Instant expert-level output</span>
+						</div>
+						<div class="benefit-item">
+							<span class="benefit-icon">🎯</span>
+							<span>Structured & actionable</span>
+						</div>
+						<div class="benefit-item">
+							<span class="benefit-icon">🔄</span>
+							<span>Iterate until perfect</span>
+						</div>
+					</div>
+
+					{#if skillPresets.length > 0}
+						<div class="empty-cta">
+							<p class="text-muted text-sm">First time? Try an example →</p>
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -701,5 +914,240 @@
 	.alternatives-list li,
 	.recommendations-list li {
 		margin: 0.5rem 0;
+	}
+
+	/* NEW STYLES FROM AUDIT */
+	.value-prop {
+		font-size: 1.125rem;
+		color: var(--color-text-secondary);
+		max-width: 600px;
+		margin-bottom: 1.5rem;
+	}
+
+	.trust-indicators {
+		display: flex;
+		gap: 2rem;
+		margin-top: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.stat {
+		font-size: 0.8125rem;
+		color: var(--color-text-muted);
+		line-height: 1.4;
+	}
+
+	.stat strong {
+		color: var(--color-accent);
+		font-size: 1.25rem;
+		display: block;
+		margin-bottom: 0.25rem;
+	}
+
+	.progress-steps {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 2.5rem;
+		padding: 1.25rem;
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+	}
+
+	.step {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		opacity: 0.3;
+		transition: all 0.3s ease;
+	}
+
+	.step.complete {
+		opacity: 1;
+	}
+
+	.step-number {
+		width: 32px;
+		height: 32px;
+		border-radius: 50%;
+		background: var(--color-bg-tertiary);
+		border: 2px solid var(--color-border);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 0.875rem;
+		transition: all 0.3s ease;
+	}
+
+	.step.complete .step-number {
+		background: var(--color-accent);
+		border-color: var(--color-accent);
+		color: white;
+		box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+	}
+
+	.step-label {
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+	}
+
+	.step-line {
+		flex: 0 0 60px;
+		height: 2px;
+		background: var(--color-border);
+		margin: 0 1rem;
+		margin-bottom: 1.25rem;
+		transition: background 0.3s ease;
+	}
+
+	@media (max-width: 640px) {
+		.step-line {
+			flex: 0 0 30px;
+		}
+	}
+
+	.step-line.complete {
+		background: var(--color-accent);
+	}
+
+	.quick-start {
+		background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		padding: 1rem;
+		margin-bottom: 1.25rem;
+	}
+
+	.quick-start-label {
+		display: block;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		margin-bottom: 0.75rem;
+		color: var(--color-text);
+		cursor: pointer;
+	}
+
+	.presets-list-compact {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.preset-pill {
+		background: var(--color-bg-secondary);
+		border: 1px solid var(--color-border);
+		padding: 0.4rem 0.8rem;
+		font-size: 0.8125rem;
+		border-radius: 20px;
+		white-space: nowrap;
+		transition: all 0.15s ease;
+		color: var(--color-text-secondary);
+	}
+
+	.preset-pill:hover {
+		border-color: var(--color-accent);
+		background: rgba(59, 130, 246, 0.1);
+		color: var(--color-text);
+		transform: translateY(-1px);
+	}
+
+	.preset-more {
+		background: var(--color-bg-tertiary);
+		color: var(--color-text-muted);
+	}
+
+	.advanced-toggle-wrapper {
+		margin: 1.5rem 0;
+		display: flex;
+		justify-content: center;
+	}
+
+	.btn-text-toggle {
+		background: none;
+		border: none;
+		color: var(--color-accent);
+		padding: 0.5rem 1rem;
+		font-size: 0.875rem;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+		transition: all 0.2s ease;
+	}
+
+	.btn-text-toggle:hover {
+		color: var(--color-accent-hover);
+		background: rgba(59, 130, 246, 0.05);
+		border-radius: var(--radius);
+	}
+
+	.text-muted-sm {
+		font-size: 0.75rem;
+		color: var(--color-text-muted);
+	}
+
+	.advanced-options {
+		border-top: 1px dashed var(--color-border);
+		margin-top: 0.5rem;
+		padding-top: 1.5rem;
+	}
+
+	/* Enhanced Empty State */
+	.empty-state {
+		text-align: center;
+		padding: 4rem 1.5rem;
+	}
+
+	.empty-icon {
+		font-size: 3.5rem;
+		margin-bottom: 1.5rem;
+		filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
+	}
+
+	.empty-state h4 {
+		margin-bottom: 0.75rem;
+		color: var(--color-text);
+		font-size: 1.25rem;
+	}
+
+	.empty-benefits {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		margin: 2rem auto;
+		padding: 1.5rem;
+		background: var(--color-bg-tertiary);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		max-width: 320px;
+		text-align: left;
+	}
+
+	.benefit-item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		font-size: 0.9375rem;
+		color: var(--color-text-secondary);
+	}
+
+	.benefit-icon {
+		font-size: 1.25rem;
+		flex-shrink: 0;
+	}
+
+	.empty-cta {
+		margin-top: 2rem;
+		padding-top: 2rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.text-sm {
+		font-size: 0.875rem;
 	}
 </style>
