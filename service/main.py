@@ -8,9 +8,10 @@ Designed for deployment on Google Cloud Run.
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Security, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from service.api.schemas import (
     ErrorResponse,
@@ -23,6 +24,21 @@ from service.core.executor import get_executor, SkillExecutor
 
 
 VERSION = "1.0.0"
+
+# Security
+api_key_header = HTTPBearer(auto_error=False)
+
+async def verify_api_secret(token: HTTPAuthorizationCredentials = Security(api_key_header)):
+    """Verify the API secret if configured."""
+    secret = os.getenv("API_SECRET")
+    if not secret:
+        return
+    
+    if not token or token.credentials != secret:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing API secret"
+        )
 
 
 @asynccontextmanager
@@ -83,6 +99,7 @@ competitor-alternatives, referral-program, free-tool-strategy
     """,
     version=VERSION,
     lifespan=lifespan,
+    dependencies=[Depends(verify_api_secret)],
 )
 
 # CORS middleware for browser access

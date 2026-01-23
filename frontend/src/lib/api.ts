@@ -2,12 +2,8 @@
  * Marketing Agency API Client
  */
 
-let apiUrl = import.meta.env.VITE_API_URL || '/api';
-// Handle cases where only hostname is provided (e.g. Render environment)
-if (apiUrl !== '/api' && !apiUrl.startsWith('http') && !apiUrl.startsWith('/')) {
-	apiUrl = `https://${apiUrl}`;
-}
-const API_BASE = apiUrl;
+// Use local proxy which forwards to backend with auth
+const API_BASE = '/api';
 
 export interface WorkRequest {
 	skill: string;

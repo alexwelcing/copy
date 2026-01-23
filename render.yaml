@@ -16,6 +16,8 @@ services:
         value: "*"
       - key: DEBUG
         value: "false"
+      - key: API_SECRET
+        generateValue: true
 
   # Frontend UI Service
   - type: web
@@ -30,3 +32,9 @@ services:
           type: web
           name: marketing-agency-api
           property: host
+      - key: API_SECRET
+        fromService:
+          type: web
+          name: marketing-agency-api
+          property: envVar
+          envVarKey: API_SECRET
