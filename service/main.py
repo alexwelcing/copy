@@ -7,6 +7,7 @@ Designed for deployment on Google Cloud Run.
 
 import os
 from contextlib import asynccontextmanager
+from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Security, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +22,7 @@ from service.api.schemas import (
     WorkResult,
 )
 from service.core.executor import get_executor, SkillExecutor
+from service.core.storage import get_storage
 
 
 VERSION = "1.0.0"
@@ -166,8 +168,21 @@ async def list_skills():
             "analytics-tracking": "Events, funnels, attribution",
             "paid-ads": "Google, Meta, LinkedIn structure and optimization",
         },
+        "video": {
+            "remotion-script": "Dynamic video scripts",
+            "remotion-layout": "Video component design",
+            "manim-composer": "Mathematical animations",
+            "manim-best-practices": "Manim optimization",
+        }
     }
     return {"skills": skills, "total": len(SkillName)}
+
+
+@app.get("/assets")
+async def list_assets(prefix: Optional[str] = None):
+    """List assets in Cloud Storage."""
+    storage = get_storage()
+    return {"assets": storage.list_assets(prefix=prefix)}
 
 
 @app.post("/work", response_model=WorkResult)

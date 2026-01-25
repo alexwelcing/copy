@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { executeWork, SKILL_CATEGORIES, type WorkResult, ApiError } from '$lib/api';
 	import { getPresetsForSkill, type Preset } from '$lib/presets';
+    import { onMount } from 'svelte';
+
+	// Toggle State for Dogfooding demonstration
+	let showOptimized = false;
 
 	// Form state
 	let selectedCategory = 'writing';
@@ -13,585 +17,98 @@
 		{ key: 'audience', value: '' }
 	];
 
-		// Execution state
+	// Execution state
+	let loading = false;
+	let error: string | null = null;
+	let result: WorkResult | null = null;
 
-		let loading = false;
+	// UI State
+	let showPresets = false;
+	let showAdvanced = false;
+	let showAllPresets = false;
 
-		let error: string | null = null;
+	$: currentStep = task.trim() ? 2 : 1;
+	$: isReadyToExecute = selectedSkill && task.trim();
+	$: skillPresets = getPresetsForSkill(selectedSkill);
+	$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
 
-		let result: WorkResult | null = null;
+	$: {
+		const skills = Object.keys(categorySkills);
+		if (skills.length > 0 && !skills.includes(selectedSkill)) {
+			selectedSkill = skills[0];
+		}
+	}
 
-	
+	function addContextField() {
+		contextFields = [...contextFields, { key: '', value: '' }];
+	}
 
-		// UI State
+	function removeContextField(index: number) {
+		contextFields = contextFields.filter((_, i) => i !== index);
+	}
 
-		let showPresets = false;
+	function loadPreset(preset: Preset) {
+		task = preset.task;
+		content = preset.content || '';
+		if (preset.context) {
+			contextFields = Object.entries(preset.context).map(([key, value]) => ({ key, value }));
+		} else {
+			contextFields = [
+				{ key: 'product', value: '' },
+				{ key: 'audience', value: '' }
+			];
+		}
+		showPresets = false;
+	}
 
-		let showAdvanced = false;
+	async function handleSubmit() {
+		if (!task.trim()) {
+			error = 'Please enter a task';
+			return;
+		}
 
-		let showAllPresets = false;
+		loading = true;
+		error = null;
+		result = null;
 
-	
-
-		$: currentStep = task.trim() ? 2 : 1;
-
-		$: isReadyToExecute = selectedSkill && task.trim();
-
-		
-
-		// Presets
-
-		$: skillPresets = getPresetsForSkill(selectedSkill);
-
-	
-
-		// Get skills for selected category
-
-		$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
-
-	
-
-		// Reset skill when category changes
-
-		$: {
-
-			const skills = Object.keys(categorySkills);
-
-			if (skills.length > 0 && !skills.includes(selectedSkill)) {
-
-				selectedSkill = skills[0];
-
+		const context: Record<string, string> = {};
+		for (const field of contextFields) {
+			if (field.key.trim() && field.value.trim()) {
+				context[field.key.trim()] = field.value.trim();
 			}
-
 		}
 
-	
-
-		function addContextField() {
-
-			contextFields = [...contextFields, { key: '', value: '' }];
-
-		}
-
-	
-
-		function removeContextField(index: number) {
-
-			contextFields = contextFields.filter((_, i) => i !== index);
-
-		}
-
-	
-
-		function loadPreset(preset: Preset) {
-
-			task = preset.task;
-
-			content = preset.content || '';
-
-	
-
-			// Load context fields
-
-			if (preset.context) {
-
-				contextFields = Object.entries(preset.context).map(([key, value]) => ({ key, value }));
-
+		try {
+			result = await executeWork({
+				skill: selectedSkill,
+				task: task.trim(),
+				context: Object.keys(context).length > 0 ? context : undefined,
+				content: content.trim() || undefined,
+				model: selectedModel
+			});
+		} catch (e) {
+			if (e instanceof ApiError) {
+				error = e.detail;
 			} else {
-
-				contextFields = [
-
-					{ key: 'product', value: '' },
-
-					{ key: 'audience', value: '' }
-
-				];
-
+				error = 'Failed to execute skill. Is the API running?';
 			}
-
-	
-
-			showPresets = false;
-
+		} finally {
+			loading = false;
 		}
+	}
 
-	
+	function clearResults() {
+		result = null;
+		error = null;
+	}
 
-		async function handleSubmit() {
-
-			if (!task.trim()) {
-
-				error = 'Please enter a task';
-
-				return;
-
-			}
-
-	
-
-			loading = true;
-
-			error = null;
-
-			result = null;
-
-	
-
-			// Build context object
-
-			const context: Record<string, string> = {};
-
-			for (const field of contextFields) {
-
-				if (field.key.trim() && field.value.trim()) {
-
-					context[field.key.trim()] = field.value.trim();
-
-				}
-
-			}
-
-	
-
-						try {
-
-	
-
-							result = await executeWork({
-
-	
-
-								skill: selectedSkill,
-
-	
-
-								task: task.trim(),
-
-	
-
-								context: Object.keys(context).length > 0 ? context : undefined,
-
-	
-
-								content: content.trim() || undefined,
-
-	
-
-								model: selectedModel
-
-	
-
-							});
-
-	
-
-						} catch (e) {
-
-	
-
-			
-
-				if (e instanceof ApiError) {
-
-					error = e.detail;
-
-				} else {
-
-					error = 'Failed to execute skill. Is the API running?';
-
-				}
-
-			}
-
-			finally {
-
-				loading = false;
-
-			}
-
+	function copyOutput() {
+		if (result?.output) {
+			navigator.clipboard.writeText(result.output);
 		}
+	}
 
-	
-
-		function clearResults() {
-
-			result = null;
-
-			error = null;
-
-		}
-
-	
-
-		function copyOutput() {
-
-			if (result?.output) {
-
-				navigator.clipboard.writeText(result.output);
-
-			}
-
-		}
-
-	</script>
-
-	
-
-	<svelte:head>
-
-		<title>AI Marketing Agency | Execute Expert Skills</title>
-
-	</svelte:head>
-
-	
-
-	<div class="container">
-
-		<div class="page-header">
-
-			<h1>AI Marketing Skills That Actually Work</h1>
-
-			<p class="value-prop">
-
-				Get expert-level copy, audits, and strategy in 30 seconds. 
-
-				No prompt engineering required—just describe what you need.
-
-			</p>
-
-			<div class="trust-indicators">
-
-				<div class="stat"><strong>23</strong> specialized skills</div>
-
-				<div class="stat"><strong>10-30s</strong> average execution</div>
-
-				<div class="stat"><strong>Zero</strong> AI expertise needed</div>
-
-			</div>
-
-		</div>
-
-	
-
-		<div class="progress-steps">
-
-			<div class="step" class:complete={currentStep >= 1}>
-
-				<span class="step-number">1</span>
-
-				<span class="step-label">Choose Skill</span>
-
-			</div>
-
-			<div class="step-line" class:complete={currentStep >= 2}></div>
-
-			<div class="step" class:complete={currentStep >= 2}>
-
-				<span class="step-number">2</span>
-
-				<span class="step-label">Describe Task</span>
-
-			</div>
-
-			<div class="step-line" class:complete={currentStep >= 3}></div>
-
-			<div class="step" class:complete={currentStep >= 3}>
-
-				<span class="step-number">3</span>
-
-				<span class="step-label">Get Results</span>
-
-			</div>
-
-		</div>
-
-	
-
-		<div class="layout">
-
-	
-		<!-- Input Panel -->
-		<div class="panel input-panel">
-			<form on:submit|preventDefault={handleSubmit}>
-				<!-- Skill Selection -->
-				<div class="form-section">
-					<h3>1. Choose Skill</h3>
-
-					<div class="skill-selector">
-						<div class="category-tabs">
-							{#each Object.entries(SKILL_CATEGORIES) as [key, cat]}
-								<button
-									type="button"
-									class="category-tab"
-									class:active={selectedCategory === key}
-									on:click={() => selectedCategory = key}
-								>
-									{cat.label}
-								</button>
-							{/each}
-						</div>
-
-						<div class="skill-grid">
-							{#each Object.entries(categorySkills) as [skillKey, description]}
-								<button
-									type="button"
-									class="skill-card"
-									class:active={selectedSkill === skillKey}
-									on:click={() => selectedSkill = skillKey}
-								>
-									<span class="skill-name">{skillKey}</span>
-									<span class="skill-desc">{description}</span>
-								</button>
-							{/each}
-						</div>
-					</div>
-				</div>
-
-				<!-- Model Selection -->
-				<div class="form-section">
-					<h3>2. Select Intelligence</h3>
-					<div class="model-selector">
-						<label class="model-card" class:active={selectedModel.includes('sonnet')}>
-							<input type="radio" name="model" value="claude-sonnet-4-5-20250929" bind:group={selectedModel}>
-							<div class="model-info">
-								<span class="model-name">Power (Claude 3.5)</span>
-								<span class="model-desc">Best for complex audits and strategy</span>
-							</div>
-						</label>
-						<label class="model-card" class:active={selectedModel.includes('MiniMax')}>
-							<input type="radio" name="model" value="MiniMax-M2.1" bind:group={selectedModel}>
-							<div class="model-info">
-								<span class="model-name">Speed (MiniMax M2.1)</span>
-								<span class="model-desc">Ultra-fast execution for copy and video scripts</span>
-							</div>
-						</label>
-					</div>
-				</div>
-
-				<!-- Task Input -->
-				<div class="form-section">
-					<div class="section-header">
-						<h3>3. Describe Task</h3>
-					</div>
-
-					{#if skillPresets.length > 0}
-						<div class="quick-start">
-							<label class="quick-start-label" for="task">
-								⚡ Quick Start (click to use)
-							</label>
-							<div class="presets-list-compact">
-								{#each (showAllPresets ? skillPresets : skillPresets.slice(0, 3)) as preset}
-									<button
-										type="button"
-										class="preset-pill"
-										on:click={() => loadPreset(preset)}
-									>
-										{preset.name}
-									</button>
-								{/each}
-								{#if skillPresets.length > 3}
-									<button 
-										type="button" 
-										class="preset-pill preset-more"
-										on:click={() => showAllPresets = !showAllPresets}
-									>
-										{showAllPresets ? 'Show Less' : `+${skillPresets.length - 3} more`}
-									</button>
-								{/if}
-							</div>
-						</div>
-					{/if}
-
-					<label for="task">Or describe what you need in your own words</label>
-					<textarea
-						id="task"
-						bind:value={task}
-						placeholder="e.g., Write a landing page headline for a project management tool targeting engineering managers"
-						rows="4"
-					></textarea>
-				</div>
-
-				<!-- Advanced Options Toggle -->
-				<div class="advanced-toggle-wrapper">
-					<button 
-						type="button" 
-						class="btn-text-toggle" 
-						on:click={() => showAdvanced = !showAdvanced}
-					>
-						<span>{showAdvanced ? '− Hide' : '+ Show'} Advanced Options</span>
-						<span class="text-muted-sm">(context & content analysis)</span>
-					</button>
-				</div>
-
-				{#if showAdvanced}
-					<div class="advanced-options fade-in">
-						<!-- Context -->
-						<div class="form-section">
-							<h3>3. Add Context <span class="optional">(optional)</span></h3>
-							<p class="text-secondary mb-2">Details about your product or audience improve output quality.</p>
-
-							<div class="context-fields">
-								{#each contextFields as field, i}
-									<div class="context-field">
-										<input
-											type="text"
-											placeholder="Key (e.g., product)"
-											bind:value={field.key}
-										/>
-										<input
-											type="text"
-											placeholder="Value"
-											bind:value={field.value}
-										/>
-										<button
-											type="button"
-											class="btn-icon"
-											on:click={() => removeContextField(i)}
-											title="Remove field"
-										>
-											×
-										</button>
-									</div>
-								{/each}
-							</div>
-							<button type="button" class="btn-secondary btn-sm" on:click={addContextField}>
-								+ Add Field
-							</button>
-						</div>
-
-						<!-- Content to Analyze -->
-						<div class="form-section">
-							<h3>4. Content to Analyze <span class="optional">(optional)</span></h3>
-							<label for="content">For audits and editing, paste existing content here</label>
-							<textarea
-								id="content"
-								bind:value={content}
-								placeholder="Paste landing page HTML, existing copy, or other content to analyze..."
-								rows="6"
-							></textarea>
-						</div>
-					</div>
-				{/if}
-
-				<!-- Submit -->
-				<div class="form-actions">
-					<button type="submit" class="btn-primary btn-lg" disabled={!isReadyToExecute || loading}>
-						{#if loading}
-							<span class="spinner"></span>
-							Generating {selectedSkill}...
-						{:else}
-							{task.trim() ? `Generate ${selectedSkill} →` : 'Enter a Task to Continue'}
-						{/if}
-					</button>
-				</div>
-			</form>
-		</div>
-
-		<!-- Results Panel -->
-		<div class="panel results-panel">
-			<div class="results-header">
-				<h3>Results</h3>
-				<div class="results-actions">
-					{#if result}
-						<button class="btn-secondary btn-sm" on:click={copyOutput} title="Copy output">
-							Copy
-						</button>
-						<button class="btn-secondary btn-sm" on:click={clearResults}>
-							Clear
-						</button>
-					{/if}
-				</div>
-			</div>
-
-			{#if error}
-				<div class="error-box fade-in">
-					<strong>Error:</strong> {error}
-				</div>
-			{:else if loading}
-				<div class="loading-state">
-					<div class="spinner"></div>
-					<p>Executing <code>{selectedSkill}</code> skill...</p>
-					<p class="text-muted">This may take 10-30 seconds</p>
-				</div>
-			{:else if result}
-				<div class="result-content fade-in">
-					<!-- Metadata -->
-					<div class="result-meta">
-						<span class="skill-badge">{result.skill}</span>
-						{#if result.metadata}
-							<span class="text-muted">
-								{result.metadata.input_tokens + result.metadata.output_tokens} tokens
-							</span>
-						{/if}
-					</div>
-
-					<!-- Main Output -->
-					<div class="result-section">
-						<h4>Output</h4>
-						<div class="output-content">
-							{@html formatOutput(result.output)}
-						</div>
-					</div>
-
-					<!-- Alternatives -->
-					{#if result.alternatives && result.alternatives.length > 0}
-						<div class="result-section">
-							<h4>Alternatives</h4>
-							<ul class="alternatives-list">
-								{#each result.alternatives as alt}
-									<li>{alt}</li>
-								{/each}
-							</ul>
-						</div>
-					{/if}
-
-					<!-- Recommendations -->
-					{#if result.recommendations && result.recommendations.length > 0}
-						<div class="result-section">
-							<h4>Recommendations</h4>
-							<ul class="recommendations-list">
-								{#each result.recommendations as rec}
-									<li>{rec}</li>
-								{/each}
-							</ul>
-						</div>
-					{/if}
-				</div>
-			{:else}
-				<div class="empty-state">
-					<div class="empty-icon">✨</div>
-					<h4>Ready to Execute</h4>
-					<p>Your results will appear here in 10-30 seconds.</p>
-					
-					<div class="empty-benefits">
-						<div class="benefit-item">
-							<span class="benefit-icon">⚡</span>
-							<span>Instant expert-level output</span>
-						</div>
-						<div class="benefit-item">
-							<span class="benefit-icon">🎯</span>
-							<span>Structured & actionable</span>
-						</div>
-						<div class="benefit-item">
-							<span class="benefit-icon">🔄</span>
-							<span>Iterate until perfect</span>
-						</div>
-					</div>
-
-					{#if skillPresets.length > 0}
-						<div class="empty-cta">
-							<p class="text-muted text-sm">First time? Try an example →</p>
-						</div>
-					{/if}
-				</div>
-			{/if}
-		</div>
-	</div>
-</div>
-
-<script context="module" lang="ts">
-	function formatOutput(text: string): string {
-		// Basic markdown-like formatting
+    function formatOutput(text: string): string {
 		return text
 			.replace(/&/g, '&amp;')
 			.replace(/</g, '&lt;')
@@ -610,642 +127,511 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{showOptimized ? 'Marketing Skills, Automated | Agency AI' : 'AI Marketing Agency'}</title>
+</svelte:head>
+
+<!-- Global Mode Toggle -->
+<div class="mode-toggle-wrapper container">
+    <div class="mode-toggle glass">
+        <button class:active={!showOptimized} on:click={() => showOptimized = false}>Original View</button>
+        <div class="toggle-divider"></div>
+        <button class:active={showOptimized} on:click={() => showOptimized = true}>✨ Optimized View</button>
+    </div>
+</div>
+
+{#if !showOptimized}
+    <!-- ORIGINAL HOMEPAGE -->
+    <div class="container fade-in">
+        <div class="page-header">
+            <h1>AI Marketing Skills That Actually Work</h1>
+            <p class="value-prop">
+                Get expert-level copy, audits, and strategy in 30 seconds. 
+                No prompt engineering required—just describe what you need.
+            </p>
+            <div class="trust-indicators">
+                <div class="stat"><strong>23</strong> specialized skills</div>
+                <div class="stat"><strong>10-30s</strong> average execution</div>
+                <div class="stat"><strong>Zero</strong> AI expertise needed</div>
+            </div>
+        </div>
+
+        <div class="progress-steps glass">
+            <div class="step" class:complete={currentStep >= 1}>
+                <span class="step-number">1</span>
+                <span class="step-label">Choose Skill</span>
+            </div>
+            <div class="step-line" class:complete={currentStep >= 2}></div>
+            <div class="step" class:complete={currentStep >= 2}>
+                <span class="step-number">2</span>
+                <span class="step-label">Describe Task</span>
+            </div>
+            <div class="step-line" class:complete={currentStep >= 3}></div>
+            <div class="step" class:complete={currentStep >= 3}>
+                <span class="step-number">3</span>
+                <span class="step-label">Get Results</span>
+            </div>
+        </div>
+
+        <div class="layout">
+            <!-- Input Panel -->
+            <div class="panel glass">
+                <form on:submit|preventDefault={handleSubmit}>
+                    <!-- Skill Selection -->
+                    <div class="form-section">
+                        <h3>1. Choose Skill</h3>
+                        <div class="skill-selector">
+                            <div class="category-tabs">
+                                {#each Object.entries(SKILL_CATEGORIES) as [key, cat]}
+                                    <button type="button" class="category-tab" class:active={selectedCategory === key} on:click={() => selectedCategory = key}>{cat.label}</button>
+                                {/each}
+                            </div>
+                            <div class="skill-grid">
+                                {#each Object.entries(categorySkills) as [skillKey, description]}
+                                    <button type="button" class="skill-card" class:active={selectedSkill === skillKey} on:click={() => selectedSkill = skillKey}>
+                                        <span class="skill-name">{skillKey}</span>
+                                        <span class="skill-desc">{description}</span>
+                                    </button>
+                                {/each}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Selection -->
+                    <div class="form-section">
+                        <h3>2. Select Intelligence</h3>
+                        <div class="model-selector">
+                            <label class="model-card" class:active={selectedModel.includes('sonnet')}>
+                                <input type="radio" name="model" value="claude-sonnet-4-5-20250929" bind:group={selectedModel}>
+                                <div class="model-info">
+                                    <span class="model-name">Power (Claude 3.5)</span>
+                                    <span class="model-desc">Best for complex audits and strategy</span>
+                                </div>
+                            </label>
+                            <label class="model-card" class:active={selectedModel.includes('MiniMax')}>
+                                <input type="radio" name="model" value="MiniMax-M2.1" bind:group={selectedModel}>
+                                <div class="model-info">
+                                    <span class="model-name">Speed (MiniMax M2.1)</span>
+                                    <span class="model-desc">Ultra-fast execution for copy and video scripts</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>3. Describe Task</h3>
+                        {#if skillPresets.length > 0}
+                            <div class="quick-start">
+                                <label class="quick-start-label" for="task">⚡ Quick Start</label>
+                                <div class="presets-list-compact">
+                                    {#each (showAllPresets ? skillPresets : skillPresets.slice(0, 3)) as preset}
+                                        <button type="button" class="preset-pill" on:click={() => loadPreset(preset)}>{preset.name}</button>
+                                    {/each}
+                                </div>
+                            </div>
+                        {/if}
+                        <textarea id="task" bind:value={task} placeholder="Describe what you need..." rows="4"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary" disabled={!isReadyToExecute || loading}>
+                            {#if loading}<span class="spinner"></span> Generating...{:else}Execute Skill →{/if}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Panel -->
+            <div class="panel glass">
+                <div class="results-header"><h3>Results</h3></div>
+                {#if result}
+                    <div class="result-content">
+                        <div class="output-content">{@html formatOutput(result.output)}</div>
+                    </div>
+                {:else}
+                    <div class="empty-state">
+                        <div class="empty-icon">✨</div>
+                        <p>Results appear here in seconds.</p>
+                    </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+{:else}
+    <!-- OPTIMIZED HOMEPAGE (Based on CRO Audit & Programmatic Strategy) -->
+    <div class="optimized-home fade-in">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <div class="badge neon-badge">LAUNCHING SOON</div>
+                        <h1>Marketing Skills, <span class="text-indigo">Automated.</span></h1>
+                        <p class="hero-sub">
+                            Execute expert marketing strategies in seconds, not hours. Access 25+ specialized skills through an intuitive UI or integrate via API.
+                        </p>
+                        <div class="hero-actions">
+                            <button class="btn-primary btn-xl" on:click={() => showOptimized = false}>Try the Interface ↓</button>
+                            <button class="btn-secondary btn-xl">View API Docs</button>
+                        </div>
+                        <div class="hero-trust">
+                            <div class="trust-avatars">
+                                <div class="avatar"></div><div class="avatar"></div><div class="avatar"></div>
+                            </div>
+                            <span>Joined by 500+ Early Access Marketers</span>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="visual-card glass">
+                            <div class="card-header">
+                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                                <div class="card-title">remotion-script.v1</div>
+                            </div>
+                            <div class="card-body">
+                                <div class="code-line"><code>const</code> script = AI.generate(&#123;</div>
+                                <div class="code-line indent">skill: <span class="text-mint">'remotion-script'</span>,</div>
+                                <div class="code-line indent">target: <span class="text-mint">'SaaS Founders'</span></div>
+                                <div class="code-line">&#125;);</div>
+                                <div class="progress-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases / Skills Section -->
+        <section class="skills-showcase">
+            <div class="container">
+                <div class="section-header-centered">
+                    <h2>Expert Frameworks, <span class="text-mint">Instant Execution.</span></h2>
+                    <p>Stop searching for frameworks. Our AI is pre-trained on agency-grade methodologies.</p>
+                </div>
+                
+                <div class="skills-grid-optimized">
+                    <div class="skill-box glass">
+                        <div class="icon">🔍</div>
+                        <h3>SEO & Content</h3>
+                        <ul>
+                            <li>SEO Audits</li>
+                            <li>Programmatic SEO</li>
+                            <li>Schema Markup</li>
+                        </ul>
+                    </div>
+                    <div class="skill-box glass">
+                        <div class="icon">📈</div>
+                        <h3>CRO & Growth</h3>
+                        <ul>
+                            <li>Landing Page Audits</li>
+                            <li>Form Optimization</li>
+                            <li>Pricing Strategy</li>
+                        </ul>
+                    </div>
+                    <div class="skill-box glass">
+                        <div class="icon">🎬</div>
+                        <h3>Programmatic Video</h3>
+                        <ul>
+                            <li>Remotion Scripting</li>
+                            <li>Visual Layouts</li>
+                            <li>Automated Ads</li>
+                        </ul>
+                    </div>
+                    <div class="skill-box glass">
+                        <div class="icon">✍️</div>
+                        <h3>Copy & Strategy</h3>
+                        <ul>
+                            <li>Email Sequences</li>
+                            <li>Competitor Analysis</li>
+                            <li>Market Positioning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section (CRO Recommended) -->
+        <section class="pricing-optimized">
+            <div class="container">
+                <div class="pricing-grid">
+                    <div class="price-card glass">
+                        <div class="price-header">
+                            <h4>Starter</h4>
+                            <div class="price">$49<span>/mo</span></div>
+                        </div>
+                        <ul class="price-features">
+                            <li>50 skill executions</li>
+                            <li>All 25+ skills</li>
+                            <li>UI Access</li>
+                        </ul>
+                        <button class="btn-secondary">Start 14-Day Trial</button>
+                    </div>
+                    <div class="price-card glass featured">
+                        <div class="featured-badge">MOST POPULAR</div>
+                        <div class="price-header">
+                            <h4>Professional</h4>
+                            <div class="price">$199<span>/mo</span></div>
+                        </div>
+                        <ul class="price-features">
+                            <li>250 skill executions</li>
+                            <li>UI + API Access</li>
+                            <li>Priority Support</li>
+                        </ul>
+                        <button class="btn-primary">Get Early Access</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+{/if}
+
 <style>
-	.page-header {
-		margin-bottom: 2rem;
-	}
-
-	.page-header h1 {
-		margin-bottom: 0.5rem;
-	}
-
-	.layout {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1.5rem;
-	}
-
-	@media (max-width: 1024px) {
-		.layout {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	.panel {
-		background: var(--color-bg-secondary);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		padding: 1.5rem;
-	}
-
-	.form-section {
-		margin-bottom: 1.5rem;
-	}
-
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-	}
-
-	.section-header h3 {
-		margin: 0;
-	}
-
-	.form-section h3 {
-		font-size: 1rem;
-		margin-bottom: 1rem;
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-	}
-
-	.optional {
-		font-weight: 400;
-		color: var(--color-text-muted);
-		font-size: 0.875rem;
-	}
-
-	/* Model Selector */
-	.model-selector {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 0.75rem;
-		margin-bottom: 1.5rem;
-	}
-
-	.model-card {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		padding: 0.75rem;
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius);
-		cursor: pointer;
-		transition: all 0.2s ease;
-		background: var(--color-bg-secondary);
-	}
-
-	.model-card:hover {
-		border-color: var(--color-accent);
-		background: rgba(59, 130, 246, 0.05);
-	}
-
-	.model-card.active {
-		border-color: var(--color-accent);
-		background: rgba(59, 130, 246, 0.1);
-		box-shadow: 0 0 0 1px var(--color-accent);
-	}
-
-	.model-card input {
-		width: 1.25rem;
-		height: 1.25rem;
-		margin: 0;
-		cursor: pointer;
-	}
-
-	.model-info {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.model-name {
-		font-weight: 600;
-		font-size: 0.875rem;
-		color: var(--color-text);
-	}
-
-	.model-desc {
-		font-size: 0.75rem;
-		color: var(--color-text-muted);
-	}
-
-	/* Presets */
-	.presets-list {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-		gap: 0.75rem;
-		margin-bottom: 1rem;
-		padding: 1rem;
-		background: var(--color-bg-tertiary);
-		border-radius: var(--radius);
-		border: 1px solid var(--color-border);
-	}
-
-	.preset-card {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		text-align: left;
-		background: var(--color-bg-secondary);
-		border: 1px solid var(--color-border);
-		padding: 0.75rem;
-		cursor: pointer;
-		transition: all 0.15s ease;
-	}
-
-	.preset-card:hover {
-		border-color: var(--color-accent);
-		background: rgba(59, 130, 246, 0.05);
-	}
-
-	.preset-name {
-		font-weight: 500;
-		font-size: 0.875rem;
-		color: var(--color-text);
-		margin-bottom: 0.25rem;
-	}
-
-	.preset-desc {
-		font-size: 0.75rem;
-		color: var(--color-text-muted);
-		line-height: 1.4;
-	}
-
-	/* Category Tabs */
-	.category-tabs {
-		display: flex;
-		gap: 0.5rem;
-		margin-bottom: 1rem;
-		flex-wrap: wrap;
-	}
-
-	.category-tab {
-		background: var(--color-bg-tertiary);
-		color: var(--color-text-secondary);
-		border: 1px solid var(--color-border);
-		padding: 0.5rem 0.75rem;
-		font-size: 0.8125rem;
-	}
-
-	.category-tab.active {
-		background: var(--color-accent);
-		color: white;
-		border-color: var(--color-accent);
-	}
-
-	.category-tab:hover:not(.active) {
-		border-color: var(--color-border-hover);
-	}
-
-	/* Skill Grid */
-	.skill-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-		gap: 0.75rem;
-	}
-
-	.skill-card {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		text-align: left;
-		background: var(--color-bg-tertiary);
-		border: 1px solid var(--color-border);
-		padding: 0.75rem;
-	}
-
-	.skill-card.active {
-		border-color: var(--color-accent);
-		background: rgba(59, 130, 246, 0.1);
-	}
-
-	.skill-card:hover:not(.active) {
-		border-color: var(--color-border-hover);
-	}
-
-	.skill-name {
-		font-family: var(--font-mono);
-		font-size: 0.8125rem;
-		color: var(--color-text);
-		margin-bottom: 0.25rem;
-	}
-
-	.skill-desc {
-		font-size: 0.75rem;
-		color: var(--color-text-muted);
-	}
-
-	/* Context Fields */
-	.context-fields {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		margin-bottom: 0.75rem;
-	}
-
-	.context-field {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.context-field input:first-child {
-		flex: 0 0 120px;
-	}
-
-	.context-field input:nth-child(2) {
-		flex: 1;
-	}
-
-	.btn-icon {
-		background: var(--color-bg-tertiary);
-		color: var(--color-text-muted);
-		border: 1px solid var(--color-border);
-		width: 36px;
-		height: 36px;
-		padding: 0;
-		font-size: 1.25rem;
-		line-height: 1;
-	}
-
-	.btn-icon:hover {
-		color: var(--color-error);
-		border-color: var(--color-error);
-	}
-
-	.btn-sm {
-		padding: 0.375rem 0.75rem;
-		font-size: 0.8125rem;
-	}
-
-	.btn-lg {
-		padding: 0.875rem 1.5rem;
-		font-size: 1rem;
-	}
-
-	.form-actions {
-		margin-top: 2rem;
-	}
-
-	.form-actions button {
-		width: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 0.5rem;
-	}
-
-	/* Results Panel */
-	.results-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		margin-bottom: 1rem;
-		padding-bottom: 0.75rem;
-		border-bottom: 1px solid var(--color-border);
-	}
-
-	.results-header h3 {
-		margin: 0;
-	}
-
-	.results-actions {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.error-box {
-		background: rgba(239, 68, 68, 0.1);
-		border: 1px solid var(--color-error);
-		border-radius: var(--radius);
-		padding: 1rem;
-		color: var(--color-error);
-	}
-
-	.loading-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 3rem 1rem;
-		text-align: center;
-	}
-
-	.loading-state .spinner {
-		width: 32px;
-		height: 32px;
-		margin-bottom: 1rem;
-	}
-
-	.empty-state {
-		text-align: center;
-		padding: 3rem 1rem;
-		color: var(--color-text-muted);
-	}
-
-	/* Result Content */
-	.result-meta {
-		display: flex;
-		align-items: center;
-		gap: 1rem;
-		margin-bottom: 1rem;
-	}
-
-	.skill-badge {
-		background: var(--color-accent);
-		color: white;
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		font-family: var(--font-mono);
-		font-size: 0.75rem;
-	}
-
-	.result-section {
-		margin-bottom: 1.5rem;
-	}
-
-	.result-section h4 {
-		font-size: 0.875rem;
-		color: var(--color-text-secondary);
-		margin-bottom: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-	}
-
-	.output-content {
-		background: var(--color-bg-tertiary);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius);
-		padding: 1rem;
-		max-height: 500px;
-		overflow-y: auto;
-		font-size: 0.9375rem;
-		line-height: 1.7;
-	}
-
-	.output-content :global(h3),
-	.output-content :global(h4),
-	.output-content :global(h5) {
-		margin-top: 1.5rem;
-		margin-bottom: 0.75rem;
-	}
-
-	.output-content :global(h3:first-child),
-	.output-content :global(h4:first-child),
-	.output-content :global(h5:first-child) {
-		margin-top: 0;
-	}
-
-	.output-content :global(code) {
-		background: var(--color-bg-secondary);
-	}
-
-	.output-content :global(ul) {
-		margin: 0.5rem 0;
-		padding-left: 1.5rem;
-	}
-
-	.output-content :global(li) {
-		margin: 0.25rem 0;
-	}
-
-	.alternatives-list,
-	.recommendations-list {
-		background: var(--color-bg-tertiary);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius);
-		padding: 1rem 1rem 1rem 2rem;
-		margin: 0;
-	}
-
-	.alternatives-list li,
-	.recommendations-list li {
-		margin: 0.5rem 0;
-	}
-
-	/* NEW STYLES FROM AUDIT */
-	.value-prop {
-		font-size: 1.125rem;
-		color: var(--color-text-secondary);
-		max-width: 600px;
-		margin-bottom: 1.5rem;
-	}
-
-	.trust-indicators {
-		display: flex;
-		gap: 2rem;
-		margin-top: 1.5rem;
-		flex-wrap: wrap;
-	}
-
-	.stat {
-		font-size: 0.8125rem;
-		color: var(--color-text-muted);
-		line-height: 1.4;
-	}
-
-	.stat strong {
-		color: var(--color-accent);
-		font-size: 1.25rem;
-		display: block;
-		margin-bottom: 0.25rem;
-	}
-
-	.progress-steps {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		margin-bottom: 2.5rem;
-		padding: 1.25rem;
-		background: var(--color-bg-secondary);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-	}
-
-	.step {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.5rem;
-		opacity: 0.3;
-		transition: all 0.3s ease;
-	}
-
-	.step.complete {
-		opacity: 1;
-	}
-
-	.step-number {
-		width: 32px;
-		height: 32px;
-		border-radius: 50%;
-		background: var(--color-bg-tertiary);
-		border: 2px solid var(--color-border);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-weight: 600;
-		font-size: 0.875rem;
-		transition: all 0.3s ease;
-	}
-
-	.step.complete .step-number {
-		background: var(--color-accent);
-		border-color: var(--color-accent);
-		color: white;
-		box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-	}
-
-	.step-label {
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--color-text-muted);
-	}
-
-	.step-line {
-		flex: 0 0 60px;
-		height: 2px;
-		background: var(--color-border);
-		margin: 0 1rem;
-		margin-bottom: 1.25rem;
-		transition: background 0.3s ease;
-	}
-
-	@media (max-width: 640px) {
-		.step-line {
-			flex: 0 0 30px;
-		}
-	}
-
-	.step-line.complete {
-		background: var(--color-accent);
-	}
-
-	.quick-start {
-		background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 51, 234, 0.05));
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius);
-		padding: 1rem;
-		margin-bottom: 1.25rem;
-	}
-
-	.quick-start-label {
-		display: block;
-		font-size: 0.8125rem;
-		font-weight: 600;
-		margin-bottom: 0.75rem;
-		color: var(--color-text);
-		cursor: pointer;
-	}
-
-	.presets-list-compact {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.preset-pill {
-		background: var(--color-bg-secondary);
-		border: 1px solid var(--color-border);
-		padding: 0.4rem 0.8rem;
-		font-size: 0.8125rem;
-		border-radius: 20px;
-		white-space: nowrap;
-		transition: all 0.15s ease;
-		color: var(--color-text-secondary);
-	}
-
-	.preset-pill:hover {
-		border-color: var(--color-accent);
-		background: rgba(59, 130, 246, 0.1);
-		color: var(--color-text);
-		transform: translateY(-1px);
-	}
-
-	.preset-more {
-		background: var(--color-bg-tertiary);
-		color: var(--color-text-muted);
-	}
-
-	.advanced-toggle-wrapper {
-		margin: 1.5rem 0;
-		display: flex;
-		justify-content: center;
-	}
-
-	.btn-text-toggle {
-		background: none;
-		border: none;
-		color: var(--color-accent);
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		cursor: pointer;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 0.25rem;
-		transition: all 0.2s ease;
-	}
-
-	.btn-text-toggle:hover {
-		color: var(--color-accent-hover);
-		background: rgba(59, 130, 246, 0.05);
-		border-radius: var(--radius);
-	}
-
-	.text-muted-sm {
-		font-size: 0.75rem;
-		color: var(--color-text-muted);
-	}
-
-	.advanced-options {
-		border-top: 1px dashed var(--color-border);
-		margin-top: 0.5rem;
-		padding-top: 1.5rem;
-	}
-
-	/* Enhanced Empty State */
-	.empty-state {
-		text-align: center;
-		padding: 4rem 1.5rem;
-	}
-
-	.empty-icon {
-		font-size: 3.5rem;
-		margin-bottom: 1.5rem;
-		filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.2));
-	}
-
-	.empty-state h4 {
-		margin-bottom: 0.75rem;
-		color: var(--color-text);
-		font-size: 1.25rem;
-	}
-
-	.empty-benefits {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		margin: 2rem auto;
-		padding: 1.5rem;
-		background: var(--color-bg-tertiary);
-		border: 1px solid var(--color-border);
-		border-radius: var(--radius-lg);
-		max-width: 320px;
-		text-align: left;
-	}
-
-	.benefit-item {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		font-size: 0.9375rem;
-		color: var(--color-text-secondary);
-	}
-
-	.benefit-icon {
-		font-size: 1.25rem;
-		flex-shrink: 0;
-	}
-
-	.empty-cta {
-		margin-top: 2rem;
-		padding-top: 2rem;
-		border-top: 1px solid var(--color-border);
-	}
-
-	.text-sm {
-		font-size: 0.875rem;
-	}
+    /* Mode Toggle */
+    .mode-toggle-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: 2rem auto;
+    }
+
+    .mode-toggle {
+        display: flex;
+        padding: 0.25rem;
+        border-radius: 40px;
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    .mode-toggle button {
+        padding: 0.5rem 1.5rem;
+        border-radius: 30px;
+        font-size: 0.875rem;
+        background: transparent;
+        color: var(--color-text-secondary);
+        transition: all 0.3s ease;
+    }
+
+    .mode-toggle button.active {
+        background: var(--color-indigo);
+        color: white;
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    }
+
+    .toggle-divider {
+        width: 1px;
+        background: var(--color-border);
+        margin: 0.5rem 0.25rem;
+    }
+
+    /* Original View Styles */
+    .page-header { margin-bottom: 3rem; text-align: center; }
+    .page-header h1 { font-size: 3rem; margin-bottom: 1rem; }
+    .value-prop { font-size: 1.25rem; max-width: 800px; margin: 0 auto 2rem; }
+    .trust-indicators { justify-content: center; }
+    
+    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .panel { min-height: 600px; border-radius: var(--radius-xl); padding: 2rem; }
+    
+    /* Optimized View Styles */
+    .optimized-home {
+        padding-bottom: 5rem;
+    }
+
+    .hero {
+        padding: 4rem 0 6rem;
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .hero-content h1 {
+        font-size: 4.5rem;
+        margin: 1.5rem 0;
+        line-height: 1;
+    }
+
+    .text-indigo { color: var(--color-indigo); }
+    .text-mint { color: var(--color-mint); }
+
+    .hero-sub {
+        font-size: 1.25rem;
+        margin-bottom: 2.5rem;
+        max-width: 540px;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 3rem;
+    }
+
+    .btn-xl {
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+    }
+
+    .neon-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--color-mint);
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        border: 1px solid var(--color-mint);
+    }
+
+    .hero-trust {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: var(--color-text-muted);
+    }
+
+    .trust-avatars {
+        display: flex;
+    }
+
+    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #334155; border: 2px solid var(--color-bg); margin-left: -8px; }
+    .avatar:first-child { margin-left: 0; }
+
+    .visual-card {
+        border-radius: var(--radius-xl);
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .card-header {
+        padding: 1rem;
+        background: rgba(255,255,255,0.03);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; }
+    .card-title { font-family: var(--font-mono); font-size: 0.75rem; margin-left: 0.5rem; color: var(--color-text-muted); }
+
+    .card-body {
+        padding: 2rem;
+        font-family: var(--font-mono);
+        font-size: 1rem;
+    }
+
+    .indent { padding-left: 1.5rem; }
+
+    .progress-pulse {
+        height: 4px;
+        background: var(--color-indigo);
+        width: 60%;
+        margin-top: 2rem;
+        border-radius: 2px;
+        box-shadow: 0 0 15px var(--color-indigo);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 0.5; width: 10%; }
+        50% { opacity: 1; width: 80%; }
+        100% { opacity: 0.5; width: 10%; }
+    }
+
+    .skills-showcase {
+        padding: 6rem 0;
+        background: rgba(0,0,0,0.2);
+    }
+
+    .section-header-centered {
+        text-align: center;
+        margin-bottom: 4rem;
+    }
+
+    .section-header-centered h2 {
+        margin-bottom: 1rem;
+    }
+
+    .skills-grid-optimized {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .skill-box {
+        padding: 2rem;
+        border-radius: var(--radius-lg);
+        transition: transform 0.3s ease;
+    }
+
+    .skill-box:hover {
+        transform: translateY(-5px);
+        border-color: var(--color-indigo);
+    }
+
+    .skill-box .icon { font-size: 2rem; margin-bottom: 1.5rem; }
+    .skill-box h3 { font-size: 1.25rem; margin-bottom: 1rem; }
+    .skill-box ul { list-style: none; padding: 0; }
+    .skill-box li { color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem; }
+
+    .pricing-optimized { padding: 6rem 0; }
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 800px; margin: 0 auto; }
+    
+    .price-card { padding: 3rem; border-radius: var(--radius-xl); text-align: center; position: relative; }
+    .price-card.featured { border: 2px solid var(--color-indigo); transform: scale(1.05); }
+    
+    .featured-badge {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--color-indigo);
+        color: white;
+        padding: 0.25rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    .price-header h4 { margin-bottom: 1rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .price { font-size: 3rem; font-weight: 800; margin-bottom: 2rem; }
+    .price span { font-size: 1rem; color: var(--color-text-muted); font-weight: 400; }
+    
+    .price-features { list-style: none; padding: 0; margin-bottom: 2.5rem; text-align: left; }
+    .price-features li { margin-bottom: 1rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 0.5rem; }
+    .price-features li::before { content: '✓'; color: var(--color-mint); font-weight: 700; }
+
+    /* Reuse existing component styles */
+    .form-section { margin-bottom: 1.5rem; }
+    .category-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .category-tab { background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); padding: 0.5rem 1rem; font-size: 0.8rem; border-radius: 4px; }
+    .category-tab.active { background: var(--color-indigo); color: white; border-color: var(--color-indigo); }
+    
+    .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .skill-card { background: rgba(255,255,255,0.03); border: 1px solid var(--color-border); padding: 1rem; text-align: left; border-radius: 8px; }
+    .skill-card.active { border-color: var(--color-indigo); background: rgba(79, 70, 229, 0.1); }
+    .skill-name { display: block; font-weight: 600; margin-bottom: 0.25rem; }
+    .skill-desc { font-size: 0.75rem; color: var(--color-text-muted); }
+
+    .model-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .model-card { border: 1px solid var(--color-border); padding: 1rem; border-radius: 8px; display: flex; gap: 1rem; cursor: pointer; }
+    .model-card.active { border-color: var(--color-indigo); background: rgba(79, 70, 229, 0.05); }
+    .model-name { font-weight: 600; display: block; }
+    .model-desc { font-size: 0.75rem; color: var(--color-text-muted); }
+
+    textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; color: white; }
+    .form-actions { margin-top: 1.5rem; }
+    .form-actions button { width: 100%; padding: 1rem; font-size: 1rem; }
+
+    @media (max-width: 1024px) {
+        .hero-grid { grid-template-columns: 1fr; text-align: center; }
+        .hero-content h1 { font-size: 3rem; }
+        .hero-sub { margin: 0 auto 2rem; }
+        .hero-actions { justify-content: center; }
+        .hero-trust { justify-content: center; }
+        .skills-grid-optimized { grid-template-columns: 1fr 1fr; }
+        .pricing-grid { grid-template-columns: 1fr; }
+    }
 </style>

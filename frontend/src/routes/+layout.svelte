@@ -11,8 +11,9 @@
 				</a>
 				<nav>
 					<a href="/">Execute</a>
-					<a href="/skills">Skills</a>
-					<a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+					<a href="/skills">Skills Library</a>
+					<a href="/#pricing">Pricing</a>
+					<a href="https://github.com" target="_blank" rel="noopener">API Docs</a>
 				</nav>
 			</div>
 		</div>

@@ -138,7 +138,9 @@ export const SKILL_CATEGORIES = {
 		description: 'Remotion and dynamic video content',
 		skills: {
 			'remotion-script': 'Dynamic video scripts',
-			'remotion-layout': 'Video component design'
+			'remotion-layout': 'Video component design',
+			'manim-composer': 'Mathematical animations',
+			'manim-best-practices': 'Manim optimization'
 		}
 	}
 } as const;

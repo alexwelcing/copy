@@ -46,6 +46,10 @@ class SkillName(str, Enum):
     REMOTION_SCRIPT = "remotion-script"
     REMOTION_LAYOUT = "remotion-layout"
 
+    # Manim
+    MANIM_COMPOSER = "manim-composer"
+    MANIM_BEST_PRACTICES = "manim-best-practices"
+
 
 class WorkRequest(BaseModel):
     """Request to execute a marketing skill."""
