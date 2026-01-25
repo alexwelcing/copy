@@ -5,6 +5,7 @@
 	// Form state
 	let selectedCategory = 'writing';
 	let selectedSkill = 'copywriting';
+	let selectedModel = 'claude-sonnet-4-5-20250929';
 	let task = '';
 	let content = '';
 	let contextFields: { key: string; value: string }[] = [
@@ -152,21 +153,43 @@
 
 	
 
-			try {
+						try {
 
-				result = await executeWork({
+	
 
-					skill: selectedSkill,
+							result = await executeWork({
 
-					task: task.trim(),
+	
 
-					context: Object.keys(context).length > 0 ? context : undefined,
+								skill: selectedSkill,
 
-					content: content.trim() || undefined
+	
 
-				});
+								task: task.trim(),
 
-			} catch (e) {
+	
+
+								context: Object.keys(context).length > 0 ? context : undefined,
+
+	
+
+								content: content.trim() || undefined,
+
+	
+
+								model: selectedModel
+
+	
+
+							});
+
+	
+
+						} catch (e) {
+
+	
+
+			
 
 				if (e instanceof ApiError) {
 
@@ -324,10 +347,31 @@
 					</div>
 				</div>
 
+				<!-- Model Selection -->
+				<div class="form-section">
+					<h3>2. Select Intelligence</h3>
+					<div class="model-selector">
+						<label class="model-card" class:active={selectedModel.includes('sonnet')}>
+							<input type="radio" name="model" value="claude-sonnet-4-5-20250929" bind:group={selectedModel}>
+							<div class="model-info">
+								<span class="model-name">Power (Claude 3.5)</span>
+								<span class="model-desc">Best for complex audits and strategy</span>
+							</div>
+						</label>
+						<label class="model-card" class:active={selectedModel.includes('MiniMax')}>
+							<input type="radio" name="model" value="MiniMax-M2.1" bind:group={selectedModel}>
+							<div class="model-info">
+								<span class="model-name">Speed (MiniMax M2.1)</span>
+								<span class="model-desc">Ultra-fast execution for copy and video scripts</span>
+							</div>
+						</label>
+					</div>
+				</div>
+
 				<!-- Task Input -->
 				<div class="form-section">
 					<div class="section-header">
-						<h3>2. Describe Task</h3>
+						<h3>3. Describe Task</h3>
 					</div>
 
 					{#if skillPresets.length > 0}
@@ -621,6 +665,60 @@
 		font-weight: 400;
 		color: var(--color-text-muted);
 		font-size: 0.875rem;
+	}
+
+	/* Model Selector */
+	.model-selector {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.model-card {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius);
+		cursor: pointer;
+		transition: all 0.2s ease;
+		background: var(--color-bg-secondary);
+	}
+
+	.model-card:hover {
+		border-color: var(--color-accent);
+		background: rgba(59, 130, 246, 0.05);
+	}
+
+	.model-card.active {
+		border-color: var(--color-accent);
+		background: rgba(59, 130, 246, 0.1);
+		box-shadow: 0 0 0 1px var(--color-accent);
+	}
+
+	.model-card input {
+		width: 1.25rem;
+		height: 1.25rem;
+		margin: 0;
+		cursor: pointer;
+	}
+
+	.model-info {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.model-name {
+		font-weight: 600;
+		font-size: 0.875rem;
+		color: var(--color-text);
+	}
+
+	.model-desc {
+		font-size: 0.75rem;
+		color: var(--color-text-muted);
 	}
 
 	/* Presets */

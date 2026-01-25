@@ -57,3 +57,5 @@ logs/
 node_modules/
 .svelte-kit/
 frontend/package-lock.json
+
+service.json

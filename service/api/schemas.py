@@ -42,6 +42,10 @@ class SkillName(str, Enum):
     ANALYTICS_TRACKING = "analytics-tracking"
     PAID_ADS = "paid-ads"
 
+    # Remotion
+    REMOTION_SCRIPT = "remotion-script"
+    REMOTION_LAYOUT = "remotion-layout"
+
 
 class WorkRequest(BaseModel):
     """Request to execute a marketing skill."""
@@ -60,6 +64,11 @@ class WorkRequest(BaseModel):
             "Audit this landing page for conversion issues: [page content]",
             "Create a 5-email onboarding sequence for a SaaS product"
         ]
+    )
+
+    model: Optional[str] = Field(
+        default=None,
+        description="Optional model to use (e.g. MiniMax-M2.1-lightning)"
     )
 
     context: Optional[dict] = Field(

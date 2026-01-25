@@ -132,5 +132,13 @@ export const SKILL_CATEGORIES = {
 			'analytics-tracking': 'Analytics setup',
 			'paid-ads': 'Paid advertising'
 		}
+	},
+	video: {
+		label: 'Programmatic Video',
+		description: 'Remotion and dynamic video content',
+		skills: {
+			'remotion-script': 'Dynamic video scripts',
+			'remotion-layout': 'Video component design'
+		}
 	}
 } as const;

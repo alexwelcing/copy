@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     executor = get_executor()
     print(f"Marketing Agency API v{VERSION} starting...")
     print(f"Skills path: {executor.skills_path}")
-    print(f"Model: {executor.model}")
+    print(f"Default Model: {executor.default_model}")
 
     # Validate all skills are loadable
     for skill in SkillName:

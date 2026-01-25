@@ -7,12 +7,16 @@ from pathlib import Path
 from typing import Optional
 
 import anthropic
+from dotenv import load_dotenv
 
 from service.api.schemas import SkillName, WorkRequest, WorkResult
 
+# Load environment variables
+load_dotenv()
+
 
 class SkillExecutor:
-    """Executes marketing skills using Claude API."""
+    """Executes marketing skills using LLM APIs."""
 
     def __init__(self, skills_path: Optional[Path] = None):
         """
@@ -21,9 +25,21 @@ class SkillExecutor:
         Args:
             skills_path: Path to the skills directory. Defaults to ./skills
         """
-        self.client = anthropic.Anthropic()
+        # Standard Anthropic client
+        self.anthropic_client = anthropic.Anthropic()
+        
+        # MiniMax client (using Anthropic SDK compatibility)
+        minimax_key = os.getenv("MINIMAX_API_KEY")
+        if minimax_key:
+            self.minimax_client = anthropic.Anthropic(
+                api_key=minimax_key,
+                base_url="https://api.minimax.io/anthropic"
+            )
+        else:
+            self.minimax_client = None
+
         self.skills_path = skills_path or Path(__file__).parent.parent.parent / "skills"
-        self.model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
+        self.default_model = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
         self._skill_cache: dict[str, str] = {}
 
     def load_skill(self, skill_name: SkillName) -> str:
@@ -121,16 +137,36 @@ class SkillExecutor:
             The work result
         """
         prompt = self.build_prompt(request)
+        
+        # Determine model and client
+        model = request.model or self.default_model
+        
+        if model.lower().startswith("minimax"):
+            if not self.minimax_client:
+                raise ValueError("MiniMax API key not configured")
+            client = self.minimax_client
+        else:
+            client = self.anthropic_client
 
-        message = self.client.messages.create(
-            model=self.model,
+        message = client.messages.create(
+            model=model,
             max_tokens=4096,
             messages=[
                 {"role": "user", "content": prompt}
             ]
         )
 
-        output = message.content[0].text
+        # Extract text content from all blocks (handling both TextBlock and ThinkingBlock)
+        output_parts = []
+        for block in message.content:
+            if hasattr(block, "text"):
+                output_parts.append(block.text)
+            elif hasattr(block, "thinking"):
+                # Optionally include thinking in the output or just skip it
+                # For marketing output, we usually just want the final result
+                pass
+        
+        output = "\n".join(output_parts)
 
         # Parse structured sections from the output
         sections = self._parse_sections(output)
@@ -144,7 +180,7 @@ class SkillExecutor:
             alternatives=alternatives if alternatives else None,
             recommendations=recommendations if recommendations else None,
             metadata={
-                "model": self.model,
+                "model": model,
                 "input_tokens": message.usage.input_tokens,
                 "output_tokens": message.usage.output_tokens,
             }
