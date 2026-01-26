@@ -280,119 +280,112 @@
     <!-- Briefing Terminal (The Tool) -->
     <section id="terminal" class="terminal-section">
         <div class="container">
-            <div class="terminal-layout">
-                <!-- Left: Sidebar Dossier -->
-                <aside class="dossier-sidebar paper-card">
-                    <div class="sidebar-header">
-                        <h3>THE DOSSIER</h3>
+            <div class="terminal-stack">
+                
+                <!-- 1. The Dossier (Horizontal Reel) -->
+                <div class="dossier-bar">
+                    <div class="dossier-header">
+                        <span class="badge-classic-small">ARCHIVES</span>
                         <button class="text-btn" on:click={() => { currentBriefId = undefined; task = ''; product = ''; audience = ''; coreValue = ''; contextFields = []; }}>+ NEW BRIEF</button>
                     </div>
-                    <div class="sidebar-content">
-                        <span class="form-id">RECENT ARCHIVES</span>
-                        {#if briefsLoading}
-                            <div class="brief-stack">
-                                <LoadingSkeleton variant="card" />
-                                <LoadingSkeleton variant="card" />
+
+                    
+                    {#if savedBriefs.length === 0}
+                        <div class="empty-reel">Your project library is empty.</div>
+                    {:else}
+                        <div class="brief-reel">
+                            {#each savedBriefs.slice(0, 6) as brief}
+                                <button class="brief-reel-card" class:active={currentBriefId === brief.id} on:click={() => loadSavedBrief(brief)}>
+                                    <span class="reel-title">{brief.title}</span>
+                                    <span class="reel-date">{new Date(brief.updated_at || '').toLocaleDateString()}</span>
+                                </button>
+                            {/each}
+                            {#if savedBriefs.length > 6}
+                                <div class="reel-more">+{savedBriefs.length - 6}</div>
+                            {/if}
+                        </div>
+                    {/if}
+                </div>
+
+                <!-- 2. The Briefing Room (Input) -->
+                <div class="brief-panel paper-card">
+                    <div class="brief-header">
+                        <span class="form-id">FORM 22-B: STRATEGIC BRIEF</span>
+                        <h2>Define the Objective</h2>
+                    </div>
+                    
+                    <form on:submit|preventDefault={handleSubmit} class="brief-form">
+                        <!-- Skill Selection -->
+                        <div class="brief-section">
+                            <label class="brief-label">1. DEPARTMENT & SPECIALIZATION</label>
+                            <div class="brief-selectors">
+                                <select bind:value={selectedCategory} class="classic-select">
+                                    {#each Object.entries(SKILL_CATEGORIES) as [key, cat]}
+                                        <option value={key}>{cat.label}</option>
+                                    {/each}
+                                </select>
+                                <select bind:value={selectedSkill} class="classic-select">
+                                    {#each Object.entries(categorySkills) as [skillKey, _]}
+                                        <option value={skillKey}>{skillKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</option>
+                                    {/each}
+                                </select>
                             </div>
-                        {:else if briefsError}
-                            <ErrorBoundary 
-                                title="Failed to load briefs" 
-                                message={briefsError}
-                                onRetry={loadBriefs}
-                            />
-                        {:else if savedBriefs.length === 0}
-                            <p class="empty-hint">Your library is currently empty.</p>
-                        {:else}
-                            <div class="brief-stack">
-                                {#each savedBriefs.slice(0, 10) as brief}
-                                    <button class="brief-mini-card" class:active={currentBriefId === brief.id} on:click={() => loadSavedBrief(brief)}>
-                                        <span class="brief-mini-title">{brief.title}</span>
-                                        <span class="brief-mini-meta">{brief.product} • {new Date(brief.updated_at || '').toLocaleDateString()}</span>
-                                    </button>
-                                {/each}
+                        </div>
+
+                        <!-- Context FIRST (Flip) -->
+                        {#if selectedSkill}
+                            <div class="brief-section" transition:slide>
+                                <label class="brief-label">2. KEY CONTEXT</label>
+                                <MadLib bind:product bind:audience bind:value={coreValue} />
                             </div>
                         {/if}
-                    </div>
-                </aside>
+                            </div>
+                        {/if}
 
-                <div class="terminal-grid-main">
-                    <!-- Left: Input Brief -->
-                    <div class="brief-panel paper-card">
-                        <div class="brief-header">
-                            <span class="form-id">FORM 22-B: STRATEGIC BRIEF</span>
-                            <h2>Define the Objective</h2>
-                        </div>
-                        
-                        <form on:submit|preventDefault={handleSubmit} class="brief-form">
-                            <!-- Skill Selection -->
-                            <div class="brief-section">
-                                <label class="brief-label">1. DEPARTMENT & SPECIALIZATION</label>
-                                <div class="brief-selectors">
-                                    <select bind:value={selectedCategory} class="classic-select">
-                                        {#each Object.entries(SKILL_CATEGORIES) as [key, cat]}
-                                            <option value={key}>{cat.label}</option>
+                        <!-- Description SECOND -->
+                        {#if product.trim() && audience.trim()}
+                            <div class="brief-section" transition:slide>
+                                <label class="brief-label" for="opt-task">3. PROJECT DESCRIPTION</label>
+                                {#if skillPresets.length > 0}
+                                    <div class="brief-presets">
+                                        {#each skillPresets.slice(0, 3) as preset}
+                                            <button type="button" class="preset-pill-classic" on:click={() => loadPreset(preset)}>{preset.name}</button>
                                         {/each}
-                                    </select>
-                                    <select bind:value={selectedSkill} class="classic-select">
-                                        {#each Object.entries(categorySkills) as [skillKey, _]}
-                                            <option value={skillKey}>{skillKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</option>
-                                        {/each}
-                                    </select>
-                                </div>
+                                    </div>
+                                {/if}
+                                <textarea 
+                                    id="opt-task" 
+                                    bind:value={task} 
+                                    placeholder="Type your strategic requirements here..." 
+                                    rows="4"
+                                    class="typewriter-textarea"
+                                ></textarea>
                             </div>
 
-                            <!-- Context FIRST (Flip) -->
-                            {#if selectedSkill}
-                                <div class="brief-section" transition:slide>
-                                    <label class="brief-label">2. KEY CONTEXT</label>
-                                    <MadLib bind:product bind:audience bind:value={coreValue} />
+                            <div class="brief-section" transition:slide>
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="brief-label">4. ADDITIONAL DATA (OPTIONAL)</label>
+                                    <button type="button" class="text-btn" on:click={addContextField}>+ Add Field</button>
                                 </div>
-                            {/if}
-
-                            <!-- Description SECOND -->
-                            {#if product.trim() && audience.trim()}
-                                <div class="brief-section" transition:slide>
-                                    <label class="brief-label" for="opt-task">3. PROJECT DESCRIPTION</label>
-                                    {#if skillPresets.length > 0}
-                                        <div class="brief-presets">
-                                            {#each skillPresets.slice(0, 3) as preset}
-                                                <button type="button" class="preset-pill-classic" on:click={() => loadPreset(preset)}>{preset.name}</button>
-                                            {/each}
+                                <div class="context-stack">
+                                    {#each contextFields as field, i}
+                                        <div class="context-row" transition:slide|local>
+                                            <input type="text" bind:value={field.key} placeholder="Key" class="context-input key" />
+                                            <input type="text" bind:value={field.value} placeholder="Value" class="context-input" />
+                                            <button type="button" class="remove-btn" on:click={() => removeContextField(i)}>&times;</button>
                                         </div>
-                                    {/if}
-                                    <textarea 
-                                        id="opt-task" 
-                                        bind:value={task} 
-                                        placeholder="Type your strategic requirements here..." 
-                                        rows="4"
-                                        class="typewriter-textarea"
-                                    ></textarea>
+                                    {/each}
                                 </div>
+                            </div>
+                        {/if}
 
-                                <div class="brief-section" transition:slide>
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label class="brief-label">4. ADDITIONAL DATA (OPTIONAL)</label>
-                                        <button type="button" class="text-btn" on:click={addContextField}>+ Add Field</button>
-                                    </div>
-                                    <div class="context-stack">
-                                        {#each contextFields as field, i}
-                                            <div class="context-row" transition:slide|local>
-                                                <input type="text" bind:value={field.key} placeholder="Key" class="context-input key" />
-                                                <input type="text" bind:value={field.value} placeholder="Value" class="context-input" />
-                                                <button type="button" class="remove-btn" on:click={() => removeContextField(i)}>&times;</button>
-                                            </div>
-                                        {/each}
-                                    </div>
-                                </div>
-                            {/if}
-
-                            <div class="brief-actions grid grid-cols-2 gap-4">
-                                <button type="button" class="btn-secondary" on:click={handleSave} disabled={isSaving || !ghostTitle}>
-                                    {isSaving ? 'SAVING...' : 'SAVE DRAFT'}
-                                </button>
-                                <button type="submit" class="btn-primary" disabled={!isReadyToExecute || loading}>
-                                    {#if loading}
-                                        <span class="spinner"></span> TRANSMITTING...
+                        <div class="brief-actions grid grid-cols-2 gap-4">
+                            <button type="button" class="btn-secondary" on:click={handleSave} disabled={isSaving || !ghostTitle}>
+                                {isSaving ? 'SAVING...' : 'SAVE DRAFT'}
+                            </button>
+                            <button type="submit" class="btn-primary" disabled={!isReadyToExecute || loading}>
+                                {#if loading}
+                                    <span class="spinner"></span> TRANSMITTING...
                                 {:else}
                                     EXECUTE STRATEGY →
                                 {/if}
@@ -401,7 +394,7 @@
                     </form>
                 </div>
 
-                <!-- Right: Output Memo (Ghost Writer) -->
+                <!-- 3. Output Memo (Result) -->
                 <div class="memo-panel paper-card">
                     <div class="memo-header">
                         <div class="agency-seal">HIGH ERA</div>
@@ -416,17 +409,6 @@
                                     <span class="pulse"></span> TWIN-ENGINE
                                 </div>
                             </div>
-                        </div>
-                    </div>
-
-                <!-- Right: Output Memo (Ghost Writer) -->
-                <div class="memo-panel paper-card">
-                    <div class="memo-header">
-                        <div class="agency-seal">HIGH ERA</div>
-                        <div class="memo-meta">
-                            <span>TO: PROJECT MANAGER</span>
-                            <span>RE: {selectedSkill.toUpperCase()} OUTPUT</span>
-                            <span>DATE: {new Date().toLocaleDateString()}</span>
                         </div>
                     </div>
                     <div class="memo-content">
@@ -555,7 +537,7 @@
     .hero-sub { font-size: 1.25rem; margin-bottom: 3rem; line-height: 1.8; color: var(--color-smoke); }
     .hero-actions { display: flex; gap: 1.5rem; }
     .btn-hero-terminal { padding: 1.25rem 3rem; font-size: 0.85rem; border-width: 2px; }
-    .hero-image-styled { width: 100%; display: block; filter: sepia(0.1) contrast(1.1); }
+    .hero-image-styled { width: 100%; display: block; filter: sepia(0.1) contrast(1.1); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
 
     .terminal-section { padding: 4rem 0; border-top: 1px solid var(--color-border); scroll-margin-top: 100px; }
     
@@ -742,5 +724,3 @@
         }
 
     </style>
-
-    
