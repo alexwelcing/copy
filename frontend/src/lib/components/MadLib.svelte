@@ -44,7 +44,7 @@
     .mad-lib {
         font-family: var(--font-serif);
         font-size: 1.25rem;
-        line-height: 2;
+        line-height: 2.5; /* Increased from 2 */
         color: var(--color-navy);
     }
 
@@ -63,7 +63,7 @@
         padding: 0 0.5rem;
         outline: none;
         transition: color 0.3s ease;
-        min-width: 120px;
+        min-width: 150px; /* Increased from 120px */
     }
 
     .mad-input::placeholder {
@@ -75,7 +75,7 @@
 
     .underline {
         position: absolute;
-        bottom: 4px;
+        bottom: 8px; /* Adjusted for higher line-height */
         left: 0;
         width: 100%;
         height: 1px;

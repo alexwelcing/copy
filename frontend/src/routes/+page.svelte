@@ -569,21 +569,21 @@
 
     .brief-header, .memo-header { border-bottom: 2px solid var(--color-navy); margin-bottom: 2rem; padding-bottom: 1.5rem; }
     .form-id { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-smoke); display: block; margin-bottom: 0.5rem; text-transform: uppercase; }
-    .brief-section { margin-bottom: 2.5rem; }
-    .brief-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+    .brief-section { margin-bottom: 3rem; } /* Increased from 2.5rem */
+    .brief-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; } /* Increased gap */
 
-    .brief-presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .brief-presets { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
     .preset-pill-classic {
         background: transparent; border: 1px solid var(--color-border);
-        padding: 0.4rem 0.8rem; font-size: 0.65rem; color: var(--color-smoke);
+        padding: 0.5rem 1rem; font-size: 0.7rem; color: var(--color-smoke); /* Increased padding */
         text-transform: none; letter-spacing: 0; cursor: pointer;
     }
     .preset-pill-classic:hover { background: var(--color-navy); color: white; }
 
-    .context-stack { display: flex; flex-direction: column; gap: 0.5rem; }
-    .context-row { display: flex; gap: 0.5rem; align-items: center; }
-    .context-input { flex: 1; padding: 0.5rem; border: 1px solid var(--color-border); font-size: 0.8rem; font-family: var(--font-mono); }
-    .context-input.key { flex: 0 0 100px; background: #f8f8f8; }
+    .context-stack { display: flex; flex-direction: column; gap: 1rem; } /* Increased gap */
+    .context-row { display: flex; gap: 1rem; align-items: center; }
+    .context-input { flex: 1; padding: 0.75rem; border: 1px solid var(--color-border); font-size: 0.9rem; font-family: var(--font-mono); }
+    .context-input.key { flex: 0 0 120px; background: #f8f8f8; }
     .remove-btn { background: none; border: none; font-size: 1.2rem; color: var(--color-smoke); cursor: pointer; padding: 0 0.5rem; }
     .text-btn { background: none; border: none; color: var(--color-brass); font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
 
@@ -664,32 +664,5 @@
         .hero-content h1 { font-size: 3.5rem; }
         .philosophy-grid { grid-template-columns: 1fr; }
         .paper-card { padding: 2rem; min-height: auto; }
-    .memo-footer { border-top: 1px solid var(--color-border); margin-top: 3rem; padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-    .serial { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-text-muted); }
-    .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-family: var(--font-serif); font-size: 8rem; font-weight: 900; color: rgba(0,0,0,0.03); pointer-events: none; transition: color 0.5s ease; }
-    .watermark.active { color: rgba(180, 83, 9, 0.05); }
-
-    .memo-ghost { height: 400px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; position: relative; padding: 2rem; }
-    .ghost-content { width: 100%; z-index: 1; }
-    .ghost-title { font-family: var(--font-serif); color: var(--color-navy); opacity: 0.4; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
-    .ghost-meta { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-brass); opacity: 0.5; margin-bottom: 2rem; }
-    .ghost-lines { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; width: 100%; }
-    .line { height: 8px; background: var(--color-border); border-radius: 4px; opacity: 0.5; }
-    .ghost-hint { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-text-muted); font-style: italic; }
-
-    .memo-loading { height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--color-smoke); font-family: var(--font-mono); font-size: 0.8rem; }
-
-    .typewriter-cursor { width: 10px; height: 1.2em; background: var(--color-brass); display: inline-block; animation: blink 1s infinite; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-    .philosophy { border-top: 1px solid var(--color-border); padding: 6rem 0; }
-    .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
-    .phil-item h3 { margin-bottom: 1rem; font-family: var(--font-serif); }
-
-    @media (max-width: 1024px) {
-        .hero-grid, .terminal-grid { grid-template-columns: 1fr; }
-        .hero-content h1 { font-size: 3.5rem; }
-        .philosophy-grid { grid-template-columns: 1fr; }
-        .paper-card { padding: 2rem; min-height: auto; }
+        .brief-selectors { grid-template-columns: 1fr; } /* Stack selectors on mobile */
     }
-</style>
