@@ -570,7 +570,13 @@
     .brief-header, .memo-header { border-bottom: 2px solid var(--color-navy); margin-bottom: 2rem; padding-bottom: 1.5rem; }
     .form-id { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-smoke); display: block; margin-bottom: 0.5rem; text-transform: uppercase; }
     .brief-section { margin-bottom: 3rem; } /* Increased from 2.5rem */
-    .brief-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; } /* Increased gap */
+    .brief-selectors { display: flex; flex-wrap: wrap; gap: 1.5rem; } 
+    
+    .classic-select {
+        flex: 1 1 auto;
+        min-width: 200px;
+        /* Maintain other global styles */
+    }
 
     .brief-presets { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem; }
     .preset-pill-classic {
