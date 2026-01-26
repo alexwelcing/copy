@@ -8,7 +8,14 @@
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
 
-	let heroImageUrl = 'https://storage.googleapis.com/marketing-copy-assets/images/generated_c46bed9c-bf11-44f3-8aba-6dcf6d121b8e.png';
+    // ASSET MAP (The Art Dept)
+    const SKILL_IMAGES: Record<string, string> = {
+        'copywriting': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_19df3244-dd73-4616-b7cb-b2ff0953a4da.png',
+        'page-cro': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_8fcfff5e-76ef-42ea-9bd3-b9712cb9c7b7.png',
+        'marketing-ideas': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_0aafc5ea-c92f-45fc-8695-13f447eaaf9a.png',
+        'remotion-script': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_c81a9c5e-5335-487e-a40f-0b58923d649d.png',
+        'default': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_c46bed9c-bf11-44f3-8aba-6dcf6d121b8e.png'
+    };
 
 	// Form state
 	let selectedCategory = 'writing';
@@ -16,6 +23,9 @@
 	let selectedModel = 'claude-sonnet-4-5-20250929';
 	let task = '';
 	let content = '';
+    
+    // Reactive Hero Image
+    $: heroImageUrl = SKILL_IMAGES[selectedSkill] || SKILL_IMAGES['default'];
     
     // MadLib state
     let product = '';
@@ -234,15 +244,15 @@
 
 <div class="optimized-home fade-in">
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero cyber-hero">
         <div class="container">
             <div class="hero-grid">
                 <div class="hero-content">
-                    <div class="badge-classic">ESTABLISHED 2026</div>
-                    <h1>Build Once. <span class="text-italic">Brief</span> Forever.</h1>
-                    <p class="hero-sub">
-                        Save your strategic context to the Dossier. Reuse proven frameworks endlessly. 
-                        Expert marketing automation built on the timeless principles of Madison Avenue.
+                    <div class="badge-cyber">SYSTEM: ONLINE // V2.0</div>
+                    <h1 class="glitch-text" data-text="Your Strategy. Their Execution. Zero Translation Loss.">Your Strategy. Their Execution. Zero Translation Loss.</h1>
+                    <p class="hero-sub cyber-sub">
+                        The briefing infrastructure for CMOs who refuse to watch brilliant strategy die in the handoff.
+                        <br><span class="highlight-cyan">25+ Specialized Agents. Async Execution. Absolute Recall.</span>
                     </p>
                     <div class="hero-actions">
                         <a href="#terminal" class="btn-primary btn-hero-terminal">Enter the Briefing Room</a>
@@ -250,9 +260,10 @@
                     </div>
                 </div>
                 <div class="hero-visual">
-                    <div class="frame-classic">
+                    <div class="frame-cyber">
                         {#if heroImageUrl}
                             <img src={heroImageUrl} alt="High Era Marketing Realism" class="hero-image-styled" />
+                            <div class="scan-line"></div>
                         {:else}
                             <div class="placeholder-classic">
                                 <span>Developing Cinematic Asset...</span>
@@ -664,7 +675,87 @@
         .dossier-sidebar { min-height: auto; margin-bottom: 2rem; }
     }
 
-        @media (max-width: 1024px) {
+        /* CYBER-NOIR THEME OVERRIDES */
+    :global(:root) {
+        --color-cyber-violet: #6B0FFF;
+        --color-cyber-black: #0A0A0A;
+        --color-cyber-cyan: #00FFFF;
+        --color-cyber-silver: #C0C0C0;
+    }
+
+    .cyber-hero {
+        background: linear-gradient(135deg, #050505 0%, #0f0f1a 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cyber-hero::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-image: 
+            linear-gradient(rgba(107, 15, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(107, 15, 255, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+    }
+
+    .badge-cyber {
+        font-family: var(--font-mono);
+        color: var(--color-cyber-cyan);
+        border: 1px solid var(--color-cyber-cyan);
+        padding: 0.2rem 0.6rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    }
+
+    .glitch-text {
+        color: white;
+        text-shadow: 2px 2px 0px var(--color-cyber-violet);
+        position: relative;
+    }
+
+    .cyber-sub {
+        color: #a0a0a0;
+        font-weight: 300;
+    }
+
+    .highlight-cyan {
+        color: var(--color-cyber-cyan);
+        font-weight: 600;
+        display: block;
+        margin-top: 0.5rem;
+    }
+
+    .frame-cyber {
+        border: 1px solid var(--color-cyber-violet);
+        padding: 5px;
+        background: rgba(10, 10, 10, 0.8);
+        box-shadow: 0 0 30px rgba(107, 15, 255, 0.15);
+        position: relative;
+    }
+
+    .scan-line {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 2px;
+        background: rgba(0, 255, 255, 0.5);
+        animation: scan 3s linear infinite;
+        pointer-events: none;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+    }
+
+    @keyframes scan {
+        0% { top: 0%; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+    }
+
+    @media (max-width: 1024px) {
 
             .hero-grid { grid-template-columns: 1fr; }
 
