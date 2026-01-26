@@ -8,6 +8,8 @@
     let userName = '';
 
     onMount(() => {
+        if (!auth) return;
+        
         // Listen for auth state changes
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -25,6 +27,10 @@
     });
 
     async function handleLogin() {
+        if (!auth || !googleProvider) {
+            alert("Auth not initialized (Missing config?)");
+            return;
+        }
         try {
             await signInWithPopup(auth, googleProvider);
             // State update handled by onAuthStateChanged
@@ -36,8 +42,10 @@
     }
 
     async function handleLogout() {
-        await signOut(auth);
-        window.location.reload();
+        if (auth) {
+            await signOut(auth);
+            window.location.reload();
+        }
     }
 </script>
 
