@@ -85,5 +85,23 @@ def main():
     except KeyboardInterrupt:
         streaming_pull_future.cancel()
 
+def start_health_server():
+    """Start a dummy HTTP server to satisfy Cloud Run health checks."""
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    import threading
+
+    class HealthHandler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.end_headers()
+            self.wfile.write(b"OK")
+
+    port = int(os.getenv("PORT", 8080))
+    server = HTTPServer(('0.0.0.0', port), HealthHandler)
+    print(f"Health server listening on port {port}")
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+
 if __name__ == "__main__":
+    start_health_server()
     main()

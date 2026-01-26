@@ -44,13 +44,13 @@ gcloud run deploy "$SERVICE_NAME" \
     --region="$REGION" \
     --image="$IMAGE_NAME:latest" \
     --command="python3" \
-    --args="service/worker.py" \
+    --args="-m,service.worker" \
     --no-allow-unauthenticated \
     --min-instances=1 \
     --max-instances=5 \
     --memory=2Gi \
     --cpu=2 \
-    --set-env-vars="CLAUDE_MODEL=claude-sonnet-4-20250514,GCP_PROJECT_ID=${PROJECT_ID}" \
+    --set-env-vars="CLAUDE_MODEL=claude-sonnet-4-20250514,GCP_PROJECT_ID=${PROJECT_ID},PYTHONPATH=/app" \
     --set-secrets="ANTHROPIC_API_KEY=anthropic-api-key:latest"
 
 log "Worker deployment complete!"

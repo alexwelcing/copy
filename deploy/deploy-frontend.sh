@@ -44,15 +44,61 @@ check_prerequisites() {
     log "Prerequisites OK"
 }
 
+# Fetch Firebase Config
+get_firebase_config() {
+    log "Fetching Firebase configuration..."
+    
+    # Check if vars are already set in environment
+    if [ -n "${VITE_FIREBASE_API_KEY:-}" ]; then
+        log "Using Firebase config from environment variables"
+        _API_KEY="$VITE_FIREBASE_API_KEY"
+        _AUTH_DOMAIN="$VITE_FIREBASE_AUTH_DOMAIN"
+        _PROJECT_ID="$VITE_FIREBASE_PROJECT_ID"
+        _STORAGE_BUCKET="$VITE_FIREBASE_STORAGE_BUCKET"
+        _SENDER_ID="$VITE_FIREBASE_MESSAGING_SENDER_ID"
+        _APP_ID="$VITE_FIREBASE_APP_ID"
+        return
+    fi
+
+    # Try to fetch from Firebase CLI
+    if command -v firebase &> /dev/null; then
+        log "Using Firebase CLI to fetch config..."
+        # We need the App ID. Try to list or assume one exists.
+        # This is tricky without interactivity.
+        # We'll try to find the 'web' app config.
+        
+        CONFIG_JSON=$(firebase apps:sdkconfig web --project "$PROJECT_ID" --json 2>/dev/null || echo "")
+        
+        if [ -n "$CONFIG_JSON" ] && [ "$CONFIG_JSON" != "null" ]; then
+             _API_KEY=$(echo "$CONFIG_JSON" | grep -o '"apiKey": "[^"]*"' | cut -d'"' -f4)
+             _AUTH_DOMAIN=$(echo "$CONFIG_JSON" | grep -o '"authDomain": "[^"]*"' | cut -d'"' -f4)
+             _PROJECT_ID=$(echo "$CONFIG_JSON" | grep -o '"projectId": "[^"]*"' | cut -d'"' -f4)
+             _STORAGE_BUCKET=$(echo "$CONFIG_JSON" | grep -o '"storageBucket": "[^"]*"' | cut -d'"' -f4)
+             _SENDER_ID=$(echo "$CONFIG_JSON" | grep -o '"messagingSenderId": "[^"]*"' | cut -d'"' -f4)
+             _APP_ID=$(echo "$CONFIG_JSON" | grep -o '"appId": "[^"]*"' | cut -d'"' -f4)
+             
+             if [ -n "$_API_KEY" ]; then
+                 log "Firebase config fetched successfully."
+                 return
+             fi
+        fi
+    fi
+    
+    error "Could not determine Firebase configuration. Set VITE_FIREBASE_* environment variables."
+}
+
 # Build and push
 build_and_push() {
+    get_firebase_config
+
     log "Building frontend container..."
 
-    REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+    REPO_ROOT="$(cd "$(dirname "$0")"/.. && pwd)"
 
     gcloud builds submit "$REPO_ROOT/frontend" \
         --project="$PROJECT_ID" \
-        --tag="$IMAGE_NAME:latest" \
+        --config="$REPO_ROOT/frontend/cloudbuild.yaml" \
+        --substitutions="_IMAGE_NAME=$IMAGE_NAME,_API_KEY=$_API_KEY,_AUTH_DOMAIN=$_AUTH_DOMAIN,_PROJECT_ID=$_PROJECT_ID,_STORAGE_BUCKET=$_STORAGE_BUCKET,_SENDER_ID=$_SENDER_ID,_APP_ID=$_APP_ID" \
         --timeout=600s
 
     log "Image built: $IMAGE_NAME:latest"
