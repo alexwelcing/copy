@@ -8,12 +8,12 @@
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
 
-    // ASSET MAP (The Art Dept)
+    // ASSET MAP (Neo-Madison Collection)
     const SKILL_IMAGES: Record<string, string> = {
-        'copywriting': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_19df3244-dd73-4616-b7cb-b2ff0953a4da.png',
-        'page-cro': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_8fcfff5e-76ef-42ea-9bd3-b9712cb9c7b7.png',
-        'marketing-ideas': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_0aafc5ea-c92f-45fc-8695-13f447eaaf9a.png',
-        'remotion-script': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_c81a9c5e-5335-487e-a40f-0b58923d649d.png',
+        'copywriting': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_68947224-4217-4070-b3be-c011f0f45085.png',
+        'page-cro': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_e21500bf-66a2-40cf-a3ab-081068a5486c.png',
+        'marketing-ideas': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_28c3106a-835a-4f55-960f-ed828a2e7113.png',
+        'remotion-script': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_95fee53a-08cd-4ad6-a597-2a685a93a747.png',
         'default': 'https://storage.googleapis.com/marketing-copy-assets/images/generated_c46bed9c-bf11-44f3-8aba-6dcf6d121b8e.png'
     };
 
@@ -244,31 +244,33 @@
 
 <div class="optimized-home fade-in">
     <!-- Hero Section -->
-    <section class="hero cyber-hero">
+    <section class="hero neo-hero">
         <div class="container">
             <div class="hero-grid">
                 <div class="hero-content">
-                    <div class="badge-cyber">SYSTEM: ONLINE // V2.0</div>
-                    <h1 class="glitch-text" data-text="Your Strategy. Their Execution. Zero Translation Loss.">Your Strategy. Their Execution. Zero Translation Loss.</h1>
-                    <p class="hero-sub cyber-sub">
-                        The briefing infrastructure for CMOs who refuse to watch brilliant strategy die in the handoff.
-                        <br><span class="highlight-cyan">25+ Specialized Agents. Async Execution. Absolute Recall.</span>
+                    <div class="badge-classic">ESTABLISHED 2026</div>
+                    <h1>The Agency That <span class="text-italic">Remembers</span>.</h1>
+                    <p class="hero-sub">
+                        Your brand context, saved forever. Your strategy, executed instantly.
+                        <br>The briefing infrastructure for leaders who refuse to repeat themselves.
                     </p>
                     <div class="hero-actions">
-                        <a href="#terminal" class="btn-primary btn-hero-terminal">Enter the Briefing Room</a>
+                        <a href="#terminal" class="btn-primary btn-hero-terminal">Open Briefing Terminal</a>
                         <button class="btn-secondary">Request API Credentials</button>
                     </div>
                 </div>
                 <div class="hero-visual">
-                    <div class="frame-cyber">
+                    <div class="frame-classic">
                         {#if heroImageUrl}
                             <img src={heroImageUrl} alt="High Era Marketing Realism" class="hero-image-styled" />
-                            <div class="scan-line"></div>
                         {:else}
                             <div class="placeholder-classic">
                                 <span>Developing Cinematic Asset...</span>
                             </div>
                         {/if}
+                    </div>
+                    <div class="caption-classic">
+                        FIG 1. THE TWIN-ENGINE WORKFLOW
                     </div>
                 </div>
             </div>
@@ -675,84 +677,41 @@
         .dossier-sidebar { min-height: auto; margin-bottom: 2rem; }
     }
 
-        /* CYBER-NOIR THEME OVERRIDES */
-    :global(:root) {
-        --color-cyber-violet: #6B0FFF;
-        --color-cyber-black: #0A0A0A;
-        --color-cyber-cyan: #00FFFF;
-        --color-cyber-silver: #C0C0C0;
-    }
-
-    .cyber-hero {
-        background: linear-gradient(135deg, #050505 0%, #0f0f1a 100%);
-        color: white;
-        position: relative;
-        overflow: hidden;
+        /* NEO-MADISON THEME */
+    .neo-hero {
+        background-color: var(--color-bg);
+        border-bottom: 1px solid var(--color-border);
     }
     
-    .cyber-hero::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background-image: 
-            linear-gradient(rgba(107, 15, 255, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(107, 15, 255, 0.03) 1px, transparent 1px);
-        background-size: 40px 40px;
-        pointer-events: none;
+    .neo-madison-section {
+        background-color: #f8f8f8;
+        border-top: 1px solid var(--color-border);
+        padding: 8rem 0;
     }
 
-    .badge-cyber {
+    .section-header-center {
+        text-align: center;
+        margin-bottom: 5rem;
+    }
+    
+    .section-header-center h2 {
+        font-size: 3rem;
+        color: var(--color-navy);
+        margin-bottom: 1rem;
+    }
+
+    .phil-item {
+        border-left: 1px solid var(--color-border);
+        padding-left: 2rem;
+        position: relative;
+    }
+    
+    .phil-number {
         font-family: var(--font-mono);
-        color: var(--color-cyber-cyan);
-        border: 1px solid var(--color-cyber-cyan);
-        padding: 0.2rem 0.6rem;
-        font-size: 0.7rem;
-        letter-spacing: 0.2em;
-        display: inline-block;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-    }
-
-    .glitch-text {
-        color: white;
-        text-shadow: 2px 2px 0px var(--color-cyber-violet);
-        position: relative;
-    }
-
-    .cyber-sub {
-        color: #a0a0a0;
-        font-weight: 300;
-    }
-
-    .highlight-cyan {
-        color: var(--color-cyber-cyan);
-        font-weight: 600;
-        display: block;
-        margin-top: 0.5rem;
-    }
-
-    .frame-cyber {
-        border: 1px solid var(--color-cyber-violet);
-        padding: 5px;
-        background: rgba(10, 10, 10, 0.8);
-        box-shadow: 0 0 30px rgba(107, 15, 255, 0.15);
-        position: relative;
-    }
-
-    .scan-line {
-        position: absolute;
-        top: 0; left: 0; width: 100%; height: 2px;
-        background: rgba(0, 255, 255, 0.5);
-        animation: scan 3s linear infinite;
-        pointer-events: none;
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
-    }
-
-    @keyframes scan {
-        0% { top: 0%; opacity: 0; }
-        10% { opacity: 1; }
-        90% { opacity: 1; }
-        100% { top: 100%; opacity: 0; }
+        color: var(--color-brass);
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+        letter-spacing: 0.1em;
     }
 
     @media (max-width: 1024px) {
