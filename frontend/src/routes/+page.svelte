@@ -658,11 +658,22 @@
         .dossier-sidebar { min-height: auto; margin-bottom: 2rem; }
     }
 
-    @media (max-width: 1024px) {
-        .hero-grid { grid-template-columns: 1fr; }
-        .terminal-grid-main { grid-template-columns: 1fr; }
-        .hero-content h1 { font-size: 3.5rem; }
-        .philosophy-grid { grid-template-columns: 1fr; }
-        .paper-card { padding: 2rem; min-height: auto; }
-        .brief-selectors { grid-template-columns: 1fr; } /* Stack selectors on mobile */
-    }
+        @media (max-width: 1024px) {
+
+            .hero-grid { grid-template-columns: 1fr; }
+
+            .terminal-grid-main { grid-template-columns: 1fr; }
+
+            .hero-content h1 { font-size: 3.5rem; }
+
+            .philosophy-grid { grid-template-columns: 1fr; }
+
+            .paper-card { padding: 2rem; min-height: auto; }
+
+            .brief-selectors { grid-template-columns: 1fr; } /* Stack selectors on mobile */
+
+        }
+
+    </style>
+
+    
