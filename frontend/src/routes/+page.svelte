@@ -3,8 +3,7 @@
 	import { getPresetsForSkill, type Preset } from '$lib/presets';
     import { onMount } from 'svelte';
 
-	// Toggle State for Dogfooding demonstration
-	let showOptimized = false;
+	let heroImageUrl = 'https://storage.googleapis.com/marketing-copy-assets/images/generated_c46bed9c-bf11-44f3-8aba-6dcf6d121b8e.png';
 
 	// Form state
 	let selectedCategory = 'writing';
@@ -23,11 +22,6 @@
 	let result: WorkResult | null = null;
 
 	// UI State
-	let showPresets = false;
-	let showAdvanced = false;
-	let showAllPresets = false;
-
-	$: currentStep = task.trim() ? 2 : 1;
 	$: isReadyToExecute = selectedSkill && task.trim();
 	$: skillPresets = getPresetsForSkill(selectedSkill);
 	$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
@@ -58,7 +52,6 @@
 				{ key: 'audience', value: '' }
 			];
 		}
-		showPresets = false;
 	}
 
 	async function handleSubmit() {
@@ -97,11 +90,6 @@
 		}
 	}
 
-	function clearResults() {
-		result = null;
-		error = null;
-	}
-
 	function copyOutput() {
 		if (result?.output) {
 			navigator.clipboard.writeText(result.output);
@@ -128,510 +116,227 @@
 </script>
 
 <svelte:head>
-	<title>{showOptimized ? 'Marketing Skills, Automated | Agency AI' : 'AI Marketing Agency'}</title>
+	<title>Strategic Marketing Automation | HIGH ERA</title>
 </svelte:head>
 
-<!-- Global Mode Toggle -->
-<div class="mode-toggle-wrapper container">
-    <div class="mode-toggle glass">
-        <button class:active={!showOptimized} on:click={() => showOptimized = false}>Original View</button>
-        <div class="toggle-divider"></div>
-        <button class:active={showOptimized} on:click={() => showOptimized = true}>✨ Optimized View</button>
-    </div>
-</div>
-
-{#if !showOptimized}
-    <!-- ORIGINAL HOMEPAGE -->
-    <div class="container fade-in">
-        <div class="page-header">
-            <h1>AI Marketing Skills That Actually Work</h1>
-            <p class="value-prop">
-                Get expert-level copy, audits, and strategy in 30 seconds. 
-                No prompt engineering required—just describe what you need.
-            </p>
-            <div class="trust-indicators">
-                <div class="stat"><strong>23</strong> specialized skills</div>
-                <div class="stat"><strong>10-30s</strong> average execution</div>
-                <div class="stat"><strong>Zero</strong> AI expertise needed</div>
-            </div>
-        </div>
-
-        <div class="progress-steps glass">
-            <div class="step" class:complete={currentStep >= 1}>
-                <span class="step-number">1</span>
-                <span class="step-label">Choose Skill</span>
-            </div>
-            <div class="step-line" class:complete={currentStep >= 2}></div>
-            <div class="step" class:complete={currentStep >= 2}>
-                <span class="step-number">2</span>
-                <span class="step-label">Describe Task</span>
-            </div>
-            <div class="step-line" class:complete={currentStep >= 3}></div>
-            <div class="step" class:complete={currentStep >= 3}>
-                <span class="step-number">3</span>
-                <span class="step-label">Get Results</span>
-            </div>
-        </div>
-
-        <div class="layout">
-            <!-- Input Panel -->
-            <div class="panel glass">
-                <form on:submit|preventDefault={handleSubmit}>
-                    <!-- Skill Selection -->
-                    <div class="form-section">
-                        <h3>1. Choose Skill</h3>
-                        <div class="skill-selector">
-                            <div class="category-tabs">
-                                {#each Object.entries(SKILL_CATEGORIES) as [key, cat]}
-                                    <button type="button" class="category-tab" class:active={selectedCategory === key} on:click={() => selectedCategory = key}>{cat.label}</button>
-                                {/each}
-                            </div>
-                            <div class="skill-grid">
-                                {#each Object.entries(categorySkills) as [skillKey, description]}
-                                    <button type="button" class="skill-card" class:active={selectedSkill === skillKey} on:click={() => selectedSkill = skillKey}>
-                                        <span class="skill-name">{skillKey}</span>
-                                        <span class="skill-desc">{description}</span>
-                                    </button>
-                                {/each}
-                            </div>
-                        </div>
+<div class="optimized-home fade-in">
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-grid">
+                <div class="hero-content">
+                    <div class="badge-classic">ESTABLISHED 2026</div>
+                    <h1>The <span class="text-italic">Human</span> Side of Automation.</h1>
+                    <p class="hero-sub">
+                        Expert marketing strategies executed with mid-century precision. 25+ specialized skills built on the timeless frameworks of Madison Avenue.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="#terminal" class="btn-primary btn-hero-terminal">Open Briefing Terminal</a>
+                        <button class="btn-secondary">Request API Credentials</button>
                     </div>
-
-                    <!-- Model Selection -->
-                    <div class="form-section">
-                        <h3>2. Select Intelligence</h3>
-                        <div class="model-selector">
-                            <label class="model-card" class:active={selectedModel.includes('sonnet')}>
-                                <input type="radio" name="model" value="claude-sonnet-4-5-20250929" bind:group={selectedModel}>
-                                <div class="model-info">
-                                    <span class="model-name">Power (Claude 3.5)</span>
-                                    <span class="model-desc">Best for complex audits and strategy</span>
-                                </div>
-                            </label>
-                            <label class="model-card" class:active={selectedModel.includes('MiniMax')}>
-                                <input type="radio" name="model" value="MiniMax-M2.1" bind:group={selectedModel}>
-                                <div class="model-info">
-                                    <span class="model-name">Speed (MiniMax M2.1)</span>
-                                    <span class="model-desc">Ultra-fast execution for copy and video scripts</span>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>3. Describe Task</h3>
-                        {#if skillPresets.length > 0}
-                            <div class="quick-start">
-                                <label class="quick-start-label" for="task">⚡ Quick Start</label>
-                                <div class="presets-list-compact">
-                                    {#each (showAllPresets ? skillPresets : skillPresets.slice(0, 3)) as preset}
-                                        <button type="button" class="preset-pill" on:click={() => loadPreset(preset)}>{preset.name}</button>
-                                    {/each}
-                                </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="frame-classic">
+                        {#if heroImageUrl}
+                            <img src={heroImageUrl} alt="High Era Marketing Realism" class="hero-image-styled" />
+                        {:else}
+                            <div class="placeholder-classic">
+                                <span>Developing Cinematic Asset...</span>
                             </div>
                         {/if}
-                        <textarea id="task" bind:value={task} placeholder="Describe what you need..." rows="4"></textarea>
                     </div>
-
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary" disabled={!isReadyToExecute || loading}>
-                            {#if loading}<span class="spinner"></span> Generating...{:else}Execute Skill →{/if}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Results Panel -->
-            <div class="panel glass">
-                <div class="results-header"><h3>Results</h3></div>
-                {#if result}
-                    <div class="result-content">
-                        <div class="output-content">{@html formatOutput(result.output)}</div>
-                    </div>
-                {:else}
-                    <div class="empty-state">
-                        <div class="empty-icon">✨</div>
-                        <p>Results appear here in seconds.</p>
-                    </div>
-                {/if}
+                </div>
             </div>
         </div>
-    </div>
-{:else}
-    <!-- OPTIMIZED HOMEPAGE (Based on CRO Audit & Programmatic Strategy) -->
-    <div class="optimized-home fade-in">
-        <!-- Hero Section -->
-        <section class="hero">
-            <div class="container">
-                <div class="hero-grid">
-                    <div class="hero-content">
-                        <div class="badge neon-badge">LAUNCHING SOON</div>
-                        <h1>Marketing Skills, <span class="text-indigo">Automated.</span></h1>
-                        <p class="hero-sub">
-                            Execute expert marketing strategies in seconds, not hours. Access 25+ specialized skills through an intuitive UI or integrate via API.
-                        </p>
-                        <div class="hero-actions">
-                            <button class="btn-primary btn-xl" on:click={() => showOptimized = false}>Try the Interface ↓</button>
-                            <button class="btn-secondary btn-xl">View API Docs</button>
-                        </div>
-                        <div class="hero-trust">
-                            <div class="trust-avatars">
-                                <div class="avatar"></div><div class="avatar"></div><div class="avatar"></div>
-                            </div>
-                            <span>Joined by 500+ Early Access Marketers</span>
-                        </div>
-                    </div>
-                    <div class="hero-visual">
-                        <div class="visual-card glass">
-                            <div class="card-header">
-                                <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                                <div class="card-title">remotion-script.v1</div>
-                            </div>
-                            <div class="card-body">
-                                <div class="code-line"><code>const</code> script = AI.generate(&#123;</div>
-                                <div class="code-line indent">skill: <span class="text-mint">'remotion-script'</span>,</div>
-                                <div class="code-line indent">target: <span class="text-mint">'SaaS Founders'</span></div>
-                                <div class="code-line">&#125;);</div>
-                                <div class="progress-pulse"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+    </section>
 
-        <!-- Use Cases / Skills Section -->
-        <section class="skills-showcase">
-            <div class="container">
-                <div class="section-header-centered">
-                    <h2>Expert Frameworks, <span class="text-mint">Instant Execution.</span></h2>
-                    <p>Stop searching for frameworks. Our AI is pre-trained on agency-grade methodologies.</p>
-                </div>
-                
-                <div class="skills-grid-optimized">
-                    <div class="skill-box glass">
-                        <div class="icon">🔍</div>
-                        <h3>SEO & Content</h3>
-                        <ul>
-                            <li>SEO Audits</li>
-                            <li>Programmatic SEO</li>
-                            <li>Schema Markup</li>
-                        </ul>
+    <!-- Briefing Terminal (The Tool) -->
+    <section id="terminal" class="terminal-section">
+        <div class="container">
+            <div class="terminal-grid">
+                <!-- Left: Input Brief -->
+                <div class="brief-panel paper-card">
+                    <div class="brief-header">
+                        <span class="form-id">FORM 22-B: STRATEGIC BRIEF</span>
+                        <h2>Define the Objective</h2>
                     </div>
-                    <div class="skill-box glass">
-                        <div class="icon">📈</div>
-                        <h3>CRO & Growth</h3>
-                        <ul>
-                            <li>Landing Page Audits</li>
-                            <li>Form Optimization</li>
-                            <li>Pricing Strategy</li>
-                        </ul>
-                    </div>
-                    <div class="skill-box glass">
-                        <div class="icon">🎬</div>
-                        <h3>Programmatic Video</h3>
-                        <ul>
-                            <li>Remotion Scripting</li>
-                            <li>Visual Layouts</li>
-                            <li>Automated Ads</li>
-                        </ul>
-                    </div>
-                    <div class="skill-box glass">
-                        <div class="icon">✍️</div>
-                        <h3>Copy & Strategy</h3>
-                        <ul>
-                            <li>Email Sequences</li>
-                            <li>Competitor Analysis</li>
-                            <li>Market Positioning</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
+                    
+                    <form on:submit|preventDefault={handleSubmit} class="brief-form">
+                        <!-- Skill Selection -->
+                        <div class="brief-section">
+                            <label class="brief-label">1. DEPARTMENT & SPECIALIZATION</label>
+                            <div class="brief-selectors">
+                                <select bind:value={selectedCategory} class="classic-select">
+                                    {#each Object.entries(SKILL_CATEGORIES) as [key, cat]}
+                                        <option value={key}>{cat.label}</option>
+                                    {/each}
+                                </select>
+                                <select bind:value={selectedSkill} class="classic-select">
+                                    {#each Object.entries(categorySkills) as [skillKey, _]}
+                                        <option value={skillKey}>{skillKey.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}</option>
+                                    {/each}
+                                </select>
+                            </div>
+                        </div>
 
-        <!-- Pricing Section (CRO Recommended) -->
-        <section class="pricing-optimized">
-            <div class="container">
-                <div class="pricing-grid">
-                    <div class="price-card glass">
-                        <div class="price-header">
-                            <h4>Starter</h4>
-                            <div class="price">$49<span>/mo</span></div>
+                        <!-- Task Input -->
+                        <div class="brief-section">
+                            <label class="brief-label" for="opt-task">2. PROJECT DESCRIPTION</label>
+                            {#if skillPresets.length > 0}
+                                <div class="brief-presets">
+                                    {#each skillPresets.slice(0, 3) as preset}
+                                        <button type="button" class="preset-pill-classic" on:click={() => loadPreset(preset)}>{preset.name}</button>
+                                    {/each}
+                                </div>
+                            {/if}
+                            <textarea 
+                                id="opt-task" 
+                                bind:value={task} 
+                                placeholder="Type your strategic requirements here..." 
+                                rows="6"
+                                class="typewriter-textarea"
+                            ></textarea>
                         </div>
-                        <ul class="price-features">
-                            <li>50 skill executions</li>
-                            <li>All 25+ skills</li>
-                            <li>UI Access</li>
-                        </ul>
-                        <button class="btn-secondary">Start 14-Day Trial</button>
-                    </div>
-                    <div class="price-card glass featured">
-                        <div class="featured-badge">MOST POPULAR</div>
-                        <div class="price-header">
-                            <h4>Professional</h4>
-                            <div class="price">$199<span>/mo</span></div>
+
+                        <!-- Context Fields -->
+                        <div class="brief-section">
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="brief-label">3. KEY CONTEXT</label>
+                                <button type="button" class="text-btn" on:click={addContextField}>+ Add Field</button>
+                            </div>
+                            <div class="context-stack">
+                                {#each contextFields as field, i}
+                                    <div class="context-row">
+                                        <input type="text" bind:value={field.key} placeholder="Key" class="context-input key" />
+                                        <input type="text" bind:value={field.value} placeholder="Value" class="context-input" />
+                                        <button type="button" class="remove-btn" on:click={() => removeContextField(i)}>&times;</button>
+                                    </div>
+                                {/each}
+                            </div>
                         </div>
-                        <ul class="price-features">
-                            <li>250 skill executions</li>
-                            <li>UI + API Access</li>
-                            <li>Priority Support</li>
-                        </ul>
-                        <button class="btn-primary">Get Early Access</button>
+
+                        <div class="brief-actions">
+                            <button type="submit" class="btn-primary w-full" disabled={!isReadyToExecute || loading}>
+                                {#if loading}
+                                    <span class="spinner"></span> TRANSMITTING...
+                                {:else}
+                                    EXECUTE STRATEGY →
+                                {/if}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                                    <!-- Right: Output Memo -->
+                                    <div class="memo-panel paper-card">
+                                        <div class="memo-header">
+                                            <div class="agency-seal">HIGH ERA</div>
+                                            <div class="memo-meta">
+                                                <span>TO: PROJECT MANAGER</span>
+                                                <span>RE: {selectedSkill.toUpperCase()} OUTPUT</span>
+                                                <span>DATE: {new Date().toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                    <div class="memo-content">
+                        {#if result}
+                            <div class="memo-body typewriter">
+                                {@html formatOutput(result.output)}
+                            </div>
+                            <div class="memo-footer">
+                                <button class="btn-secondary btn-sm" on:click={copyOutput}>Copy to Clipboard</button>
+                                <span class="serial">SN: {result.id.slice(0,8)}</span>
+                            </div>
+                        {:else if loading}
+                            <div class="memo-loading">
+                                <div class="typewriter-cursor"></div>
+                                <p>Processing strategy... Intelligence is being applied.</p>
+                            </div>
+                        {:else}
+                            <div class="memo-empty">
+                                <div class="watermark">DRAFT</div>
+                                <p>Awaiting briefing input...</p>
+                            </div>
+                        {/if}
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
-{/if}
+        </div>
+    </section>
+
+    <!-- The Value Section -->
+    <section class="philosophy">
+        <div class="container">
+            <div class="philosophy-grid">
+                <div class="phil-item">
+                    <h3>Tactile Precision</h3>
+                    <p>We believe in the weight of words. Our AI doesn't just predict; it constructs using the same strategic rigor as the legends of advertising.</p>
+                </div>
+                <div class="phil-item">
+                    <h3>Human Realism</h3>
+                    <p>No neon. No cliches. Just high-fidelity execution that respects the intelligence of your audience and the humanity of your brand.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
 
 <style>
-    /* Mode Toggle */
-    .mode-toggle-wrapper {
-        display: flex;
-        justify-content: center;
-        margin: 2rem auto;
-    }
+    /* Page Specific Layout */
+    .optimized-home { padding-bottom: 8rem; background: var(--color-bg); }
+    .hero { padding: 6rem 0; }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 5rem; align-items: center; }
+    .hero-content h1 { font-size: 5rem; margin-bottom: 2rem; color: var(--color-navy); }
+    .hero-sub { font-size: 1.25rem; margin-bottom: 3rem; line-height: 1.8; color: var(--color-smoke); }
+    .hero-actions { display: flex; gap: 1.5rem; }
+    .btn-hero-terminal { padding: 1.25rem 3rem; font-size: 0.85rem; border-width: 2px; }
+    .hero-image-styled { width: 100%; display: block; filter: sepia(0.1) contrast(1.1); }
 
-    .mode-toggle {
-        display: flex;
-        padding: 0.25rem;
-        border-radius: 40px;
-        background: rgba(15, 23, 42, 0.8);
-    }
-
-    .mode-toggle button {
-        padding: 0.5rem 1.5rem;
-        border-radius: 30px;
-        font-size: 0.875rem;
-        background: transparent;
-        color: var(--color-text-secondary);
-        transition: all 0.3s ease;
-    }
-
-    .mode-toggle button.active {
-        background: var(--color-indigo);
-        color: white;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
-    }
-
-    .toggle-divider {
-        width: 1px;
-        background: var(--color-border);
-        margin: 0.5rem 0.25rem;
-    }
-
-    /* Original View Styles */
-    .page-header { margin-bottom: 3rem; text-align: center; }
-    .page-header h1 { font-size: 3rem; margin-bottom: 1rem; }
-    .value-prop { font-size: 1.25rem; max-width: 800px; margin: 0 auto 2rem; }
-    .trust-indicators { justify-content: center; }
+    .terminal-section { padding: 4rem 0; border-top: 1px solid var(--color-border); scroll-margin-top: 100px; }
+    .terminal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
     
-    .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-    .panel { min-height: 600px; border-radius: var(--radius-xl); padding: 2rem; }
+    .brief-header, .memo-header { border-bottom: 2px solid var(--color-navy); margin-bottom: 2rem; padding-bottom: 1.5rem; }
+    .form-id { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-smoke); display: block; margin-bottom: 0.5rem; }
+    .brief-section { margin-bottom: 2.5rem; }
+    .brief-selectors { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+
+    .brief-presets { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+    .preset-pill-classic {
+        background: transparent; border: 1px solid var(--color-border);
+        padding: 0.4rem 0.8rem; font-size: 0.65rem; color: var(--color-smoke);
+        text-transform: none; letter-spacing: 0; cursor: pointer;
+    }
+    .preset-pill-classic:hover { background: var(--color-navy); color: white; }
+
+    .context-stack { display: flex; flex-direction: column; gap: 0.5rem; }
+    .context-row { display: flex; gap: 0.5rem; align-items: center; }
+    .context-input { flex: 1; padding: 0.5rem; border: 1px solid var(--color-border); font-size: 0.8rem; font-family: var(--font-mono); }
+    .context-input.key { flex: 0 0 100px; background: #f8f8f8; }
+    .remove-btn { background: none; border: none; font-size: 1.2rem; color: var(--color-smoke); cursor: pointer; padding: 0 0.5rem; }
+    .text-btn { background: none; border: none; color: var(--color-brass); font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
+
+    /* Memo Specifics */
+    .memo-meta { display: flex; flex-direction: column; gap: 0.25rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-navy); }
+    .agency-seal { position: absolute; top: 3rem; right: 3rem; font-family: var(--font-serif); font-weight: 900; opacity: 0.1; font-size: 1.5rem; transform: rotate(-15deg); border: 2px solid currentColor; padding: 0.5rem; }
+    .memo-body :global(p) { margin-bottom: 1.5rem; }
+    .memo-body :global(h5), .memo-body :global(h4), .memo-body :global(h3) { font-family: var(--font-serif); margin: 2rem 0 1rem; color: var(--color-navy); }
     
-    /* Optimized View Styles */
-    .optimized-home {
-        padding-bottom: 5rem;
-    }
+    .memo-footer { border-top: 1px solid var(--color-border); margin-top: 3rem; padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .serial { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-text-muted); }
+    .watermark { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-family: var(--font-serif); font-size: 8rem; font-weight: 900; color: rgba(0,0,0,0.03); pointer-events: none; }
+    .memo-empty { height: 400px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); }
+    .memo-loading { height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; color: var(--color-smoke); font-family: var(--font-mono); font-size: 0.8rem; }
 
-    .hero {
-        padding: 4rem 0 6rem;
-    }
+    .typewriter-cursor { width: 10px; height: 1.2em; background: var(--color-brass); display: inline-block; animation: blink 1s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    .hero-grid {
-        display: grid;
-        grid-template-columns: 1.2fr 0.8fr;
-        gap: 4rem;
-        align-items: center;
-    }
-
-    .hero-content h1 {
-        font-size: 4.5rem;
-        margin: 1.5rem 0;
-        line-height: 1;
-    }
-
-    .text-indigo { color: var(--color-indigo); }
-    .text-mint { color: var(--color-mint); }
-
-    .hero-sub {
-        font-size: 1.25rem;
-        margin-bottom: 2.5rem;
-        max-width: 540px;
-    }
-
-    .hero-actions {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 3rem;
-    }
-
-    .btn-xl {
-        padding: 1rem 2rem;
-        font-size: 1.125rem;
-    }
-
-    .neon-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        background: rgba(16, 185, 129, 0.1);
-        color: var(--color-mint);
-        font-weight: 700;
-        font-size: 0.75rem;
-        letter-spacing: 0.1em;
-        border: 1px solid var(--color-mint);
-    }
-
-    .hero-trust {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        font-size: 0.875rem;
-        color: var(--color-text-muted);
-    }
-
-    .trust-avatars {
-        display: flex;
-    }
-
-    .avatar { width: 32px; height: 32px; border-radius: 50%; background: #334155; border: 2px solid var(--color-bg); margin-left: -8px; }
-    .avatar:first-child { margin-left: 0; }
-
-    .visual-card {
-        border-radius: var(--radius-xl);
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-
-    .card-header {
-        padding: 1rem;
-        background: rgba(255,255,255,0.03);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        border-bottom: 1px solid var(--color-border);
-    }
-
-    .dot { width: 10px; height: 10px; border-radius: 50%; background: #334155; }
-    .card-title { font-family: var(--font-mono); font-size: 0.75rem; margin-left: 0.5rem; color: var(--color-text-muted); }
-
-    .card-body {
-        padding: 2rem;
-        font-family: var(--font-mono);
-        font-size: 1rem;
-    }
-
-    .indent { padding-left: 1.5rem; }
-
-    .progress-pulse {
-        height: 4px;
-        background: var(--color-indigo);
-        width: 60%;
-        margin-top: 2rem;
-        border-radius: 2px;
-        box-shadow: 0 0 15px var(--color-indigo);
-        animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-        0% { opacity: 0.5; width: 10%; }
-        50% { opacity: 1; width: 80%; }
-        100% { opacity: 0.5; width: 10%; }
-    }
-
-    .skills-showcase {
-        padding: 6rem 0;
-        background: rgba(0,0,0,0.2);
-    }
-
-    .section-header-centered {
-        text-align: center;
-        margin-bottom: 4rem;
-    }
-
-    .section-header-centered h2 {
-        margin-bottom: 1rem;
-    }
-
-    .skills-grid-optimized {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-    }
-
-    .skill-box {
-        padding: 2rem;
-        border-radius: var(--radius-lg);
-        transition: transform 0.3s ease;
-    }
-
-    .skill-box:hover {
-        transform: translateY(-5px);
-        border-color: var(--color-indigo);
-    }
-
-    .skill-box .icon { font-size: 2rem; margin-bottom: 1.5rem; }
-    .skill-box h3 { font-size: 1.25rem; margin-bottom: 1rem; }
-    .skill-box ul { list-style: none; padding: 0; }
-    .skill-box li { color: var(--color-text-secondary); font-size: 0.875rem; margin-bottom: 0.5rem; }
-
-    .pricing-optimized { padding: 6rem 0; }
-    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 800px; margin: 0 auto; }
-    
-    .price-card { padding: 3rem; border-radius: var(--radius-xl); text-align: center; position: relative; }
-    .price-card.featured { border: 2px solid var(--color-indigo); transform: scale(1.05); }
-    
-    .featured-badge {
-        position: absolute;
-        top: -12px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--color-indigo);
-        color: white;
-        padding: 0.25rem 1rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 700;
-    }
-
-    .price-header h4 { margin-bottom: 1rem; color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-    .price { font-size: 3rem; font-weight: 800; margin-bottom: 2rem; }
-    .price span { font-size: 1rem; color: var(--color-text-muted); font-weight: 400; }
-    
-    .price-features { list-style: none; padding: 0; margin-bottom: 2.5rem; text-align: left; }
-    .price-features li { margin-bottom: 1rem; color: var(--color-text-secondary); display: flex; align-items: center; gap: 0.5rem; }
-    .price-features li::before { content: '✓'; color: var(--color-mint); font-weight: 700; }
-
-    /* Reuse existing component styles */
-    .form-section { margin-bottom: 1.5rem; }
-    .category-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    .category-tab { background: rgba(255,255,255,0.05); border: 1px solid var(--color-border); padding: 0.5rem 1rem; font-size: 0.8rem; border-radius: 4px; }
-    .category-tab.active { background: var(--color-indigo); color: white; border-color: var(--color-indigo); }
-    
-    .skill-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
-    .skill-card { background: rgba(255,255,255,0.03); border: 1px solid var(--color-border); padding: 1rem; text-align: left; border-radius: 8px; }
-    .skill-card.active { border-color: var(--color-indigo); background: rgba(79, 70, 229, 0.1); }
-    .skill-name { display: block; font-weight: 600; margin-bottom: 0.25rem; }
-    .skill-desc { font-size: 0.75rem; color: var(--color-text-muted); }
-
-    .model-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-    .model-card { border: 1px solid var(--color-border); padding: 1rem; border-radius: 8px; display: flex; gap: 1rem; cursor: pointer; }
-    .model-card.active { border-color: var(--color-indigo); background: rgba(79, 70, 229, 0.05); }
-    .model-name { font-weight: 600; display: block; }
-    .model-desc { font-size: 0.75rem; color: var(--color-text-muted); }
-
-    textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid var(--color-border); border-radius: 8px; padding: 1rem; color: white; }
-    .form-actions { margin-top: 1.5rem; }
-    .form-actions button { width: 100%; padding: 1rem; font-size: 1rem; }
+    .philosophy { border-top: 1px solid var(--color-border); padding: 6rem 0; }
+    .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+    .phil-item h3 { margin-bottom: 1rem; font-family: var(--font-serif); }
 
     @media (max-width: 1024px) {
-        .hero-grid { grid-template-columns: 1fr; text-align: center; }
-        .hero-content h1 { font-size: 3rem; }
-        .hero-sub { margin: 0 auto 2rem; }
-        .hero-actions { justify-content: center; }
-        .hero-trust { justify-content: center; }
-        .skills-grid-optimized { grid-template-columns: 1fr 1fr; }
-        .pricing-grid { grid-template-columns: 1fr; }
+        .hero-grid, .terminal-grid { grid-template-columns: 1fr; }
+        .hero-content h1 { font-size: 3.5rem; }
+        .philosophy-grid { grid-template-columns: 1fr; }
+        .paper-card { padding: 2rem; min-height: auto; }
     }
 </style>

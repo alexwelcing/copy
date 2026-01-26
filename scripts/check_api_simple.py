@@ -4,7 +4,8 @@ import os
 from pathlib import Path
 
 def run_audit():
-    with open('frontend/src/routes/+page.svelte', 'r') as f:
+    project_root = Path(__file__).parent.parent
+    with open(project_root / 'frontend/src/routes/+page.svelte', 'r') as f:
         content = f.read()
 
     payload = {

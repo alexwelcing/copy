@@ -15,6 +15,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from service.api.schemas import (
+    AssetRequest,
     ErrorResponse,
     HealthResponse,
     SkillName,
@@ -23,6 +24,8 @@ from service.api.schemas import (
 )
 from service.core.executor import get_executor, SkillExecutor
 from service.core.storage import get_storage
+from service.core.assets import get_asset_manager
+from service.core.models import ImageModels, VideoModels, AudioModels
 
 
 VERSION = "1.0.0"
@@ -178,11 +181,40 @@ async def list_skills():
     return {"skills": skills, "total": len(SkillName)}
 
 
+from starlette.concurrency import run_in_threadpool
+
 @app.get("/assets")
 async def list_assets(prefix: Optional[str] = None):
     """List assets in Cloud Storage."""
     storage = get_storage()
     return {"assets": storage.list_assets(prefix=prefix)}
+
+
+@app.post("/generate-asset")
+async def generate_asset(request: AssetRequest):
+    """Generate an AI asset via FAL and store in GCS."""
+    manager = get_asset_manager()
+    
+    if request.type == "image":
+        if not request.model:
+            # Smart default based on prompt content
+            text_keywords = ["text", "sign", "label", "headline", "words", "typography", "logo"]
+            if any(k in request.prompt.lower() for k in text_keywords):
+                model = ImageModels.QWEN_IMAGE_2512  # Better for text
+            else:
+                model = ImageModels.FLUX_PRO_1_1  # Best for general photorealism
+        else:
+            model = request.model
+        
+        result = await manager.generate_image(request.prompt, model=model)
+    elif request.type == "video":
+        result = await manager.generate_video(request.prompt, model=request.model or VideoModels.KLING_V1_STANDARD)
+    elif request.type == "audio":
+        result = await manager.generate_audio(request.prompt, model=request.model or AudioModels.STABLE_AUDIO)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid asset type. Use 'image', 'video', or 'audio'.")
+    
+    return result
 
 
 @app.post("/work", response_model=WorkResult)

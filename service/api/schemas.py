@@ -177,3 +177,15 @@ class ErrorResponse(BaseModel):
     error: str
     detail: Optional[str] = None
     skill: Optional[str] = None
+
+class AssetRequest(BaseModel):
+    """Request to generate an AI asset."""
+    type: str = Field(..., description="'image', 'video', or 'audio'")
+    prompt: str = Field(..., description="The prompt for generation")
+    model: Optional[str] = Field(None, description="Specific model to use")
+
+class AssetEvaluation(BaseModel):
+    """Evaluation of a generated asset."""
+    status: str = Field(..., description="'approved' or 'rejected'")
+    critique: str = Field(..., description="Detailed feedback on why it was approved or rejected")
+    refined_prompt: Optional[str] = Field(None, description="Improved prompt if rejected")

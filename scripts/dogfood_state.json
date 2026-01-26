@@ -1,0 +1,13 @@
+{
+    "current_target": "homepage",
+    "completed_targets": [],
+    "iterations": {
+        "homepage": {
+            "copy": "pending",
+            "image": "approved",
+            "video": "failed",
+            "audio": "pending"
+        }
+    },
+    "history": []
+}

@@ -3,17 +3,16 @@
 </script>
 
 <div class="app">
-	<header>
+	<header class="main-header">
 		<div class="container">
 			<div class="header-content">
 				<a href="/" class="logo">
-					<span class="logo-text">Marketing Agency</span>
+					<span class="logo-text">HIGH<span class="text-italic">ERA</span></span>
 				</a>
-				<nav>
-					<a href="/">Execute</a>
-					<a href="/skills">Skills Library</a>
-					<a href="/#pricing">Pricing</a>
-					<a href="https://github.com" target="_blank" rel="noopener">API Docs</a>
+				<nav class="main-nav">
+					<a href="/">Terminal</a>
+					<a href="/skills">Index</a>
+					<a href="/assess">Lab</a>
 				</nav>
 			</div>
 		</div>
@@ -23,11 +22,18 @@
 		<slot />
 	</main>
 
-	<footer>
+	<footer class="main-footer">
 		<div class="container">
-			<p class="text-muted">
-				23 marketing skills. Each one a complete framework.
-			</p>
+			<div class="footer-grid">
+				<div class="footer-brand">
+					<span class="logo-text">HIGH<span class="text-italic">ERA</span></span>
+					<p>Established 2026. Automated Creative Infrastructure.</p>
+				</div>
+				<div class="footer-meta">
+					<span class="meta-label">SYSTEM: ONLINE</span>
+					<span class="meta-label">VERSION: 1.0.0</span>
+				</div>
+			</div>
 		</div>
 	</footer>
 </div>
@@ -39,9 +45,9 @@
 		min-height: 100vh;
 	}
 
-	header {
-		border-bottom: 1px solid var(--color-border);
-		padding: 1rem 0;
+	.main-header {
+		border-bottom: 2px solid var(--color-navy);
+		padding: 1.5rem 0;
 		background: var(--color-bg);
 		position: sticky;
 		top: 0;
@@ -59,35 +65,77 @@
 	}
 
 	.logo-text {
-		font-size: 1.125rem;
-		font-weight: 600;
-		color: var(--color-text);
+		font-family: var(--font-serif);
+		font-size: 1.5rem;
+		font-weight: 900;
+		color: var(--color-navy);
+		letter-spacing: -0.02em;
 	}
 
-	nav {
+    .logo-text .text-italic {
+        font-weight: 400;
+        margin-left: 2px;
+    }
+
+	.main-nav {
 		display: flex;
-		gap: 1.5rem;
+		gap: 2rem;
 	}
 
-	nav a {
-		color: var(--color-text-secondary);
-		font-size: 0.9375rem;
-		transition: color 0.15s ease;
+	.main-nav a {
+		color: var(--color-navy);
+		font-size: 0.75rem;
+		font-weight: 800;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+		transition: all 0.2s ease;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        padding-bottom: 2px;
 	}
 
-	nav a:hover {
-		color: var(--color-text);
-		text-decoration: none;
+	.main-nav a:hover {
+		color: var(--color-brass);
+        border-bottom-color: var(--color-brass);
 	}
+
+    .nav-dim {
+        opacity: 0.5;
+    }
 
 	main {
 		flex: 1;
-		padding: 2rem 0;
 	}
 
-	footer {
+	.main-footer {
 		border-top: 1px solid var(--color-border);
-		padding: 1.5rem 0;
-		text-align: center;
+		padding: 4rem 0;
+        background: white;
 	}
+
+    .footer-grid {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    .footer-brand p {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+        color: var(--color-smoke);
+    }
+
+    .footer-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: right;
+    }
+
+    .meta-label {
+        font-family: var(--font-mono);
+        font-size: 0.6rem;
+        color: var(--color-smoke);
+        letter-spacing: 0.1em;
+    }
 </style>
