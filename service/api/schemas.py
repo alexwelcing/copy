@@ -3,7 +3,7 @@ Request and response schemas for the Marketing Agency API.
 """
 
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
 from pydantic import BaseModel, Field
 
 
@@ -189,3 +189,37 @@ class AssetEvaluation(BaseModel):
     status: str = Field(..., description="'approved' or 'rejected'")
     critique: str = Field(..., description="Detailed feedback on why it was approved or rejected")
     refined_prompt: Optional[str] = Field(None, description="Improved prompt if rejected")
+
+class BriefCreate(BaseModel):
+    """Request to create or update a brief."""
+    id: Optional[str] = Field(None, description="Optional ID to update existing brief")
+    title: str = Field(..., description="Project title")
+    product: str = Field(..., description="Product or service name")
+    audience: str = Field(..., description="Target audience")
+    value: str = Field(..., description="Core value proposition")
+    context: Optional[dict] = Field(default={}, description="Additional key-value context")
+    description: Optional[str] = Field(None, description="Long form description")
+
+class BriefResponse(BriefCreate):
+    """Full brief object."""
+    id: str
+    created_at: Any = Field(None, description="Creation timestamp")
+    updated_at: Any = Field(None, description="Last update timestamp")
+
+class BriefList(BaseModel):
+    """List of briefs."""
+    briefs: list[BriefResponse]
+    total: int
+
+class LeadCreate(BaseModel):
+    """Request to capture a new lead."""
+    email: str = Field(..., description="Lead email address")
+    role: Optional[str] = Field(None, description="User role or job title")
+    company: Optional[str] = Field(None, description="Company name")
+    source: Optional[str] = Field(None, description="Source campaign or slug")
+    intent: Optional[str] = Field(None, description="User intent or project type")
+
+class LeadResponse(LeadCreate):
+    """Lead capture response."""
+    id: str
+    created_at: Any

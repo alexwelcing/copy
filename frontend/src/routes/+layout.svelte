@@ -1,5 +1,44 @@
 <script lang="ts">
 	import '../app.css';
+    import { onMount } from 'svelte';
+    import { auth, googleProvider } from '$lib/firebase';
+    import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+
+    let isLoggedIn = false;
+    let userName = '';
+
+    onMount(() => {
+        // Listen for auth state changes
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                isLoggedIn = true;
+                userName = user.displayName || user.email || 'Agent';
+                const token = await user.getIdToken();
+                localStorage.setItem('agency_user_token', token);
+            } else {
+                isLoggedIn = false;
+                userName = '';
+                localStorage.removeItem('agency_user_token');
+            }
+        });
+        return unsubscribe;
+    });
+
+    async function handleLogin() {
+        try {
+            await signInWithPopup(auth, googleProvider);
+            // State update handled by onAuthStateChanged
+            window.location.reload(); 
+        } catch (error) {
+            console.error("Login failed:", error);
+            alert("Authentication failed. Please try again.");
+        }
+    }
+
+    async function handleLogout() {
+        await signOut(auth);
+        window.location.reload();
+    }
 </script>
 
 <div class="app">
@@ -14,6 +53,17 @@
 					<a href="/skills">Index</a>
 					<a href="/assess">Lab</a>
 				</nav>
+                <div class="header-auth">
+                    {#if isLoggedIn}
+                        <div class="user-badge">
+                            <span class="status-dot"></span>
+                            <span class="user-name">{userName}</span>
+                            <button class="auth-btn-small" on:click={handleLogout}>Exit</button>
+                        </div>
+                    {:else}
+                        <button class="auth-btn" on:click={handleLogin}>Verify Credentials</button>
+                    {/if}
+                </div>
 			</div>
 		</div>
 	</header>
@@ -94,10 +144,24 @@
         padding-bottom: 2px;
 	}
 
-	.main-nav a:hover {
+    .main-nav a:hover {
 		color: var(--color-brass);
         border-bottom-color: var(--color-brass);
 	}
+
+    /* AUTH UI */
+    .header-auth { display: flex; align-items: center; }
+    .auth-btn {
+        background: transparent; border: 1px solid var(--color-navy); color: var(--color-navy);
+        padding: 0.5rem 1rem; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+        letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s ease;
+    }
+    .auth-btn:hover { background: var(--color-navy); color: white; }
+    
+    .user-badge { display: flex; align-items: center; gap: 0.75rem; background: #f1f5f9; padding: 0.4rem 0.8rem; border-radius: 4px; border: 1px solid var(--color-border); }
+    .status-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; }
+    .user-name { font-family: var(--font-mono); font-size: 0.65rem; color: var(--color-navy); font-weight: 700; }
+    .auth-btn-small { background: none; border: none; font-size: 0.6rem; text-decoration: underline; color: var(--color-smoke); cursor: pointer; }
 
     .nav-dim {
         opacity: 0.5;

@@ -1,9 +1,18 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import campaigns from '$lib/data/campaigns.json';
+    import LeadModal from '$lib/components/LeadModal.svelte';
+    import { goto } from '$app/navigation';
 
     $: slug = $page.params.slug;
     $: campaign = campaigns.find(c => c.slug === slug);
+    
+    let showModal = false;
+
+    function handleSuccess() {
+        showModal = false;
+        goto('/');
+    }
 </script>
 
 <svelte:head>
@@ -12,6 +21,10 @@
 
 {#if campaign}
     <div class="campaign-page fade-in">
+        {#if showModal}
+            <LeadModal campaign={campaign.title} on:close={() => showModal = false} on:success={handleSuccess} />
+        {/if}
+
         <section class="hero">
             <div class="container" style="position: relative;">
                 <nav class="manual-nav mb-4" style="position: absolute; top: -3rem;">
@@ -23,7 +36,7 @@
                         <h1>{campaign.headline}</h1>
                         <p class="hero-sub">{campaign.subheadline}</p>
                         <div class="hero-actions">
-                            <button class="btn-primary">Start {campaign.target_audience} Project</button>
+                            <button class="btn-primary" on:click={() => showModal = true}>Start {campaign.target_audience} Project</button>
                         </div>
                     </div>
                     <div class="hero-visual">

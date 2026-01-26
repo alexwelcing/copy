@@ -21,10 +21,19 @@ from service.api.schemas import (
     SkillName,
     WorkRequest,
     WorkResult,
+    BriefCreate,
+    BriefResponse,
+    BriefList,
+    LeadCreate,
+    LeadResponse
 )
 from service.core.executor import get_executor, SkillExecutor
 from service.core.storage import get_storage
+from service.core.db import get_db
+from service.core.queue import get_queue
 from service.core.assets import get_asset_manager
+from service.core.auth import get_current_user
+from service.core.limiter import get_limiter
 from service.core.models import ImageModels, VideoModels, AudioModels
 
 
@@ -190,6 +199,83 @@ async def list_assets(prefix: Optional[str] = None):
     return {"assets": storage.list_assets(prefix=prefix)}
 
 
+@app.post("/briefs", response_model=BriefResponse)
+async def save_brief(
+    brief: BriefCreate,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """Save or update a strategic brief."""
+    user_id, _ = user_info
+    db = get_db()
+    
+    # Check ownership if updating
+    if brief.id:
+        existing = db.get_brief(brief.id)
+        if existing and existing.get("user_id") != user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to edit this brief")
+    
+    # Convert Pydantic model to dict
+    data = brief.model_dump()
+    data["user_id"] = user_id # Attach owner
+    
+    doc_id = db.save_brief(data)
+    
+    # Fetch the full object back to get timestamps
+    saved_data = db.get_brief(doc_id)
+    if not saved_data:
+        raise HTTPException(status_code=500, detail="Failed to save brief")
+        
+    return saved_data
+
+
+@app.get("/briefs", response_model=BriefList)
+async def list_briefs(
+    limit: int = 20,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """List recent strategic briefs for the current user."""
+    user_id, _ = user_info
+    db = get_db()
+    
+    # We need to update db.py to support filtering by user_id
+    # For now, let's assume list_briefs can take a user_id filter
+    # If not, we'll filter in memory (inefficient but works for Phase 2 prototype)
+    
+    all_briefs = db.list_briefs(limit=100) # Fetch more, filter here
+    user_briefs = [b for b in all_briefs if b.get("user_id") == user_id]
+    
+    return {"briefs": user_briefs[:limit], "total": len(user_briefs)}
+
+
+@app.get("/briefs/{brief_id}", response_model=BriefResponse)
+async def get_brief(
+    brief_id: str,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """Get a specific brief by ID."""
+    user_id, _ = user_info
+    db = get_db()
+    brief = db.get_brief(brief_id)
+    
+    if not brief:
+        raise HTTPException(status_code=404, detail="Brief not found")
+        
+    if brief.get("user_id") != user_id:
+        raise HTTPException(status_code=403, detail="Not authorized to access this brief")
+        
+    return brief
+
+
+@app.post("/leads", response_model=LeadResponse)
+async def create_lead(lead: LeadCreate):
+    """Capture a new lead."""
+    db = get_db()
+    data = lead.model_dump()
+    doc_id = db.save_lead(data)
+    
+    return {**data, "id": doc_id, "created_at": None} # Timestamp handled by DB, just return dummy or fetch
+
+
 @app.post("/generate-asset")
 async def generate_asset(request: AssetRequest):
     """Generate an AI asset via FAL and store in GCS."""
@@ -218,13 +304,24 @@ async def generate_asset(request: AssetRequest):
 
 
 @app.post("/work", response_model=WorkResult)
-async def execute_work(request: WorkRequest):
+async def execute_work(
+    request: WorkRequest,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
     """
-    Execute a marketing skill.
+    Execute a marketing skill synchronously.
+    """
+    user_id, is_anon = user_info
+    
+    # Rate Limit Check
+    limiter = get_limiter()
+    if not limiter.check_limit(user_id, is_anon):
+        limit = limiter.daily_limit_anon if is_anon else limiter.daily_limit_user
+        raise HTTPException(
+            status_code=429, 
+            detail=f"Daily limit exceeded ({limit} requests/day). {'Sign in for more.' if is_anon else 'Upgrade plan for more.'}"
+        )
 
-    Send a task to be processed using a specific marketing skill framework.
-    The skill's methodology, structures, and quality checks will be applied.
-    """
     try:
         executor = get_executor()
         result = executor.execute(request)
@@ -235,8 +332,58 @@ async def execute_work(request: WorkRequest):
         raise HTTPException(status_code=500, detail=f"Execution failed: {str(e)}")
 
 
+@app.post("/work/async")
+async def execute_work_async(
+    request: WorkRequest,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """
+    Queue a marketing skill for background execution.
+    Returns a Job ID that can be tracked via GET /briefs/{id}.
+    """
+    user_id, is_anon = user_info
+    
+    # Rate Limit Check
+    limiter = get_limiter()
+    if not limiter.check_limit(user_id, is_anon):
+        limit = limiter.daily_limit_anon if is_anon else limiter.daily_limit_user
+        raise HTTPException(
+            status_code=429, 
+            detail=f"Daily limit exceeded ({limit} requests/day). {'Sign in for more.' if is_anon else 'Upgrade plan for more.'}"
+        )
+
+    try:
+        db = get_db()
+        queue = get_queue()
+        
+        # Create initial Job/Brief record
+        brief_data = {
+            "title": f"Async {request.skill.value.title()}",
+            "product": request.context.get("product", "Unknown") if request.context else "Unknown",
+            "audience": request.context.get("audience", "Unknown") if request.context else "Unknown",
+            "value": "N/A", # Placeholder
+            "description": request.task,
+            "status": "pending",
+            "type": "async_job",
+            "user_id": user_id # Track ownership
+        }
+        job_id = db.save_brief(brief_data)
+        
+        # Publish to queue
+        queue.publish_task(request, job_id)
+        
+        return {"job_id": job_id, "status": "queued"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to queue job: {str(e)}")
+
+
 @app.post("/copywriting", response_model=WorkResult)
-async def copywriting(task: str, context: dict = None, content: str = None):
+async def copywriting(
+    task: str, 
+    context: dict = None, 
+    content: str = None,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
     """
     Shortcut endpoint for copywriting skill.
 
@@ -248,11 +395,16 @@ async def copywriting(task: str, context: dict = None, content: str = None):
         context=context,
         content=content,
     )
-    return await execute_work(request)
+    return await execute_work(request, user_info)
 
 
 @app.post("/page-cro", response_model=WorkResult)
-async def page_cro(task: str, content: str, context: dict = None):
+async def page_cro(
+    task: str, 
+    content: str, 
+    context: dict = None,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
     """
     Shortcut endpoint for page-cro skill.
 
@@ -264,11 +416,15 @@ async def page_cro(task: str, content: str, context: dict = None):
         content=content,
         context=context,
     )
-    return await execute_work(request)
+    return await execute_work(request, user_info)
 
 
 @app.post("/email-sequence", response_model=WorkResult)
-async def email_sequence(task: str, context: dict = None):
+async def email_sequence(
+    task: str, 
+    context: dict = None,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
     """
     Shortcut endpoint for email-sequence skill.
 
@@ -279,7 +435,7 @@ async def email_sequence(task: str, context: dict = None):
         task=task,
         context=context,
     )
-    return await execute_work(request)
+    return await execute_work(request, user_info)
 
 
 @app.exception_handler(Exception)

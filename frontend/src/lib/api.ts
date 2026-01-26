@@ -36,6 +36,23 @@ export interface SkillsResponse {
 	total: number;
 }
 
+export interface Brief {
+    id?: string;
+    title: string;
+    product: string;
+    audience: string;
+    value: string;
+    context?: Record<string, string>;
+    description?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
+export interface BriefList {
+    briefs: Brief[];
+    total: number;
+}
+
 export class ApiError extends Error {
 	constructor(
 		public status: number,
@@ -47,12 +64,33 @@ export class ApiError extends Error {
 }
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+	const headers: Record<string, string> = {
+		'Content-Type': 'application/json',
+		...options?.headers
+	};
+
+    // 1. Anonymous ID (Always present)
+    let anonId = typeof localStorage !== 'undefined' ? localStorage.getItem('agency_anon_id') : null;
+    if (!anonId && typeof crypto !== 'undefined') {
+        anonId = crypto.randomUUID();
+        if (typeof localStorage !== 'undefined') {
+            localStorage.setItem('agency_anon_id', anonId);
+        }
+    }
+    if (anonId) {
+        headers['X-Anonymous-ID'] = anonId;
+    }
+
+    // 2. User Token (If signed in)
+    // We'll assume the token is stored in localStorage by the Auth component
+    const token = typeof localStorage !== 'undefined' ? localStorage.getItem('agency_user_token') : null;
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
 	const response = await fetch(`${API_BASE}${endpoint}`, {
 		...options,
-		headers: {
-			'Content-Type': 'application/json',
-			...options?.headers
-		}
+		headers
 	});
 
 	if (!response.ok) {
@@ -76,6 +114,36 @@ export async function executeWork(req: WorkRequest): Promise<WorkResult> {
 		method: 'POST',
 		body: JSON.stringify(req)
 	});
+}
+
+export interface Lead {
+    email: string;
+    role?: string;
+    company?: string;
+    source?: string;
+    intent?: string;
+}
+
+export async function saveLead(lead: Lead): Promise<void> {
+    await request('/leads', {
+        method: 'POST',
+        body: JSON.stringify(lead)
+    });
+}
+
+export async function saveBrief(brief: Brief): Promise<Brief> {
+    return request('/briefs', {
+        method: 'POST',
+        body: JSON.stringify(brief)
+    });
+}
+
+export async function listBriefs(limit: number = 20): Promise<BriefList> {
+    return request(`/briefs?limit=${limit}`);
+}
+
+export async function getBrief(id: string): Promise<Brief> {
+    return request(`/briefs/${id}`);
 }
 
 // Skill metadata for UI

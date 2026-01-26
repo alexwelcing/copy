@@ -1,43 +1,75 @@
-# Contributing to Copy Agency
+# Contributing to High Era
 
-## Project Structure
+We welcome contributions to High Era! This project is designed to be the open-source standard for automated marketing agencies. Whether you're fixing a bug, adding a new skill, or improving the documentation, your help is appreciated.
 
-This project follows a strict directory structure to maintain organization. Please adhere to these guidelines when adding new files.
+## Getting Started
 
-### 📂 `scripts/`
-**All development, testing, and utility scripts go here.**
-- **Do not** create `dogfood_vX.py` or `generate_X.py` files in the root directory.
-- Use `scripts/dogfood.py` to run the main end-to-end testing loop.
-- Use `scripts/tools/` for asset generation utilities.
-- If you need a new one-off script, place it in `scripts/` or `scripts/sandbox/`.
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Google Cloud SDK (for deployment)
+- Firebase Project (for auth/database)
 
-### 📂 `skills/`
-**The single source of truth for agent skills.**
-- Contains markdown definitions (`SKILL.md`) and supporting resources (templates, references) for AI skills.
-- The backend service loads skills from here.
-- Agentic tools read context from here.
+### Local Development Setup
 
-### 📂 `service/`
-**The Python backend API.**
-- `service/api`: FastAPI routes and schemas.
-- `service/core`: Core logic, executors, and asset managers.
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-org/high-era.git
+    cd high-era
+    ```
 
-### 📂 `frontend/`
-**The SvelteKit frontend application.**
+2.  **Backend Setup:**
+    ```bash
+    # Install dependencies
+    pip install -r requirements.txt
+    
+    # Set up environment variables
+    cp .env.example .env
+    # Edit .env with your API keys (Anthropic, FAL, etc.)
+    
+    # Run the server locally
+    python3 -m uvicorn service.main:app --reload --port 8080
+    ```
 
-## Development Workflow
+3.  **Frontend Setup:**
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
 
-### Running Scripts
-Scripts in `scripts/` are configured to find the `service` module automatically.
-```bash
-python scripts/dogfood.py
-```
+4.  **Access the app:**
+    Open http://localhost:3000 in your browser.
 
-### Adding New Skills
-1. Create a new directory in `skills/<skill-name>`.
-2. Add a `SKILL.md` file defining the skill.
-3. Add any necessary templates or reference docs in subdirectories.
+## Architecture Overview
 
-### Version Control
-- Avoid checking in `_v2`, `_v3` file versions. Use Git branches or commits for version history.
-- Remove temporary test files before committing.
+High Era follows a "Twin-Engine" architecture:
+-   **Frontend (SvelteKit):** Handles the "Briefing Terminal" UI, Dossier management, and real-time feedback.
+-   **Backend (FastAPI):** Exposes the skill execution engine.
+    -   **Synchronous API:** For fast tasks (copywriting, strategy).
+    -   **Asynchronous Workers (Pub/Sub):** For heavy tasks (video, deep research).
+-   **State (Firestore):** Stores briefs, leads, and user history.
+
+## Adding a New Skill
+
+1.  **Create the Skill Definition:**
+    Add a new directory in `skills/<category>/<skill-name>/`.
+    Create `SKILL.md` following the standard template (Overview, Frameworks, Checklist).
+
+2.  **Register the Skill:**
+    Update `service/api/schemas.py` to include your new `SkillName` enum.
+    Update `frontend/src/lib/api.ts` to include it in `SKILL_CATEGORIES`.
+
+3.  **Test It:**
+    Use `scripts/generate_portfolio.py` to run a test case against your new skill.
+
+## Pull Request Process
+
+1.  Fork the repo and create your branch from `main`.
+2.  Run `scripts/test_suite.sh` (if available) or ensure your changes don't break existing flows.
+3.  Update documentation if you changed API endpoints or configuration.
+4.  Submit a PR with a clear description of the "Why" and "How".
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the project's MIT License.

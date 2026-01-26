@@ -1,241 +1,117 @@
-# Stop Prompting. Start Deploying.
+# HIGH ERA | Automated Creative Infrastructure
 
-**23 marketing skills. Each one a complete framework. All executable in Claude Code.**
+**Established 2026.**
 
-Most people ask AI to "write some copy." They get generic, forgettable content that sounds like everyone else's generic, forgettable content.
+High Era is the operating system for modern marketing agencies. It replaces the chaos of scattered briefs, lost context, and manual asset generation with a unified, intelligent "Agency Memory."
 
-This is different.
+![High Era Terminal](https://storage.googleapis.com/marketing-copy-assets/images/generated_c46bed9c-bf11-44f3-8aba-6dcf6d121b8e.png)
 
-This is marketing expertise encoded into executable skills - the same mental models top copywriters, CRO specialists, and growth marketers use, made repeatable inside Claude Code.
+## Two Ways to Run High Era
 
----
+We believe in the power of open source and the convenience of managed services. Choose the path that fits your ambition.
 
-## What This Actually Does
+### 1. The Managed Studio (Recommended)
+**For Marketing Directors, Agencies, and Teams.**
 
-You load a skill. The skill contains a complete framework:
-- How to gather context
-- What questions to answer first
-- Proven structures and formulas
-- Quality checklists
-- Strategic rationale for every decision
+Skip the infrastructure setup. Get instant access to the full High Era suite, including our premium Twin-Engine video generation, priority processing, and white-glove support.
 
-**Example**: The `copywriting` skill doesn't just write headlines. It first identifies page purpose, audience awareness stage, traffic context, and objections - then applies tested formulas like "Outcome + Timeframe" or "Eliminate Pain" - then validates against a quality checklist.
+- ✅ **Instant Access:** Start briefing in 30 seconds.
+- ✅ **Managed Infrastructure:** We handle the GPUs, queues, and uptime.
+- ✅ **Enterprise Security:** SOC2 compliant (roadmap), encrypted Dossiers.
+- ✅ **Zero Maintenance:** Continuous updates and new skills automatically added.
 
-That's the difference between prompting and deploying.
+[**→ Start Your Studio ($297/mo)**](https://high-era.com) | [View Pricing](https://high-era.com/pricing)
 
----
+### 2. The Open Source Core
+**For Engineers, Hackers, and Builders.**
 
-## The Skills
+Run the core engine on your own infrastructure. You have full control over the code, the models, and the data. You are the architect.
 
-### Write Things That Convert
+- 🛠 **Full Control:** Modify the skills, tweak the prompts, own the stack.
+- 🛠 **Self-Hosted:** Run on your own GCP project or local machine.
+- 🛠 **Community Driven:** Contribute to the skill library.
 
-| Skill | What It Does |
-|-------|--------------|
-| `copywriting` | Headlines, landing pages, CTAs - with strategic frameworks |
-| `copy-editing` | Three-pass editing: clarity, then concision, then power |
-| `email-sequence` | Welcome, nurture, sales, win-back - complete sequences |
-| `social-content` | Platform-native content that doesn't smell like AI |
-
-### Fix What's Broken
-
-| Skill | What It Does |
-|-------|--------------|
-| `page-cro` | Systematic landing page audits with prioritized fixes |
-| `form-cro` | Field-by-field conversion optimization |
-| `signup-flow-cro` | Registration friction removal |
-| `onboarding-cro` | Get users to their aha moment faster |
-| `popup-cro` | Exit intent, timing, triggers that work |
-| `paywall-upgrade-cro` | Free-to-paid conversion paths |
-
-### Get Found
-
-| Skill | What It Does |
-|-------|--------------|
-| `seo-audit` | Technical + content + competitive SEO analysis |
-| `programmatic-seo` | Template-based pages at scale |
-| `schema-markup` | JSON-LD that wins rich results |
-
-### Think Bigger
-
-| Skill | What It Does |
-|-------|--------------|
-| `marketing-ideas` | Structured brainstorming with prioritization |
-| `marketing-psychology` | Cialdini, cognitive biases, applied persuasion |
-| `pricing-strategy` | Models, anchoring, packaging |
-| `launch-strategy` | Product Hunt, soft launches, hard launches |
-| `competitor-alternatives` | Positioning that creates space |
-| `referral-program` | Viral loops that actually loop |
-| `free-tool-strategy` | Lead-gen tools worth building |
-
-### Measure What Matters
-
-| Skill | What It Does |
-|-------|--------------|
-| `ab-test-setup` | Statistical validity, test design, learning extraction |
-| `analytics-tracking` | Events, funnels, attribution that tells the truth |
-| `paid-ads` | Google, Meta, LinkedIn - structure and optimization |
+[**→ View Deployment Guide**](#deployment)
 
 ---
 
-## How to Use It
+## Key Capabilities
 
-### Single Skill
+### 📂 The Dossier (Contextual Memory)
+Stop re-explaining your brand. High Era remembers your products, audiences, and value propositions. 
+- **Persists Context:** Briefs are saved and indexed.
+- **Auto-Priming:** The AI knows your voice before you write a word.
 
-Load a skill and use its framework:
+### ⚡️ Twin-Engine Workflow (Async Generation)
+Don't wait for the progress bar.
+- **Engine 1 (Synchronous):** Instant strategy, copy, and ideas.
+- **Engine 2 (Asynchronous):** Background workers handle heavy lifting (Video rendering, Deep Research).
+- **Notification System:** Queue 10 campaigns, get notified when they're done.
 
-```
-Read skills/page-cro/SKILL.md
-
-Now audit this landing page: [your page]
-```
-
-The skill guides the analysis. You get structured recommendations with strategic rationale, not just "make the button bigger."
-
-### Full Campaigns
-
-For complex work spanning multiple skills:
-
-1. Fill out `templates/brief.md` with your project details
-2. The Mayor agent analyzes requirements and creates a work plan
-3. Specialized agents execute each skill in parallel
-4. Work is tracked through convoys (task bundles)
-5. Review, iterate, deliver
-
-This orchestration system is inspired by [Gastown](https://github.com/steveyegge/gastown) - battle-tested multi-agent coordination.
+### 🧠 The Skill Library (Madison Avenue Logic)
+We don't just "prompt." We execute proven frameworks.
+- **25+ Specialized Skills:** From "Hemingway-style Copy" to "Kling Video Scripts".
+- **Rigorous Checklists:** Every output is self-evaluated before you see it.
 
 ---
 
-## The System
+## Local Development (Self-Hosted)
 
-```
-copy/
-├── skills/           # 23 marketing frameworks
-├── agency/           # Multi-agent orchestration
-│   ├── mayor/       # Coordinates complex projects
-│   ├── rigs/        # Project containers with client context
-│   └── convoys/     # Work tracking
-├── templates/        # Briefs, deliverables, tracking
-└── workflows/        # Pre-built sequences for common projects
-```
-
-### Workflows Ready to Run
-
-- **Full-Service Campaign**: Discovery → Strategy → Content → Optimization → Delivery
-- **Quick Copy**: Brief → Context → Write → Polish
-- **CRO Audit**: Analyze → Deep dive → Synthesize → Prioritize
-- **SEO Campaign**: Audit → Strategy → Create → Implement → Measure
-
----
-
-## Why This Works
-
-**Skills encode expertise.** A prompt is a one-shot request. A skill is a complete mental model - context gathering, frameworks, formulas, quality checks. The skill knows what questions to ask before writing a single word.
-
-**Strategy precedes execution.** Every skill starts with understanding: Who's the audience? What's their awareness stage? What objections will they have? What proof do we need? Copy comes last.
-
-**Compound returns.** Run a CRO audit, feed insights into copywriting, validate changes with A/B testing. The skills connect. They build on each other.
-
-**Proof by demonstration.** We dogfooded this entire system on itself. The README you're reading was written by our copywriting skill, optimized by our page-cro skill. The quality of the output is the proof that it works.
-
----
-
-## Easy Deployment (Fork & Run)
-
-Deploy your own private instance of the agency in minutes. You bring the keys, we bring the code.
-
-<a href="https://render.com/deploy" target="_blank">
-<img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
-</a>
-
-1. **Fork this repository** to your GitHub account.
-2. **Click the button above** (or go to Render.com and select "New + -> Blueprint").
-3. **Connect your forked repo.**
-4. **Enter your `ANTHROPIC_API_KEY`** when prompted.
-
-The system will deploy both the API and the Frontend, automatically connecting them.
-
----
-
-## HTTP API
-
-Run the skills as a service. Deploy to Google Cloud Run or any container platform.
+### Prerequisites
+- Python 3.10+
+- Node.js 18+
+- Google Cloud Project (Firestore, Pub/Sub, Storage)
+- Anthropic API Key
+- FAL.ai Key (for video/image generation)
 
 ### Quick Start
 
+1.  **Clone the Repo**
+    ```bash
+    git clone https://github.com/high-era/core.git
+    cd high-era
+    ```
+
+2.  **Configure Environment**
+    ```bash
+    cp .env.example .env
+    # Add your API keys to .env
+    ```
+
+3.  **Start Backend (FastAPI)**
+    ```bash
+    pip install -r requirements.txt
+    python3 -m uvicorn service.main:app --reload --port 8080
+    ```
+
+4.  **Start Frontend (SvelteKit)**
+    ```bash
+    cd frontend
+    npm install
+    npm run dev
+    ```
+
+5.  **Open the Terminal**
+    Visit `http://localhost:3000` to access your local High Era instance.
+
+## Deployment
+
+The system is designed for **Google Cloud Run**.
+
 ```bash
-# Local
-pip install -r requirements.txt
-export ANTHROPIC_API_KEY="your-key"
-python -m service.main
+# Deploy Backend
+gcloud run deploy high-era-api --source .
 
-# Docker
-docker build -t marketing-agency-api .
-docker run -p 8080:8080 -e ANTHROPIC_API_KEY="your-key" marketing-agency-api
-
-# Cloud Run
-export GCP_PROJECT_ID="your-project"
-./deploy/deploy.sh
+# Deploy Frontend
+cd frontend
+gcloud run deploy high-era-ui --source .
 ```
 
-### API Usage
-
-```bash
-# Execute any skill
-curl -X POST http://localhost:8080/work \
-  -H "Content-Type: application/json" \
-  -d '{
-    "skill": "copywriting",
-    "task": "Write a landing page headline",
-    "context": {
-      "product": "TaskFlow - AI project management",
-      "audience": "Engineering managers",
-      "benefit": "50% fewer meetings"
-    }
-  }'
-```
-
-Response includes structured output, alternatives, and recommendations parsed from the skill execution.
-
-See `service/API.md` for full documentation.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed architecture documentation.
 
 ---
 
-## Get Started
+## License
 
-### Claude Code (Interactive)
-
-```bash
-# Clone and enter
-git clone [repo] && cd copy
-
-# Load any skill and start using it
-Read skills/copywriting/SKILL.md
-# Then: "Write a landing page for [your product]"
-
-# Or run a full workflow
-Read workflows/cro-audit.md
-# Then: "Audit [your page] following this workflow"
-```
-
-### HTTP API (Programmatic)
-
-```bash
-# Run locally
-pip install -r requirements.txt
-python -m service.main
-
-# Test
-curl http://localhost:8080/skills
-```
-
----
-
-## Built On
-
-- Marketing frameworks adapted from [marketingskills](https://github.com/coreyhaines31/marketingskills)
-- Multi-agent orchestration from [Gastown](https://github.com/steveyegge/gastown)
-- [Claude Code](https://github.com/anthropics/claude-code) by Anthropic
-
----
-
-*This README was written using the copywriting skill, structured using page-cro principles, and refined using copy-editing frameworks. What you're reading is the product demonstrating itself.*
+High Era is open-source software licensed under the [MIT license](LICENSE).
+You are free to use, modify, and distribute this software for private or commercial use.
