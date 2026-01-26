@@ -559,26 +559,37 @@
 
     .terminal-section { padding: 4rem 0; border-top: 1px solid var(--color-border); scroll-margin-top: 100px; }
     
-    /* NEW GRID LAYOUT */
-    .terminal-layout { display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start; }
-    .terminal-grid-main { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
-
-    /* DOSSIER SIDEBAR */
-    .dossier-sidebar { min-height: 600px; padding: 2rem; display: flex; flex-direction: column; background: #fafafa; }
-    .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--color-navy); }
-    .sidebar-header h3 { font-size: 0.9rem; letter-spacing: 0.1em; margin: 0; }
-    .empty-hint { font-size: 0.75rem; color: var(--color-text-muted); font-style: italic; margin-top: 2rem; }
+    /* TERMINAL STACK LAYOUT */
+    .terminal-stack { display: flex; flex-direction: column; gap: 3rem; max-width: 850px; margin: 0 auto; }
     
-    .brief-stack { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
-    .brief-mini-card { 
-        display: flex; flex-direction: column; text-align: left; padding: 1rem; 
-        background: white; border: 1px solid var(--color-border); cursor: pointer;
-        transition: all 0.2s ease;
+    /* Dossier Reel (Horizontal) */
+    .dossier-bar { width: 100%; }
+    .dossier-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem; }
+    .brief-reel { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 1rem; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    .brief-reel::-webkit-scrollbar { height: 6px; }
+    .brief-reel::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+    
+    .brief-reel-card { 
+        flex: 0 0 220px; padding: 1.25rem; border: 1px solid var(--color-border); background: white; 
+        text-align: left; cursor: pointer; transition: all 0.2s ease; scroll-snap-align: start;
+        display: flex; flex-direction: column; justify-content: space-between; height: 100px;
     }
-    .brief-mini-card:hover { border-color: var(--color-navy); transform: translateX(4px); }
-    .brief-mini-card.active { border-left: 4px solid var(--color-brass); background: var(--color-bg-tertiary); }
-    .brief-mini-title { font-family: var(--font-serif); font-weight: 700; font-size: 0.8rem; color: var(--color-navy); margin-bottom: 0.25rem; }
-    .brief-mini-meta { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-text-muted); }
+    .brief-reel-card:hover { border-color: var(--color-navy); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .brief-reel-card.active { border-top: 4px solid var(--color-brass); background: #fffcf5; }
+    
+    .reel-title { font-family: var(--font-serif); font-weight: 700; font-size: 0.85rem; color: var(--color-navy); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .reel-date { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-text-muted); margin-top: auto; }
+    .reel-more { flex: 0 0 60px; display: flex; align-items: center; justify-content: center; background: var(--color-bg-tertiary); border: 1px solid var(--color-border); font-family: var(--font-mono); color: var(--color-text-muted); cursor: pointer; }
+    .empty-reel { padding: 2rem; text-align: center; color: var(--color-text-muted); font-style: italic; border: 1px dashed var(--color-border); border-radius: 4px; }
+
+    .badge-classic-small { font-family: var(--font-sans); font-weight: 800; font-size: 0.65rem; letter-spacing: 0.15em; color: var(--color-navy); text-transform: uppercase; }
+
+    /* Briefing Room */
+    .briefing-room { width: 100%; margin-bottom: 2rem; }
+    
+    /* Removed old grid/sidebar styles */
+    .terminal-layout, .terminal-grid-main, .dossier-sidebar { display: none; }
+
 
     .brief-header, .memo-header { border-bottom: 2px solid var(--color-navy); margin-bottom: 2rem; padding-bottom: 1.5rem; }
     .form-id { font-family: var(--font-mono); font-size: 0.6rem; color: var(--color-smoke); display: block; margin-bottom: 0.5rem; text-transform: uppercase; }
