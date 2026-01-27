@@ -1,81 +1,80 @@
-# Copy & Marketing Agency
+# High Era: Marketing Agency
 
-Marketing expertise encoded into executable skills for Claude Code.
+A living marketing agency powered by specialized AI agents.
 
-## How It Works
+## Quick Start
 
-**Skills are frameworks, not prompts.** Each skill file contains:
-- Context-gathering questions
-- Proven structures and formulas
-- Psychological principles
-- Quality checklists
-- Strategic rationale
-
-Load a skill, then use it. The skill guides the thinking.
-
-## Using Skills
-
-### Load and Use
+**Talk to an agent:**
 ```
-Read skills/copywriting/SKILL.md
-# Then: "Write a landing page for [product] using this framework"
+Read agency/agents/director.md
+"I need a landing page for [product]"
 ```
 
-### Skill + Input Pattern
-The skill provides the methodology. You provide the specifics:
-- Product details
-- Target audience
-- Existing content to analyze
-- Brand constraints
+**Or use a quick-start pattern:**
+```
+Read agency/spawn/write.md
+Read agency/agents/copywriter.md
+"Write a hero section for [product]"
+```
 
-### Compound Skills
-Skills work together:
-1. `marketing-psychology` → identify triggers
-2. `copywriting` → write with frameworks
-3. `page-cro` → audit for conversion
-4. `copy-editing` → polish output
+## The Team
 
-## Available Skills
+| Agent | Role | Spawn |
+|-------|------|-------|
+| **Director** | Orchestrates projects, assigns work, ensures delivery | `agency/agents/director.md` |
+| **Strategist** | Positioning, psychology, competitive analysis | `agency/agents/strategist.md` |
+| **Copywriter** | Headlines, pages, emails, ads | `agency/agents/copywriter.md` |
+| **Editor** | Polish, consistency, quality gate | `agency/agents/editor.md` |
+| **Optimizer** | CRO, page structure, conversion | `agency/agents/optimizer.md` |
+| **Analyst** | Measurement, tracking, data | `agency/agents/analyst.md` |
 
-### Writing
-`copywriting` `copy-editing` `email-sequence` `social-content`
+## Entry Points
 
-### CRO
-`page-cro` `form-cro` `signup-flow-cro` `onboarding-cro` `popup-cro` `paywall-upgrade-cro`
+| Need | Pattern | What to Load |
+|------|---------|--------------|
+| Full project | Brief mode | `spawn/brief.md` + `agents/director.md` |
+| Fast copy | Write mode | `spawn/write.md` + `agents/copywriter.md` |
+| Analyze something | Audit mode | `spawn/audit.md` + `agents/optimizer.md` |
+| Fix something | Optimize mode | `spawn/optimize.md` + `agents/optimizer.md` |
+| Figure out positioning | Strategy mode | `spawn/strategy.md` + `agents/strategist.md` |
 
-### SEO
-`seo-audit` `programmatic-seo` `schema-markup`
+## Skills Library
 
-### Strategy
-`marketing-ideas` `marketing-psychology` `pricing-strategy` `launch-strategy` `competitor-alternatives` `referral-program` `free-tool-strategy`
+Agents draw from 23 specialized skills:
 
-### Measurement
-`ab-test-setup` `analytics-tracking` `paid-ads`
+**Writing:** `copywriting` `copy-editing` `email-sequence` `social-content`
 
-## Workflows
+**CRO:** `page-cro` `form-cro` `signup-flow-cro` `onboarding-cro` `popup-cro` `paywall-upgrade-cro`
 
-Pre-built sequences in `workflows/`:
-- `full-service.md` - Complete campaigns
-- `quick-copy.md` - Fast turnaround copy
-- `cro-audit.md` - Conversion audits
-- `seo-campaign.md` - SEO projects
+**SEO:** `seo-audit` `programmatic-seo` `schema-markup`
 
-## Agency System
+**Strategy:** `marketing-ideas` `marketing-psychology` `pricing-strategy` `launch-strategy` `competitor-alternatives` `referral-program` `free-tool-strategy`
 
-For complex projects spanning multiple skills:
+**Measurement:** `ab-test-setup` `analytics-tracking` `paid-ads`
 
-1. Create a rig: `agency/rigs/[project-name]/`
-2. Write a brief: `brief.md` with objectives, audience, constraints
-3. Track work in convoys: bundles of tasks with dependencies
-4. Review outputs against brief
-5. Iterate and deliver
+Load skills directly when needed: `skills/[skill-name]/SKILL.md`
+
+## How Agents Work Together
+
+Agents communicate through protocols:
+- **Handoffs** - Work transfers with context (`protocols/handoff.md`)
+- **Reviews** - Feedback requests (`protocols/review.md`)
+- **Escalations** - Blockers and conflicts (`protocols/escalate.md`)
+- **Syncs** - Status updates (`protocols/sync.md`)
+
+The **Board** tracks live state:
+- `agency/board/status.json` - Agent availability
+- `agency/board/active.json` - Current projects
+- `agency/board/inbox.json` - Pending requests
 
 ## Key Principle
 
-**Strategy precedes execution.** Every skill starts with understanding:
+**Strategy precedes execution.**
+
+Every project starts with understanding:
 - Who is the audience?
-- What's their awareness stage?
-- What objections will they have?
+- What do they believe now?
+- What do we need them to believe?
 - What proof do we have?
 
 Copy comes last. Thinking comes first.
