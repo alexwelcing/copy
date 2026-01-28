@@ -1,15 +1,79 @@
 <script lang="ts">
   import type { PageData } from './$types';
+  import SEO from '$lib/components/SEO.svelte';
+  import { audienceSEO } from '$lib/seo/config';
 
   export let data: PageData;
   $: audience = data.audience;
+  $: seo = audienceSEO[audience.slug];
 
-  let showLeadModal = false;
+  // Track UTM parameters for conversion attribution
+  import { onMount } from 'svelte';
+  import { browser } from '$app/environment';
+
+  onMount(() => {
+    if (browser) {
+      // Store UTM params in sessionStorage for conversion tracking
+      const params = new URLSearchParams(window.location.search);
+      const utmParams = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
+
+      utmParams.forEach(param => {
+        const value = params.get(param);
+        if (value) {
+          sessionStorage.setItem(param, value);
+        }
+      });
+
+      // Track page view for analytics
+      if (typeof gtag !== 'undefined') {
+        gtag('event', 'page_view', {
+          page_title: seo?.title || audience.headline,
+          page_location: window.location.href,
+          audience_type: audience.slug
+        });
+      }
+    }
+  });
+
+  // CTA click tracking
+  function trackCTA(action: string, label: string) {
+    if (browser && typeof gtag !== 'undefined') {
+      gtag('event', 'cta_click', {
+        event_category: 'conversion',
+        event_label: label,
+        audience_type: audience.slug,
+        cta_action: action
+      });
+    }
+  }
 </script>
 
 <svelte:head>
-  <title>High Era for {audience.audience}</title>
-  <meta name="description" content={audience.subheadline} />
+  {#if seo}
+    <SEO
+      title={seo.title}
+      description={seo.description}
+      keywords={seo.keywords}
+      canonical={seo.canonical}
+      ogTitle={seo.og.title}
+      ogDescription={seo.og.description}
+      ogImage={seo.og.image}
+      ogImageAlt={seo.og.imageAlt}
+      ogType={seo.og.type}
+      twitterCard={seo.twitter.card}
+      twitterTitle={seo.twitter.title}
+      twitterDescription={seo.twitter.description}
+      twitterImage={seo.twitter.image}
+      schema={seo.schema}
+    />
+  {:else}
+    <title>High Era for {audience.audience}</title>
+    <meta name="description" content={audience.subheadline} />
+  {/if}
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://www.googletagmanager.com" />
 </svelte:head>
 
 <main class="audience-page">
@@ -19,10 +83,18 @@
     <h1>{audience.headline}</h1>
     <p class="subheadline">{audience.subheadline}</p>
     <div class="hero-cta">
-      <a href="/skills/{audience.cta.action}" class="btn-primary">
+      <a
+        href="/skills/{audience.cta.action}"
+        class="btn-primary"
+        on:click={() => trackCTA('primary', audience.cta.primary)}
+      >
         {audience.cta.primary}
       </a>
-      <a href="/skills" class="btn-secondary">
+      <a
+        href="/skills"
+        class="btn-secondary"
+        on:click={() => trackCTA('secondary', audience.cta.secondary)}
+      >
         {audience.cta.secondary}
       </a>
     </div>
@@ -87,7 +159,11 @@
     <p class="skills-intro">Recommended skills for {audience.audience.toLowerCase()}:</p>
     <div class="skills-grid">
       {#each audience.skills as skill}
-        <a href="/skills/{skill}" class="skill-card">
+        <a
+          href="/skills/{skill}"
+          class="skill-card"
+          on:click={() => trackCTA('skill', skill)}
+        >
           <span class="skill-name">{skill.replace(/-/g, ' ')}</span>
           <span class="skill-arrow">→</span>
         </a>
@@ -100,7 +176,11 @@
     <h2>Ready to ship?</h2>
     <p>Load a skill. Give it context. Ship something today.</p>
     <div class="cta-buttons">
-      <a href="/skills/{audience.cta.action}" class="btn-primary btn-large">
+      <a
+        href="/skills/{audience.cta.action}"
+        class="btn-primary btn-large"
+        on:click={() => trackCTA('final', audience.cta.primary)}
+      >
         {audience.cta.primary}
       </a>
     </div>
