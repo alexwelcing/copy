@@ -1,0 +1,36 @@
+{
+  "agency": "High Era",
+  "last_updated": null,
+  "agents": {
+    "director": {
+      "status": "idle",
+      "current": null,
+      "last_completed": null
+    },
+    "strategist": {
+      "status": "idle",
+      "current": null,
+      "last_completed": null
+    },
+    "copywriter": {
+      "status": "idle",
+      "current": null,
+      "last_completed": null
+    },
+    "editor": {
+      "status": "idle",
+      "current": null,
+      "last_completed": null
+    },
+    "optimizer": {
+      "status": "idle",
+      "current": null,
+      "last_completed": null
+    },
+    "analyst": {
+      "status": "idle",
+      "current": null,
+      "last_completed": null
+    }
+  }
+}
