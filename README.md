@@ -62,7 +62,7 @@ We don't just "prompt." We execute proven frameworks.
 - Node.js 18+
 - Google Cloud Project (Firestore, Pub/Sub, Storage)
 - Anthropic API Key
-- FAL.ai Key (for video/image generation)
+- **FAL.ai Key** (for image/video/audio generation with turbo models)
 
 ### Quick Start
 
@@ -75,7 +75,9 @@ We don't just "prompt." We execute proven frameworks.
 2.  **Configure Environment**
     ```bash
     cp .env.example .env
-    # Add your API keys to .env
+    # Add your API keys to .env:
+    # - ANTHROPIC_API_KEY
+    # - FAL_KEY (for asset generation)
     ```
 
 3.  **Start Backend (FastAPI)**
@@ -93,6 +95,64 @@ We don't just "prompt." We execute proven frameworks.
 
 5.  **Open the Terminal**
     Visit `http://localhost:3000` to access your local High Era instance.
+
+6.  **Generate Campaign Assets (Optional)**
+    ```bash
+    # Generate hero images and campaign assets using FAL turbo models
+    python scripts/generate_campaign_assets.py --all
+    
+    # Or use the Asset Assessment Lab at http://localhost:3000/assess
+    ```
+
+## Asset Generation with Turbo Models
+
+High Era includes integrated asset generation using FAL.ai's turbo models for ultra-fast, high-quality images, videos, and audio.
+
+### Available Turbo Models
+
+**Image Generation:**
+- **FLUX Schnell** - Ultra-fast (2-4s), high-quality photorealism
+- **SDXL Lightning** - Ultra-fast (1-2s) for rapid iteration
+- **Qwen Image 2512** - Fast with exceptional text rendering
+- **FLUX Pro 1.1** - Premium photorealism for hero images
+- **Recraft V3** - Design and vector-focused assets
+
+**Video Generation:**
+- **LTX Video** - Fast video generation
+- **Kling V2.5 Turbo Pro** - High-quality turbo video
+
+**Audio Generation:**
+- **Stable Audio** - Music and soundscapes
+
+### Generate Assets
+
+**Via UI:**
+1. Visit `/assess` (Asset Assessment Lab)
+2. Select asset type (image/video/audio)
+3. Choose a turbo model
+4. Enter your creative prompt
+5. Generate and review
+
+**Via Script:**
+```bash
+# Generate all assets for all audiences
+python scripts/generate_campaign_assets.py --all
+
+# Generate specific audience assets
+python scripts/generate_campaign_assets.py --audience founders --type og
+
+# Generate ad creatives
+python scripts/generate_campaign_assets.py --audience freelancers --type ads
+```
+
+**Via API:**
+```bash
+curl -X POST http://localhost:8000/generate-asset \
+  -H "Content-Type: application/json" \
+  -d '{"type":"image","prompt":"Cinematic hero image","model":"fal-ai/flux/schnell"}'
+```
+
+See [Asset Generation Guide](docs/ASSET_GENERATION.md) for detailed documentation.
 
 ## Deployment
 

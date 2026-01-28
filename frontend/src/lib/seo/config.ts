@@ -376,8 +376,19 @@ export const campaignURLs = {
 
 /**
  * Asset paths for generated campaign images.
- * Generate with: python scripts/generate_campaign_assets.py --all
- * Then copy to frontend/static/og/ and frontend/static/ads/
+ * 
+ * TO GENERATE THESE ASSETS:
+ * 1. Ensure FAL_KEY is set in .env
+ * 2. Run: python scripts/generate_campaign_assets.py --all
+ * 3. Or visit /assess to generate assets via UI
+ * 
+ * Assets are generated using FAL turbo models:
+ * - FLUX Schnell (ultra-fast, high quality)
+ * - SDXL Lightning (ultra-fast)
+ * - Qwen Image 2512 (text specialist)
+ * 
+ * Generated assets are stored in GCS and can be copied to frontend/static/
+ * for static hosting, or loaded dynamically from GCS URLs.
  */
 export const assetPaths = {
   og: {

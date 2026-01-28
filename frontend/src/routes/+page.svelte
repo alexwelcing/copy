@@ -430,6 +430,67 @@
             </div>
         </div>
     </section>
+
+    <!-- Asset Generation Section -->
+    <section class="asset-generation">
+        <div class="container">
+            <div class="section-header">
+                <div class="badge-classic">TURBO GENERATION</div>
+                <h2>Cinematic Assets at <span class="text-italic">Speed</span></h2>
+                <p class="section-intro">
+                    Generate high-quality images, videos, and audio using state-of-the-art turbo models.
+                    From hero images to campaign assets, all optimized for speed without sacrificing quality.
+                </p>
+            </div>
+
+            <div class="turbo-models-grid">
+                <div class="model-card">
+                    <div class="model-icon">🎨</div>
+                    <h4>FLUX Schnell</h4>
+                    <p>Ultra-fast image generation (2-4s) with photorealistic quality. Perfect for hero images and OG graphics.</p>
+                    <div class="model-meta">
+                        <span class="speed-badge">ultra-fast</span>
+                        <span class="quality-badge">high</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-icon">⚡</div>
+                    <h4>SDXL Lightning</h4>
+                    <p>Lightning-fast generation (1-2s) for rapid iteration. Ideal for social media and quick concepts.</p>
+                    <div class="model-meta">
+                        <span class="speed-badge">ultra-fast</span>
+                        <span class="quality-badge">good</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-icon">🎬</div>
+                    <h4>Kling Video Turbo</h4>
+                    <p>High-quality video generation with turbo speed. Create engaging motion graphics and explainers.</p>
+                    <div class="model-meta">
+                        <span class="speed-badge">fast</span>
+                        <span class="quality-badge">high</span>
+                    </div>
+                </div>
+
+                <div class="model-card">
+                    <div class="model-icon">✍️</div>
+                    <h4>Qwen Text Specialist</h4>
+                    <p>Exceptional text rendering in images. Best for logos, posters, and typography-heavy designs.</p>
+                    <div class="model-meta">
+                        <span class="speed-badge">fast</span>
+                        <span class="quality-badge">high</span>
+                        <span class="specialty-badge">text</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-center">
+                <a href="/assess" class="btn-primary">Try Asset Generation Lab →</a>
+            </div>
+        </div>
+    </section>
 </div>
 
 <style>
@@ -521,6 +582,35 @@
     .philosophy { border-top: 1px solid var(--color-border); padding: 6rem 0; }
     .philosophy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
     .phil-item h3 { margin-bottom: 1rem; font-family: var(--font-serif); }
+
+    /* Asset Generation Section */
+    .asset-generation { background: var(--color-cream); padding: 6rem 0; border-top: 1px solid var(--color-border); }
+    .section-header { text-align: center; max-width: 700px; margin: 0 auto 4rem; }
+    .section-header h2 { font-size: 3rem; margin: 1rem 0; color: var(--color-navy); }
+    .section-intro { font-size: 1.1rem; color: var(--color-smoke); line-height: 1.8; }
+    
+    .turbo-models-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 3rem; }
+    
+    .model-card {
+        background: white; padding: 2rem; border: 1px solid var(--color-border);
+        transition: all 0.3s ease;
+    }
+    .model-card:hover { border-color: var(--color-brass); transform: translateY(-4px); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    
+    .model-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .model-card h4 { font-family: var(--font-mono); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-navy); margin-bottom: 0.75rem; }
+    .model-card p { font-size: 0.9rem; color: var(--color-smoke); line-height: 1.6; margin-bottom: 1rem; }
+    
+    .model-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .speed-badge, .quality-badge, .specialty-badge { 
+        font-family: var(--font-mono); font-size: 0.6rem; text-transform: uppercase;
+        padding: 0.2rem 0.6rem; border-radius: 2px;
+    }
+    .speed-badge { background: var(--color-bg-tertiary); color: var(--color-text-muted); }
+    .quality-badge { background: var(--color-brass); color: white; }
+    .specialty-badge { background: var(--color-navy); color: white; }
+    
+    .cta-center { text-align: center; margin-top: 3rem; }
 
     @media (max-width: 1200px) {
         .terminal-layout { grid-template-columns: 1fr; }
