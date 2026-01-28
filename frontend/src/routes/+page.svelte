@@ -2,6 +2,9 @@
 	import { executeWork, SKILL_CATEGORIES, type WorkResult, ApiError, saveBrief, listBriefs, type Brief } from '$lib/api';
 	import { getPresetsForSkill, type Preset } from '$lib/presets';
     import MadLib from '$lib/components/MadLib.svelte';
+    import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
+    import LoadingSkeleton from '$lib/components/LoadingSkeleton.svelte';
+    import { toasts } from '$lib/stores/toast';
     import { onMount } from 'svelte';
     import { fade, slide } from 'svelte/transition';
 
@@ -24,6 +27,8 @@
     let currentBriefId: string | undefined = undefined;
     let isSaving = false;
     let showDossier = false;
+    let briefsLoading = true;
+    let briefsError: string | null = null;
 
 	let contextFields: { key: string; value: string }[] = [];
 
@@ -41,13 +46,22 @@
     $: ghostTitle = task ? (task.length > 30 ? task.slice(0, 30) + '...' : task) : 'UNNAMED STRATEGY';
     $: ghostContext = product || audience ? `FOR ${product.toUpperCase()} targeting ${audience.toUpperCase()}` : 'AWAITING CONTEXT';
 
-    onMount(async () => {
+    async function loadBriefs() {
+        briefsLoading = true;
+        briefsError = null;
         try {
             const res = await listBriefs();
             savedBriefs = res.briefs;
         } catch (e) {
             console.error("Failed to load briefs", e);
+            briefsError = "Failed to load saved briefs";
+        } finally {
+            briefsLoading = false;
         }
+    }
+
+    onMount(() => {
+        loadBriefs();
     });
 
 	$: {
@@ -85,8 +99,11 @@
             // Refresh list
             const res = await listBriefs();
             savedBriefs = res.briefs;
+            toasts.success('Brief saved to dossier');
         } catch (e) {
-            error = "Failed to save to dossier";
+            const errorMsg = e instanceof ApiError ? e.detail : 'Failed to save to dossier';
+            toasts.error(errorMsg);
+            error = errorMsg;
         } finally {
             isSaving = false;
         }
@@ -134,6 +151,7 @@
 
 	async function handleSubmit() {
 		if (!task.trim()) {
+			toasts.warning('Please enter a task description');
 			error = 'Please enter a task';
 			return;
 		}
@@ -162,12 +180,23 @@
 				content: content.trim() || undefined,
 				model: selectedModel
 			});
+			toasts.success('Strategy generated successfully');
 		} catch (e) {
+			let errorMessage: string;
 			if (e instanceof ApiError) {
-				error = e.detail;
+				// Handle specific error codes
+				if (e.status === 429) {
+					errorMessage = 'Daily limit reached. Sign in for more requests or try again tomorrow.';
+				} else if (e.status === 503 || e.status === 502) {
+					errorMessage = 'Service temporarily unavailable. Please try again in a moment.';
+				} else {
+					errorMessage = e.detail;
+				}
 			} else {
-				error = 'Failed to execute skill. Is the API running?';
+				errorMessage = 'Failed to execute skill. Is the API running?';
 			}
+			error = errorMessage;
+			toasts.error(errorMessage);
 		} finally {
 			loading = false;
 		}
@@ -176,6 +205,7 @@
 	function copyOutput() {
 		if (result?.output) {
 			navigator.clipboard.writeText(result.output);
+			toasts.success('Copied to clipboard');
 		}
 	}
 
@@ -246,7 +276,18 @@
                     </div>
                     <div class="sidebar-content">
                         <span class="form-id">RECENT ARCHIVES</span>
-                        {#if savedBriefs.length === 0}
+                        {#if briefsLoading}
+                            <div class="brief-stack">
+                                <LoadingSkeleton variant="card" />
+                                <LoadingSkeleton variant="card" />
+                            </div>
+                        {:else if briefsError}
+                            <ErrorBoundary 
+                                title="Failed to load briefs" 
+                                message={briefsError}
+                                onRetry={loadBriefs}
+                            />
+                        {:else if savedBriefs.length === 0}
                             <p class="empty-hint">Your library is currently empty.</p>
                         {:else}
                             <div class="brief-stack">
