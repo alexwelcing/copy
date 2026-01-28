@@ -1,0 +1,21 @@
+# High Era - Marketing Frameworks for Claude Code
+# https://highera.com
+
+User-agent: *
+Allow: /
+
+# Crawlable paths
+Allow: /for/
+Allow: /skills/
+Allow: /agency/
+
+# Disallow non-public paths
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_app/
+
+# Sitemap
+Sitemap: https://highera.com/sitemap.xml
+
+# Crawl-delay for courtesy
+Crawl-delay: 1
