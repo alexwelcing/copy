@@ -106,7 +106,13 @@ export const MODEL_RECOMMENDATIONS = {
 };
 
 // Helper to get model list by type
-export function getModelsByType(type: 'image' | 'video' | 'audio'): Record<string, any> {
+export function getModelsByType(type: 'image' | 'video' | 'audio'): Record<string, {
+	name: string;
+	description: string;
+	speed: string;
+	quality: string;
+	specialty?: string;
+}> {
 	return TURBO_MODELS[type];
 }
 

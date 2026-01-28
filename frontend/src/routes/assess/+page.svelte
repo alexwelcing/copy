@@ -124,10 +124,15 @@
                             </option>
                         {/each}
                     </select>
-                    <div class="model-info">
-                        <span class="speed-badge">{availableModels[selectedModel]?.speed}</span>
-                        <span class="quality-badge">{availableModels[selectedModel]?.quality}</span>
-                    </div>
+                    {#if availableModels[selectedModel]}
+                        <div class="model-info">
+                            <span class="speed-badge">{availableModels[selectedModel].speed}</span>
+                            <span class="quality-badge">{availableModels[selectedModel].quality}</span>
+                            {#if availableModels[selectedModel].specialty}
+                                <span class="specialty-badge">{availableModels[selectedModel].specialty}</span>
+                            {/if}
+                        </div>
+                    {/if}
                 </div>
 
                 <div class="brief-section">

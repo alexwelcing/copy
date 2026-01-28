@@ -31,10 +31,22 @@
 			if (response.ok) {
 				const data = await response.json();
 				assets = data.assets || [];
+			} else if (response.status === 403) {
+				error = 'No permission to access assets. Check your credentials.';
+			} else if (response.status === 404) {
+				error = 'Assets service not found. Ensure backend is running.';
+			} else if (response.status >= 500) {
+				error = 'Assets service unavailable. Try again later.';
+			} else {
+				error = `Failed to load assets (${response.status})`;
 			}
 		} catch (e) {
-			error = 'Failed to load assets';
-			console.error(e);
+			if (e instanceof TypeError && e.message.includes('fetch')) {
+				error = 'Cannot connect to assets service. Check backend URL.';
+			} else {
+				error = 'Failed to load assets. Check console for details.';
+			}
+			console.error('Asset loading error:', e);
 		} finally {
 			loading = false;
 		}
@@ -45,7 +57,19 @@
 	}
 
 	function copyUrl(url: string) {
-		navigator.clipboard.writeText(url);
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(url)
+				.then(() => {
+					// Could add a toast notification here
+				})
+				.catch((err) => {
+					console.error('Failed to copy URL:', err);
+					// Fallback: Could show a modal with the URL to copy manually
+				});
+		} else {
+			// Fallback for browsers without clipboard API
+			console.warn('Clipboard API not available');
+		}
 	}
 </script>
 
@@ -88,9 +112,24 @@
 	{/if}
 
 	{#if selectedAsset}
-		<div class="asset-modal" on:click={() => selectedAsset = null} transition:fade>
+		<div 
+			class="asset-modal" 
+			on:click={() => selectedAsset = null} 
+			on:keydown={(e) => e.key === 'Escape' && (selectedAsset = null)}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="modal-title"
+			transition:fade
+		>
 			<div class="modal-content" on:click|stopPropagation>
-				<button class="close-btn" on:click={() => selectedAsset = null}>&times;</button>
+				<button 
+					class="close-btn" 
+					on:click={() => selectedAsset = null}
+					aria-label="Close modal"
+				>
+					&times;
+				</button>
+				<h2 id="modal-title" class="sr-only">Asset Preview</h2>
 				<img src={selectedAsset.url} alt={getAssetName(selectedAsset.name)} />
 				<div class="modal-actions">
 					<button class="btn-secondary" on:click={() => copyUrl(selectedAsset.url)}>
@@ -234,6 +273,18 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.sr-only {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.modal-actions {
