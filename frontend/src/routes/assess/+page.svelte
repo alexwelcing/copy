@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { listSkills } from '$lib/api';
+    import { TURBO_MODELS, getModelsByType } from '$lib/config/models';
 
     let assessmentLog: any[] = [];
     let loading = false;
@@ -23,18 +24,19 @@
     }
 
     // Asset Generation State
-    type AssetType = keyof typeof MODELS;
+    type AssetType = 'image' | 'video' | 'audio';
     let assetType: AssetType = 'image';
     let prompt = '';
-    let selectedModel = 'fal-ai/flux-2';
+    let selectedModel = 'fal-ai/flux/schnell'; // Default to turbo model
     
-    const MODELS = {
-        image: ['fal-ai/flux-2', 'fal-ai/flux-2-pro', 'bria/text-to-image/3.2'],
-        video: ['fal-ai/ltx-2-19b/distilled/text-to-video', 'fal-ai/kling-video/v2.5-turbo/pro/text-to-video', 'fal-ai/minimax/hailuo-2.3/pro/image-to-video'],
-        audio: ['fal-ai/stable-audio']
-    };
-
-    $: availableModels = MODELS[assetType];
+    $: availableModels = getModelsByType(assetType);
+    $: {
+        // Update selected model when type changes
+        const models = Object.keys(availableModels);
+        if (models.length > 0 && !models.includes(selectedModel)) {
+            selectedModel = models[0];
+        }
+    }
 
     async function handleGenerate() {
         loading = true;
@@ -116,10 +118,21 @@
                 <div class="brief-section">
                     <label class="brief-label">2. INTELLIGENCE MODEL</label>
                     <select bind:value={selectedModel} class="classic-select">
-                        {#each availableModels as model}
-                            <option value={model}>{model}</option>
+                        {#each Object.entries(availableModels) as [modelId, modelInfo]}
+                            <option value={modelId}>
+                                {modelInfo.name} - {modelInfo.description}
+                            </option>
                         {/each}
                     </select>
+                    {#if availableModels[selectedModel]}
+                        <div class="model-info">
+                            <span class="speed-badge">{availableModels[selectedModel].speed}</span>
+                            <span class="quality-badge">{availableModels[selectedModel].quality}</span>
+                            {#if availableModels[selectedModel].specialty}
+                                <span class="specialty-badge">{availableModels[selectedModel].specialty}</span>
+                            {/if}
+                        </div>
+                    {/if}
                 </div>
 
                 <div class="brief-section">
@@ -216,6 +229,13 @@
     .report-actions { display: flex; gap: 1rem; border-top: 1px solid var(--color-border); padding-top: 1.5rem; }
     
     .empty-memo { height: 300px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); }
+    
+    .model-info { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .speed-badge, .quality-badge { 
+        font-family: var(--font-mono); font-size: 0.55rem; text-transform: uppercase;
+        padding: 0.2rem 0.5rem; background: var(--color-bg-tertiary); color: var(--color-text-muted); border-radius: 2px;
+    }
+    .quality-badge { background: var(--color-brass); color: var(--color-cream); }
 
     @media (max-width: 1024px) {
         .lab-grid { grid-template-columns: 1fr; }

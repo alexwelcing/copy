@@ -53,6 +53,9 @@ Thumbs.db
 *.log
 logs/
 
+# Generated Assets (exclude from git, upload to GCS)
+generated_assets/
+
 # Node
 node_modules/
 .svelte-kit/
