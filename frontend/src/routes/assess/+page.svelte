@@ -2,6 +2,8 @@
     import { onMount } from 'svelte';
     import { listSkills } from '$lib/api';
     import { TURBO_MODELS, getModelsByType } from '$lib/config/models';
+    import { toasts } from '$lib/stores/toast';
+    import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
 
     let assessmentLog: any[] = [];
     let loading = false;
@@ -14,6 +16,7 @@
                 assessmentLog = JSON.parse(saved);
             } catch (e) {
                 console.error('Failed to load history');
+                toasts.warning('Failed to load assessment history');
             }
         }
     });
@@ -39,6 +42,11 @@
     }
 
     async function handleGenerate() {
+        if (!prompt.trim()) {
+            toasts.warning('Please enter an artistic prompt');
+            return;
+        }
+
         loading = true;
         error = null;
         
@@ -49,7 +57,10 @@
                 body: JSON.stringify({ type: assetType, prompt, model: selectedModel })
             });
             
-            if (!res.ok) throw new Error('Generation failed');
+            if (!res.ok) {
+                const errorData = await res.json().catch(() => ({}));
+                throw new Error(errorData.detail || errorData.error || `Generation failed (${res.status})`);
+            }
             
             const asset = await res.json();
             
@@ -63,10 +74,12 @@
             }, ...assessmentLog];
             
             saveLog(newLog);
+            toasts.success('Asset generated successfully');
             
             prompt = '';
         } catch (e: any) {
             error = e.message;
+            toasts.error(e.message || 'Asset generation failed');
         } finally {
             loading = false;
         }
@@ -76,12 +89,18 @@
         const newLog = [...assessmentLog];
         newLog[index].status = 'Approved';
         saveLog(newLog);
+        toasts.success('Asset approved and integrated');
     }
 
     function rejectAsset(index: number) {
         const newLog = [...assessmentLog];
         newLog[index].status = 'Rejected';
         saveLog(newLog);
+        toasts.info('Asset rejected');
+    }
+
+    function clearError() {
+        error = null;
     }
 </script>
 
@@ -139,6 +158,15 @@
                     <label class="brief-label" for="prompt">3. ARTISTIC PROMPT</label>
                     <textarea id="prompt" bind:value={prompt} placeholder="Enter unique differentiating prompt..." rows="4" class="typewriter-textarea"></textarea>
                 </div>
+
+                {#if error}
+                    <ErrorBoundary 
+                        title="Generation Failed"
+                        message={error}
+                        onRetry={handleGenerate}
+                        onDismiss={clearError}
+                    />
+                {/if}
 
                 <button class="btn-primary w-full mt-4" on:click={handleGenerate} disabled={loading || !prompt}>
                     {#if loading}<span class="spinner"></span> PROCESSING...{:else}INITIATE GENERATION →{/if}

@@ -3,6 +3,7 @@
     import { onMount } from 'svelte';
     import { auth, googleProvider } from '$lib/firebase';
     import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+    import Toast from '$lib/components/Toast.svelte';
 
     let isLoggedIn = false;
     let userName = '';
@@ -50,6 +51,7 @@
 </script>
 
 <div class="app">
+	<Toast />
 	<header class="main-header">
 		<div class="container">
 			<div class="header-content">

@@ -1,13 +1,20 @@
 import pytest
 import asyncio
+import os
 from service.core.models import ImageModels
 
+# Skip tests that require GCP credentials if not available
+requires_gcp = pytest.mark.skipif(
+    not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS") and not os.path.exists("service.json"),
+    reason="GCP credentials not available"
+)
+
+@requires_gcp
 @pytest.mark.asyncio
 async def test_asset_generation_integration(asset_manager):
     """
     Integration test for FAL asset generation.
-    Skipped by default unless --run-e2e is passed (implementation detail).
-    For now, we just mock or verify the manager structure.
+    Skipped by default unless GCP credentials are available.
     """
     # Verify the manager has the correct storage bucket configured
     assert asset_manager.storage.bucket_name is not None
@@ -16,6 +23,14 @@ async def test_asset_generation_integration(asset_manager):
     # unless specifically requested.
     # But we can verify the model constants are correct
     assert ImageModels.FLUX_PRO_1_1 == "fal-ai/flux-pro/v1.1"
+
+def test_image_models_structure():
+    """
+    Unit test to verify model constants without GCP credentials.
+    """
+    assert ImageModels.FLUX_PRO_1_1 == "fal-ai/flux-pro/v1.1"
+    assert ImageModels.FLUX_SCHNELL == "fal-ai/flux/schnell"
+    assert hasattr(ImageModels, 'SDXL_LIGHTNING')
 
 @pytest.mark.asyncio
 async def test_evaluator_structure(quality_guard):
