@@ -128,11 +128,11 @@ While test infrastructure exists (`pytest.ini`, `service/tests/`), the test cove
 
 **Recommendation**: Add tests for critical paths like skill execution and asset generation.
 
-### 2. Error Handling in Frontend 🟡
+### 2. Error Handling in Frontend ✅ RESOLVED
 
-The frontend could benefit from more robust error states and loading indicators for async operations.
+~~The frontend could benefit from more robust error states and loading indicators for async operations.~~
 
-**Recommendation**: Add skeleton loaders and error boundaries.
+**Status**: Added `Toast.svelte`, `ErrorBoundary.svelte`, and `LoadingSkeleton.svelte` components with global toast notifications for user feedback.
 
 ### 3. Monitoring/Observability 🟡
 
@@ -140,17 +140,20 @@ No obvious logging, metrics, or tracing infrastructure.
 
 **Recommendation**: Consider adding structured logging and APM integration.
 
-### 4. Rate Limiting Persistence 🟡
+### 4. Rate Limiting Persistence ✅ VERIFIED
 
-Rate limits appear to be in-memory. Restart would reset counts.
+~~Rate limits appear to be in-memory. Restart would reset counts.~~
 
-**Recommendation**: Use Redis or Firestore for persistent rate limiting.
+**Status**: Rate limiting already uses Firestore for persistence via `users/{user_id}/usage/{date}` collection structure. Added comprehensive unit tests to verify behavior.
 
-### 5. CI/CD Pipeline 🟡
+### 5. CI/CD Pipeline ✅ RESOLVED
 
-No GitHub Actions workflows visible (may be in main branch).
+~~No GitHub Actions workflows visible (may be in main branch).~~
 
-**Recommendation**: Add automated testing and deployment workflows.
+**Status**: Added `.github/workflows/ci.yml` with:
+- Backend Python tests with pytest
+- Frontend build verification
+- CodeQL security scanning
 
 ---
 
