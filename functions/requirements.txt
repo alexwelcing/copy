@@ -1,0 +1,14 @@
+# Shared requirements for billing Cloud Functions
+
+# Google Cloud
+google-cloud-firestore>=2.14.0
+google-cloud-bigquery>=3.17.0
+google-cloud-pubsub>=2.19.0
+google-cloud-secret-manager>=2.18.0
+
+# Stripe
+stripe>=8.0.0
+
+# Flask (for webhook handlers)
+flask>=3.0.0
+functions-framework>=3.5.0
