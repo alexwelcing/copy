@@ -125,6 +125,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include swarm router for sprite management
+try:
+    from service.api.swarm import router as swarm_router
+    app.include_router(swarm_router)
+    print("Swarm API enabled")
+except ImportError as e:
+    print(f"Swarm API not available: {e}")
+
 
 @app.get("/", response_model=HealthResponse)
 async def health_check():

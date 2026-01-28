@@ -1,0 +1,50 @@
+# Fly.io configuration for sprite machines
+# Note: Sprites are spawned dynamically via Fly Machines API, not `fly deploy`
+
+app = "highera-sprites"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+# Machine configuration (used when spawning via API)
+[vm]
+  size = "shared-cpu-1x"
+  memory = 512
+
+# Environment (defaults, overridden per-sprite)
+[env]
+  PYTHONUNBUFFERED = "1"
+  IDLE_TIMEOUT = "300"
+  HEARTBEAT_INTERVAL = "30"
+
+# Machines API will set these per-spawn:
+# - TENANT_ID
+# - AGENT_TYPE
+# - PROJECT_ID
+# - SPRITE_ID
+# - COORDINATOR_URL
+# - REDIS_URL
+# - ANTHROPIC_API_KEY
+
+# Internal networking only - sprites don't serve HTTP
+# Communication is via Redis pub/sub
+[experimental]
+  auto_rollback = true
+
+# Metrics endpoint (optional, for monitoring)
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+
+  [[services.http_checks]]
+    interval = "30s"
+    timeout = "5s"
+    path = "/health"
