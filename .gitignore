@@ -53,6 +53,20 @@ Thumbs.db
 *.log
 logs/
 
+# Generated Assets (exclude from git, upload to GCS)
+generated_assets/
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.mp3
+*.wav
+
+# But include placeholder/example images in static
+!frontend/static/**/*.png
+!frontend/static/**/*.jpg
+!frontend/static/**/*.jpeg
+
 # Node
 node_modules/
 .svelte-kit/
