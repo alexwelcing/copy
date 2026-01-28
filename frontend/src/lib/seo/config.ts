@@ -370,6 +370,81 @@ export const campaignURLs = {
 // AD COPY VARIANTS
 // =============================================================================
 
+// =============================================================================
+// GENERATED ASSET PATHS
+// =============================================================================
+
+/**
+ * Asset paths for generated campaign images.
+ * Generate with: python scripts/generate_campaign_assets.py --all
+ * Then copy to frontend/static/og/ and frontend/static/ads/
+ */
+export const assetPaths = {
+  og: {
+    founders: {
+      primary: '/og/founders.png',
+      abstract: '/og/founders-abstract.png',
+      symbolic: '/og/founders-symbolic.png'
+    },
+    freelancers: {
+      primary: '/og/freelancers.png',
+      abstract: '/og/freelancers-abstract.png',
+      symbolic: '/og/freelancers-symbolic.png'
+    },
+    teams: {
+      primary: '/og/teams.png',
+      abstract: '/og/teams-abstract.png',
+      symbolic: '/og/teams-symbolic.png'
+    },
+    home: '/og/home.png'
+  },
+  ads: {
+    founders: {
+      google: '/ads/founders-google.png',
+      linkedin: '/ads/founders-linkedin.png',
+      meta: '/ads/founders-meta.png',
+      twitter: '/ads/founders-twitter.png'
+    },
+    freelancers: {
+      google: '/ads/freelancers-google.png',
+      linkedin: '/ads/freelancers-linkedin.png',
+      meta: '/ads/freelancers-meta.png',
+      twitter: '/ads/freelancers-twitter.png'
+    },
+    teams: {
+      google: '/ads/teams-google.png',
+      linkedin: '/ads/teams-linkedin.png',
+      meta: '/ads/teams-meta.png',
+      twitter: '/ads/teams-twitter.png'
+    }
+  },
+  social: {
+    founders: {
+      testimonialBg: '/social/founders-testimonial.png',
+      featureCard: '/social/founders-feature.png'
+    },
+    freelancers: {
+      testimonialBg: '/social/freelancers-testimonial.png',
+      featureCard: '/social/freelancers-feature.png'
+    },
+    teams: {
+      testimonialBg: '/social/teams-testimonial.png',
+      featureCard: '/social/teams-feature.png'
+    }
+  },
+  brand: {
+    heroAbstract: '/brand/hero-abstract.png',
+    heroKinetic: '/brand/hero-kinetic.png',
+    heroMinimal: '/brand/hero-minimal.png',
+    pattern: '/brand/pattern.png',
+    gradient: '/brand/gradient.png'
+  }
+};
+
+// =============================================================================
+// AD COPY VARIANTS
+// =============================================================================
+
 export const adCopy = {
   founders: {
     google: {
