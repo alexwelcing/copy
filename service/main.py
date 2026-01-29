@@ -25,7 +25,8 @@ from service.api.schemas import (
     BriefResponse,
     BriefList,
     LeadCreate,
-    LeadResponse
+    LeadResponse,
+    UserProfile
 )
 from service.core.executor import get_executor, SkillExecutor
 from service.core.storage import get_storage
@@ -207,6 +208,35 @@ async def list_assets(prefix: Optional[str] = None):
     return {"assets": storage.list_assets(prefix=prefix)}
 
 
+@app.get("/user/profile", response_model=Optional[UserProfile])
+async def get_user_profile(
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """Get the current user's profile."""
+    user_id, _ = user_info
+    db = get_db()
+    profile = db.get_user_profile(user_id)
+    if not profile:
+        return None
+    return profile
+
+
+@app.post("/user/profile", response_model=UserProfile)
+async def save_user_profile(
+    profile: UserProfile,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """Save or update the current user's profile."""
+    user_id, _ = user_info
+    db = get_db()
+    
+    data = profile.model_dump(exclude_unset=True)
+    db.save_user_profile(user_id, data)
+    
+    updated = db.get_user_profile(user_id)
+    return updated
+
+
 @app.post("/briefs", response_model=BriefResponse)
 async def save_brief(
     brief: BriefCreate,
@@ -309,6 +339,36 @@ async def generate_asset(request: AssetRequest):
         raise HTTPException(status_code=400, detail="Invalid asset type. Use 'image', 'video', or 'audio'.")
     
     return result
+
+
+from service.core.browser import capture_screenshot
+
+@app.post("/analyze-url", response_model=WorkResult)
+async def analyze_url(
+    url: str,
+    task: Optional[str] = "Audit this page for conversion optimization opportunities.",
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """
+    Capture a screenshot of a URL and analyze it using AI vision.
+    """
+    user_id, _ = user_info
+    
+    # 1. Capture Screenshot
+    try:
+        image_base64 = await capture_screenshot(url)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to capture screenshot: {str(e)}")
+    
+    # 2. Execute Work
+    request = WorkRequest(
+        skill=SkillName.PAGE_CRO, # Reuse CRO skill logic
+        task=task,
+        image_data=image_base64,
+        context={"url": url}
+    )
+    
+    return await execute_work(request, user_info)
 
 
 @app.post("/work", response_model=WorkResult)

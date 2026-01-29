@@ -65,6 +65,28 @@ class FirestoreClient:
         update_time, doc_ref = leads_col.add(lead_data)
         return doc_ref.id
 
+    def save_user_profile(self, user_id: str, profile_data: Dict[str, Any]) -> str:
+        """Save or update a user profile."""
+        users_col = self.db.collection('users')
+        doc_ref = users_col.document(user_id)
+        
+        profile_data["updated_at"] = datetime.utcnow()
+        if "created_at" not in profile_data:
+            # Check if exists to preserve created_at or set new
+            doc = doc_ref.get()
+            if not doc.exists:
+                profile_data["created_at"] = datetime.utcnow()
+        
+        doc_ref.set(profile_data, merge=True)
+        return user_id
+
+    def get_user_profile(self, user_id: str) -> Optional[Dict[str, Any]]:
+        """Get a user profile."""
+        doc = self.db.collection('users').document(user_id).get()
+        if doc.exists:
+            return doc.to_dict()
+        return None
+
 # Singleton
 _db: Optional[FirestoreClient] = None
 

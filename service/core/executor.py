@@ -148,13 +148,35 @@ class SkillExecutor:
         else:
             client = self.anthropic_client
 
+        messages = []
+        if request.image_data:
+            messages.append({
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": "image/jpeg",
+                            "data": request.image_data,
+                        },
+                    },
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
+            })
+        else:
+            messages.append({"role": "user", "content": prompt})
+
         message = client.messages.create(
             model=model,
             max_tokens=4096,
-            messages=[
-                {"role": "user", "content": prompt}
-            ]
+            messages=messages
         )
+
+        print(f"DEBUG: Model response content: {message.content}")
 
         # Extract text content from all blocks (handling both TextBlock and ThinkingBlock)
         output_parts = []
@@ -163,10 +185,16 @@ class SkillExecutor:
                 output_parts.append(block.text)
             elif hasattr(block, "thinking"):
                 # Optionally include thinking in the output or just skip it
-                # For marketing output, we usually just want the final result
                 pass
+            elif isinstance(block, dict) and "text" in block:
+                output_parts.append(block["text"])
         
         output = "\n".join(output_parts)
+
+        if not output.strip():
+            print("ERROR: Empty output from model")
+            # Fallback or error
+            raise ValueError("Model returned empty response")
 
         # Parse structured sections from the output
         sections = self._parse_sections(output)

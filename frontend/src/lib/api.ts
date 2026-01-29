@@ -53,6 +53,17 @@ export interface BriefList {
     total: number;
 }
 
+export interface UserProfile {
+    name?: string;
+    company?: string;
+    product_name?: string;
+    target_audience?: string;
+    brand_values?: string;
+    website_url?: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export class ApiError extends Error {
 	constructor(
 		public status: number,
@@ -94,15 +105,34 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 	});
 
 	if (!response.ok) {
+        // Handle 404 for optional resources gracefully if needed, or throw
 		const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
 		throw new ApiError(response.status, error.detail || error.error || 'Request failed');
 	}
+    
+    // Handle empty responses (like 204 or void)
+    if (response.status === 204 || response.headers.get('content-length') === '0') {
+        return {} as T;
+    }
 
 	return response.json();
 }
 
 export async function health(): Promise<HealthResponse> {
 	return request('/health');
+}
+
+export async function getUserProfile(): Promise<UserProfile | null> {
+    // We catch 404/null inside request or here? 
+    // The backend returns null (JSON null) if not found, which is valid JSON.
+    return request('/user/profile');
+}
+
+export async function saveUserProfile(profile: UserProfile): Promise<UserProfile> {
+    return request('/user/profile', {
+        method: 'POST',
+        body: JSON.stringify(profile)
+    });
 }
 
 export async function listSkills(): Promise<SkillsResponse> {

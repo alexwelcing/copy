@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { executeWork, SKILL_CATEGORIES, type WorkResult, ApiError, saveBrief, listBriefs, type Brief } from '$lib/api';
+	import { executeWork, SKILL_CATEGORIES, type WorkResult, ApiError, saveBrief, listBriefs, type Brief, getUserProfile, type UserProfile } from '$lib/api';
 	import { getPresetsForSkill, type Preset } from '$lib/presets';
     import MadLib from '$lib/components/MadLib.svelte';
     import ErrorBoundary from '$lib/components/ErrorBoundary.svelte';
@@ -23,6 +23,7 @@
 	let selectedModel = 'claude-sonnet-4-5-20250929';
 	let task = '';
 	let content = '';
+    let targetUrl = ''; // New
     
     // Reactive Hero Image
     $: heroImageUrl = SKILL_IMAGES[selectedSkill] || SKILL_IMAGES['default'];
@@ -37,8 +38,7 @@
     let currentBriefId: string | undefined = undefined;
     let isSaving = false;
     let showDossier = false;
-    let briefsLoading = true;
-    let briefsError: string | null = null;
+    let userProfile: UserProfile | null = null;
 
 	let contextFields: { key: string; value: string }[] = [];
 
@@ -48,25 +48,40 @@
 	let result: WorkResult | null = null;
 
 	// UI State
-	$: isReadyToExecute = selectedSkill && task.trim() && product.trim() && audience.trim();
+    $: isUrlMode = selectedSkill === 'page-cro';
+	$: isReadyToExecute = selectedSkill && (task.trim() || targetUrl.trim()) && product.trim() && audience.trim();
 	$: skillPresets = getPresetsForSkill(selectedSkill);
 	$: categorySkills = SKILL_CATEGORIES[selectedCategory as keyof typeof SKILL_CATEGORIES]?.skills || {};
 
     // Ghost Writer Logic
-    $: ghostTitle = task ? (task.length > 30 ? task.slice(0, 30) + '...' : task) : 'UNNAMED STRATEGY';
+    $: ghostTitle = task ? (task.length > 30 ? task.slice(0, 30) + '...' : task) : (targetUrl ? 'SITE AUDIT' : 'UNNAMED STRATEGY');
     $: ghostContext = product || audience ? `FOR ${product.toUpperCase()} targeting ${audience.toUpperCase()}` : 'AWAITING CONTEXT';
 
     async function loadBriefs() {
         briefsLoading = true;
         briefsError = null;
         try {
-            const res = await listBriefs();
-            savedBriefs = res.briefs;
+            // Parallel load
+            const [briefsRes, profileRes] = await Promise.all([
+                listBriefs(),
+                getUserProfile()
+            ]);
+            
+            savedBriefs = briefsRes.briefs;
+            
+            if (profileRes && profileRes.company) {
+                userProfile = profileRes;
+                // Auto-fill context
+                product = profileRes.product_name || '';
+                audience = profileRes.target_audience || '';
+                coreValue = profileRes.brand_values || '';
+                if (profileRes.company) {
+                     contextFields = [{ key: 'Company', value: profileRes.company }];
+                }
+            }
         } catch (e) {
-            console.error("Failed to load briefs", e);
-            briefsError = "Failed to load saved briefs";
-        } finally {
-            briefsLoading = false;
+            console.error("Failed to load initial data", e);
+        }
         }
     }
 
@@ -82,7 +97,7 @@
 	}
 
     async function handleSave() {
-        if (!product || !audience || !task) return;
+        if (!product || !audience || (!task && !targetUrl)) return;
         
         isSaving = true;
         try {
@@ -92,6 +107,7 @@
                     context[field.key.trim()] = field.value.trim();
                 }
             }
+            if (targetUrl) context['analyzed_url'] = targetUrl;
 
             const brief: Brief = {
                 id: currentBriefId,
@@ -99,7 +115,7 @@
                 product,
                 audience,
                 value: coreValue,
-                description: task,
+                description: task || `Audit of ${targetUrl}`,
                 context
             };
 
@@ -127,6 +143,7 @@
         task = brief.description || '';
         if (brief.context) {
              contextFields = Object.entries(brief.context).map(([key, value]) => ({ key, value }));
+             if (brief.context['analyzed_url']) targetUrl = brief.context['analyzed_url'];
         }
         showDossier = false;
     }
@@ -160,9 +177,8 @@
 	}
 
 	async function handleSubmit() {
-		if (!task.trim()) {
-			toasts.warning('Please enter a task description');
-			error = 'Please enter a task';
+		if (!task.trim() && !targetUrl.trim()) {
+			error = 'Please enter a task or URL';
 			return;
 		}
 
@@ -183,14 +199,26 @@
 		}
 
 		try {
-			result = await executeWork({
-				skill: selectedSkill,
-				task: task.trim(),
-				context: Object.keys(context).length > 0 ? context : undefined,
-				content: content.trim() || undefined,
-				model: selectedModel
-			});
-			toasts.success('Strategy generated successfully');
+            if (targetUrl.trim() && isUrlMode) {
+                 // Use the new endpoint
+                 const res = await fetch(`${'/api'}/analyze-url?url=${encodeURIComponent(targetUrl.trim())}&task=${encodeURIComponent(task || 'Audit this page')}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('agency_user_token') || ''}`,
+                        'X-Anonymous-ID': localStorage.getItem('agency_anon_id') || ''
+                    }
+                 });
+                 if (!res.ok) throw new Error("Analysis failed");
+                 result = await res.json();
+            } else {
+                result = await executeWork({
+                    skill: selectedSkill,
+                    task: task.trim(),
+                    context: Object.keys(context).length > 0 ? context : undefined,
+                    content: content.trim() || undefined,
+                    model: selectedModel
+                });
+            }
 		} catch (e) {
 			let errorMessage: string;
 			if (e instanceof ApiError) {
@@ -335,8 +363,29 @@
                         <!-- Context FIRST (Flip) -->
                         {#if selectedSkill}
                             <div class="brief-section" transition:slide>
-                                <label class="brief-label">2. KEY CONTEXT</label>
-                                <MadLib bind:product bind:audience bind:value={coreValue} />
+                                <div class="flex justify-between items-center mb-2">
+                                    <label class="brief-label">2. KEY CONTEXT</label>
+                                    {#if userProfile}
+                                        <a href="/onboard" class="text-btn" style="font-size: 0.6rem;">EDIT PROFILE</a>
+                                    {/if}
+                                </div>
+                                
+                                {#if userProfile}
+                                    <div class="context-summary paper-card-flat">
+                                        <div class="summary-badge">AGENCY FILE: {userProfile.company?.toUpperCase()}</div>
+                                        <div class="summary-grid">
+                                            <div><strong>PRODUCT:</strong> {userProfile.product_name}</div>
+                                            <div><strong>AUDIENCE:</strong> {userProfile.target_audience}</div>
+                                            <div><strong>VALUES:</strong> {userProfile.brand_values}</div>
+                                        </div>
+                                    </div>
+                                    <!-- Hidden inputs to keep reactive variables bound if user wants to override manually via console/future edit -->
+                                {:else}
+                                    <MadLib bind:product bind:audience bind:value={coreValue} />
+                                    <div class="text-center mt-4">
+                                        <a href="/onboard" class="text-btn">→ Set up persistent agency profile</a>
+                                    </div>
+                                {/if}
                             </div>
                         {/if}
                             </div>
@@ -353,10 +402,24 @@
                                         {/each}
                                     </div>
                                 {/if}
+
+                                {#if isUrlMode}
+                                    <div class="mb-4">
+                                        <input 
+                                            type="url" 
+                                            bind:value={targetUrl} 
+                                            placeholder="https://example.com" 
+                                            class="classic-input w-full p-3 border border-gray-300 font-mono text-sm mb-2"
+                                            style="border: 1px solid var(--color-border);"
+                                        />
+                                        <div class="text-xs text-smoke font-mono">AGENCY SATELLITE WILL CAPTURE & AUDIT THIS TARGET.</div>
+                                    </div>
+                                {/if}
+
                                 <textarea 
                                     id="opt-task" 
                                     bind:value={task} 
-                                    placeholder="Type your strategic requirements here..." 
+                                    placeholder={isUrlMode ? "Specific audit instructions (optional)..." : "Type your strategic requirements here..."} 
                                     rows="4"
                                     class="typewriter-textarea"
                                 ></textarea>
@@ -405,14 +468,16 @@
                                     <span>RE: {selectedSkill.toUpperCase()} OUTPUT</span>
                                     <span>DATE: {new Date().toLocaleDateString()}</span>
                                 </div>
-                                <div class="twin-engine-badge">
-                                    <span class="pulse"></span> TWIN-ENGINE
-                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="memo-content">
-                        {#if result}
+                        {#if error}
+                            <div class="memo-error" in:fade>
+                                <h4 style="color: #ef4444; font-family: var(--font-mono);">TRANSMISSION ERROR</h4>
+                                <p style="color: var(--color-smoke); font-family: var(--font-mono); font-size: 0.9rem;">{error}</p>
+                            </div>
+                        {:else if result}
                             <div class="memo-body typewriter" in:fade>
                                 {@html formatOutput(result.output)}
                             </div>
@@ -599,14 +664,24 @@
     .remove-btn { background: none; border: none; font-size: 1.2rem; color: var(--color-smoke); cursor: pointer; padding: 0 0.5rem; }
     .text-btn { background: none; border: none; color: var(--color-brass); font-family: var(--font-mono); font-size: 0.7rem; cursor: pointer; text-transform: uppercase; }
 
-    /* TWIN ENGINE BADGE */
-    .twin-engine-badge {
-        display: flex; align-items: center; gap: 0.5rem; background: var(--color-navy);
-        color: white; padding: 0.4rem 0.8rem; font-family: var(--font-mono); font-size: 0.6rem;
-        letter-spacing: 0.1em; border-radius: 20px;
+    .paper-card-flat {
+        background: #fcfcfc;
+        border: 1px solid var(--color-border);
+        padding: 1rem;
+        font-family: var(--font-mono);
+        font-size: 0.8rem;
+        color: var(--color-smoke);
     }
-    .pulse { width: 6px; height: 6px; background: #10b981; border-radius: 50%; animation: pulse-green 2s infinite; }
-    @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+    .summary-badge {
+        color: var(--color-navy);
+        font-weight: bold;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.5rem;
+        margin-bottom: 0.5rem;
+        letter-spacing: 0.05em;
+    }
+    .summary-grid { display: grid; gap: 0.5rem; }
+    .summary-grid strong { color: var(--color-navy); }
 
     /* Memo Specifics */
     .memo-meta { display: flex; flex-direction: column; gap: 0.25rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--color-navy); }

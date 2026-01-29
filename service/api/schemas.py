@@ -92,6 +92,11 @@ class WorkRequest(BaseModel):
         examples=["<html>Your landing page HTML here</html>"]
     )
 
+    image_data: Optional[str] = Field(
+        default=None,
+        description="Base64 encoded image data for vision tasks"
+    )
+
 
 class WorkResult(BaseModel):
     """Result from executing a marketing skill."""
@@ -223,3 +228,16 @@ class LeadResponse(LeadCreate):
     """Lead capture response."""
     id: str
     created_at: Any
+
+
+class UserProfile(BaseModel):
+    """User profile and context."""
+    name: Optional[str] = Field(None, description="User's name")
+    company: Optional[str] = Field(None, description="Company name")
+    product_name: Optional[str] = Field(None, description="Primary product name")
+    target_audience: Optional[str] = Field(None, description="Primary target audience")
+    brand_values: Optional[str] = Field(None, description="Core brand values")
+    website_url: Optional[str] = Field(None, description="Company website URL")
+    created_at: Any = Field(None, description="Creation timestamp")
+    updated_at: Any = Field(None, description="Last update timestamp")
+
