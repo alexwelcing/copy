@@ -8,7 +8,7 @@ WORKDIR /app
 
 # Install dependencies first (for layer caching)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && playwright install --with-deps chromium
 
 # Copy skills (these are the core content)
 COPY skills/ ./skills/
