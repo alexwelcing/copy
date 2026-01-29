@@ -1,4 +1,7 @@
 NAME                       URL                                                        STATUS  LATEST_CREATED_REVISION_NAME
-marketing-agency-api       https://marketing-agency-api-bexuyahqvq-uc.a.run.app       True    marketing-agency-api-00005-bdn
-marketing-agency-frontend  https://marketing-agency-frontend-bexuyahqvq-uc.a.run.app  True    marketing-agency-frontend-00017-r4s
+marketing-agency-api       https://marketing-agency-api-bexuyahqvq-uc.a.run.app       True    marketing-agency-api-00006-qzq
+marketing-agency-frontend  https://marketing-agency-frontend-bexuyahqvq-uc.a.run.app  True    marketing-agency-frontend-00019-ppc
 marketing-agency-worker    https://marketing-agency-worker-bexuyahqvq-uc.a.run.app    True    marketing-agency-worker-00003-hhp
+
+# To verify deployment health and flows:
+# python3 scripts/verify_full_flows.py

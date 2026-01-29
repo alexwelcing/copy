@@ -1,0 +1,61 @@
+{{ define "showcase.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div style="margin-bottom: 6rem; border-bottom: 1px solid var(--border); padding-bottom: 4rem;">
+    <span class="section-label">Case Study #001</span>
+    <h1>Punch Card Logic</h1>
+    <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1rem;">Engineering a 10-second TikTok spot for the modern startup founder.</p>
+</div>
+
+<!-- The Narrative Section -->
+<div class="grid-2">
+    <div>
+        <h3>The Objective</h3>
+        <p>Position 'The Agency' as a technical infrastructure provider for founders who reject traditional marketing fluff. The campaign needed to feel like precision machinery—urgent, smart, and impossible to ignore.</p>
+        
+        <h3>The Swarm Consensus</h3>
+        <p>The Strategist identified 'Systems Thinking' as the core hook. The Brand Guardian refined the aesthetic to 'Neo-Madison'—mixing vintage industrial textures with neon cyberpunk data streams. The Director brought the 'Brooklyn Grit'—breaking the fourth wall with aggressive high-contrast shots.</p>
+    </div>
+    <div style="padding: 2rem; background: #fafafa; border: 1px solid var(--border);">
+        <h4 style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 1.5rem;">DIRECTOR'S TREATMENT (SPIKE PERSONA)</h4>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #666; max-height: 300px; overflow-y: auto;">
+            {{ .Campaign.DirectorTreatment }}
+        </div>
+    </div>
+</div>
+
+<!-- The Visual Engineering -->
+<div style="margin-top: 8rem;">
+    <span class="section-label">Engineering Output: Dailies</span>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 3rem;">
+        {{ range .Visuals }}
+        <div class="scene-card">
+            <div style="aspect-ratio: 9/16; background: #000; overflow: hidden; border-radius: 4px;">
+                {{ if .VideoURL }}
+                <video autoplay loop muted playsinline src="{{ .VideoURL }}" style="width: 100%; height: 100%; object-fit: cover;"></video>
+                {{ else }}
+                <img src="{{ .ImageURL }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {{ end }}
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);">SCENE 0{{ .Scene }}</span>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; line-height: 1.4;">{{ .Desc }}</p>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+<div style="margin-top: 10rem; text-align: center; background: var(--text); color: white; padding: 6rem 2rem;">
+    <h2>This entire campaign was built by the system you just used.</h2>
+    <p style="color: #94a3b8; margin: 2rem auto; max-width: 600px;">Stop hiring artists to do an engineer's job. Start architecting your influence with Agency Studio.</p>
+    <a href="/" class="btn" style="background: var(--accent); margin-top: 2rem;">Initialize Your Brief</a>
+</div>
+
+<style>
+    .scene-card { transition: transform 0.3s; }
+    .scene-card:hover { transform: translateY(-10px); }
+</style>
+{{ end }}

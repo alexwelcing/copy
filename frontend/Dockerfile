@@ -1,54 +1,36 @@
-# Marketing Agency Frontend
-# Multi-stage build for SvelteKit
-
-# Build stage
-FROM node:20-slim AS builder
+# Build Stage
+FROM golang:1.23-bookworm AS builder
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json ./
-RUN npm install
+# Dependencies
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Copy source and build
+# Source
 COPY . .
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
 
-ARG VITE_FIREBASE_API_KEY
-ARG VITE_FIREBASE_AUTH_DOMAIN
-ARG VITE_FIREBASE_PROJECT_ID
-ARG VITE_FIREBASE_STORAGE_BUCKET
-ARG VITE_FIREBASE_MESSAGING_SENDER_ID
-ARG VITE_FIREBASE_APP_ID
+# Build
+# CGO_ENABLED=0 for static binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o server main.go
 
-ENV VITE_FIREBASE_API_KEY=$VITE_FIREBASE_API_KEY
-ENV VITE_FIREBASE_AUTH_DOMAIN=$VITE_FIREBASE_AUTH_DOMAIN
-ENV VITE_FIREBASE_PROJECT_ID=$VITE_FIREBASE_PROJECT_ID
-ENV VITE_FIREBASE_STORAGE_BUCKET=$VITE_FIREBASE_STORAGE_BUCKET
-ENV VITE_FIREBASE_MESSAGING_SENDER_ID=$VITE_FIREBASE_MESSAGING_SENDER_ID
-ENV VITE_FIREBASE_APP_ID=$VITE_FIREBASE_APP_ID
-
-RUN npm run build
-
-# Production stage
-FROM node:20-slim
+# Run Stage
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
-# Copy built application
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/package.json ./
+# Install CA certs for HTTPS calls to API
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Install production dependencies only
-RUN npm install --omit=dev
+# Copy Binary and Assets
+COPY --from=builder /app/server .
+COPY --from=builder /app/templates ./templates
+COPY --from=builder /app/assets ./assets
 
-# Environment
-ENV NODE_ENV=production
-ENV PORT=3000
-ENV ORIGIN=http://localhost:3000
+# Env
+ENV PORT=8080
+ENV GIN_MODE=release
 
-EXPOSE 3000
+EXPOSE 8080
 
-# Run the Node.js server
-CMD ["sh", "-c", "export ORIGIN=${RENDER_EXTERNAL_URL:-$ORIGIN} && node build"]
+CMD ["./server"]

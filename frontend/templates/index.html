@@ -1,0 +1,34 @@
+{{ define "index.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div class="hero-block" style="margin-bottom: 8rem;">
+    <span class="section-label">Automated Orchestration</span>
+    <h1>Campaigns are Engineered,<br>not just Written.</h1>
+    <p style="font-size: 1.5rem; color: var(--muted); margin-top: 2rem; max-width: 800px;">We replace the traditional agency friction with a coordinated swarm of specialized AI agents. Strategy, brand guardianship, and cinematic direction—unified into a single, high-velocity system.</p>
+    
+    <div style="margin-top: 4rem;">
+        <a href="/showcase" class="btn">Explore Case Study #001</a>
+    </div>
+</div>
+
+<div class="grid-2" style="margin-top: 8rem;">
+    <div>
+        <span class="section-label">The Workflow</span>
+        <h2>From Brief to Market in Minutes.</h2>
+        <p>Traditional agencies lose the "signal" of your strategy through weeks of internal meetings and creative reinterpretation. Our system preserves strategic intent by engineering the output directly from the brief.</p>
+    </div>
+    <div style="background: #f1f5f9; padding: 3rem; border-radius: 4px;">
+        <h3 style="font-family: var(--font-mono); font-size: 1rem; margin-bottom: 2rem; color: var(--accent);">SWARM LOGS: SEED_CAMPAIGN</h3>
+        <ul style="list-style: none; padding: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 2;">
+            <li style="color: #059669;">[STRATEGIST] Market Gap Identified: Gen Z Founders</li>
+            <li style="color: #0891b2;">[BRAND] Aesthetic Locked: Neo-Madison v2.1</li>
+            <li style="color: #7c3aed;">[DIRECTOR] Shot List Finalized: 3 Scenes Vertical</li>
+            <li style="color: #2563eb;">[EXECUTOR] Visualizing...</li>
+            <li style="color: #2563eb;">[EXECUTOR] Rendering...</li>
+            <li>[SYSTEM] DEPLOYMENT READY.</li>
+        </ul>
+    </div>
+</div>
+{{ end }}

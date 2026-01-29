@@ -1,0 +1,73 @@
+{{ define "layout" }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }} | AGENCY</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #06b6d4;
+            --border: #e2e8f0;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+        }
+
+        * { box-sizing: border-box; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font-sans); margin: 0; line-height: 1.6; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+        header { padding: 2rem 0; border-bottom: 1px solid var(--border); }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 800; letter-spacing: 0.1em; text-decoration: none; color: var(--text); }
+        
+        nav a { margin-left: 2rem; text-decoration: none; color: var(--muted); font-size: 0.85rem; font-weight: 600; text-transform: uppercase; }
+        nav a:hover { color: var(--accent); }
+
+        h1, h2, h3 { font-family: var(--font-serif); font-weight: 700; margin: 0; }
+        h1 { font-size: 4rem; line-height: 1.1; letter-spacing: -0.02em; }
+        
+        .section-label { font-family: var(--font-mono); color: var(--accent); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.2em; display: block; margin-bottom: 1rem; }
+
+        footer { margin-top: 8rem; padding: 4rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--muted); font-size: 0.8rem; }
+        
+        .btn { display: inline-block; background: var(--text); color: white; padding: 1.2rem 2.5rem; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; }
+        .btn:hover { background: var(--accent); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-content">
+            <a href="/" class="logo">AGENCY STUDIO</a>
+            <nav>
+                <a href="/">Systems</a>
+                <a href="/showcase">Case Study</a>
+                <a href="/api/health">Status</a>
+            </nav>
+        </div>
+    </header>
+
+    <main style="padding: 6rem 0;">
+        <div class="container">
+            {{ template "content" . }}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            &copy; 2026 Agency Studio. Automated Creative Infrastructure.
+        </div>
+    </footer>
+</body>
+</html>
+{{ end }}
