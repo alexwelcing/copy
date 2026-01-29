@@ -116,7 +116,7 @@ deploy() {
         --allow-unauthenticated \
         --memory=512Mi \
         --cpu=1 \
-        --timeout=60 \
+        --timeout=300 \
         --concurrency=100 \
         --min-instances=0 \
         --max-instances=5 \
