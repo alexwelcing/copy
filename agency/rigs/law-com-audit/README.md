@@ -8,6 +8,15 @@ This rig demonstrates the complete High Era agency system working on a real-worl
 
 ## Quick Links
 
+### Executive Pitch Packet
+*For presenting to win the business*
+- **[Pitch Deck](pitch/deck/PITCH_DECK.md)** — 20-slide executive presentation with speaker notes
+- **[One-Pager Leave-Behind](pitch/leave-behind/ONE_PAGER.md)** — Print-ready summary
+- **[Asset Generator](pitch/assets/generate_pitch_assets.py)** — Generate presentation visuals with Fal
+- **[Visual Specs](pitch/assets/ASSET_SPECIFICATIONS.md)** — Design system, colors, prompts
+- **[Data Viz Specs](pitch/visualizations/DATA_VIZ_SPECS.md)** — Chart specifications and animations
+- **[Pitch README](pitch/README.md)** — How to prepare and present
+
 ### Deliverables
 - **[Executive Summary](deliverables/EXECUTIVE_SUMMARY.md)** — 2-page strategic overview
 - **[Full Case Study](deliverables/CASE_STUDY.md)** — Comprehensive report with all findings
@@ -76,7 +85,18 @@ law-com-audit/
 │   ├── CRO_AUDIT.md                       # Conversion optimization
 │   ├── COPYWRITING_RECOMMENDATIONS.md     # Messaging
 │   └── COMPETITIVE_POSITIONING.md         # Strategy
-├── outputs/                               # Working documents (empty)
+├── pitch/                                 # Executive presentation materials
+│   ├── README.md                          # Pitch preparation guide
+│   ├── deck/
+│   │   └── PITCH_DECK.md                  # 20-slide presentation
+│   ├── assets/
+│   │   ├── ASSET_SPECIFICATIONS.md        # Visual design specs
+│   │   └── generate_pitch_assets.py       # AI asset generator
+│   ├── visualizations/
+│   │   └── DATA_VIZ_SPECS.md              # Chart specifications
+│   └── leave-behind/
+│       └── ONE_PAGER.md                   # Executive summary handout
+├── outputs/                               # Working documents
 └── deliverables/
     ├── EXECUTIVE_SUMMARY.md               # 2-page summary
     └── CASE_STUDY.md                      # Full report
@@ -102,8 +122,15 @@ This rig can serve as a template for future marketing audits:
 - **Status:** Complete
 - **Agency Version:** High Era v2
 - **Skills Applied:** 7
-- **Total Documents:** 8
-- **Estimated Read Time:** 45 minutes (full suite)
+- **Total Documents:** 14 (audit + pitch packet)
+- **Estimated Read Time:** 60 minutes (full suite)
+
+### Generate Pitch Assets
+```bash
+cd pitch/assets
+export FAL_KEY=your_key_here
+python generate_pitch_assets.py --all
+```
 
 ---
 
