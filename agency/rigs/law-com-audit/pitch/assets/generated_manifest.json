@@ -1,5 +1,22 @@
 {
-  "generated_at": "2026-01-29T22:30:30.910612",
+  "generated_at": "PENDING - Run generate_all_assets.sh",
   "model": "fal-ai/flux/schnell",
-  "assets": []
+  "project": "law-com-pitch",
+  "instructions": "Run: export FAL_KEY=your_key && ./generate_all_assets.sh",
+  "assets": [
+    {"id": "cover", "name": "Pitch Deck Cover Background", "slide": 1, "status": "pending"},
+    {"id": "timeline", "name": "Inflection Point Timeline", "slide": 2, "status": "pending"},
+    {"id": "market_gap", "name": "Market Preference Gap (3x)", "slide": 3, "status": "pending"},
+    {"id": "funnel", "name": "Conversion Funnel Leak", "slide": 4, "status": "pending"},
+    {"id": "pillars", "name": "Exclusive Assets Pillars", "slide": 5, "status": "pending"},
+    {"id": "positioning", "name": "Strategic Positioning Map", "slide": 6, "status": "pending"},
+    {"id": "strategy", "name": "Strategy Pillars Architecture", "slide": 7, "status": "pending"},
+    {"id": "moat", "name": "Competitive Moat Defense", "slide": 10, "status": "pending"},
+    {"id": "transformation", "name": "Before/After Transformation", "slide": 11, "status": "pending"},
+    {"id": "roi", "name": "ROI Growth Arrow", "slide": 17, "status": "pending"},
+    {"id": "risk", "name": "Risk Decline Warning", "slide": 18, "status": "pending"},
+    {"id": "divider_strategy", "name": "Section Divider", "slide": "sections", "status": "pending"},
+    {"id": "hero_intel", "name": "Intelligence Platform Hero", "slide": "hero", "status": "pending"},
+    {"id": "hero_bench", "name": "Benchmarking Rankings Hero", "slide": "hero", "status": "pending"}
+  ]
 }
