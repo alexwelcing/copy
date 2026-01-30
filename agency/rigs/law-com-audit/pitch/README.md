@@ -15,6 +15,12 @@ This directory contains all materials for presenting the Law.com marketing audit
 - Key talking points
 - Visual direction notes
 
+**present.html** — Interactive HTML presentation:
+- Open in any browser
+- Keyboard navigation (← → arrows, spacebar)
+- Press 'f' for fullscreen
+- Click to advance
+
 ### `/assets/`
 **ASSET_SPECIFICATIONS.md** — Design specs for all visual assets:
 - Color palette and typography

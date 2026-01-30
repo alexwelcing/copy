@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law.com Strategic Transformation | High Era Agency</title>
+    <style>
+        :root {
+            --navy: #0A1628;
+            --gold: #C9A227;
+            --cream: #F8F6F1;
+            --gray: #6B7280;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--navy);
+            color: var(--cream);
+            overflow: hidden;
+        }
+
+        .deck {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            padding: 8vh 10vw;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--navy) 0%, #0F1F35 100%);
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 3vh;
+            right: 5vw;
+            font-size: 0.9rem;
+            color: var(--gray);
+            opacity: 0.6;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 300;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--cream);
+        }
+
+        h1 .gold {
+            color: var(--gold);
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 400;
+            color: var(--gold);
+            margin-bottom: 2rem;
+        }
+
+        p {
+            font-size: clamp(1rem, 1.5vw, 1.3rem);
+            line-height: 1.8;
+            color: rgba(248, 246, 241, 0.85);
+            max-width: 70ch;
+        }
+
+        .stat {
+            font-size: clamp(4rem, 10vw, 8rem);
+            font-weight: 200;
+            color: var(--gold);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: clamp(1rem, 1.5vw, 1.3rem);
+            color: var(--gray);
+            margin-top: 1rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            margin-top: 3rem;
+        }
+
+        .pillar {
+            padding: 2rem;
+            border-left: 3px solid var(--gold);
+        }
+
+        .pillar h3 {
+            color: var(--gold);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .pillar p {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        ul {
+            list-style: none;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1rem;
+            position: relative;
+            font-size: clamp(1rem, 1.3vw, 1.2rem);
+            color: rgba(248, 246, 241, 0.85);
+        }
+
+        li::before {
+            content: '';
+            position: absolute;
+            left: -1.5rem;
+            top: 0.6em;
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .cover {
+            text-align: center;
+            justify-content: center;
+        }
+
+        .cover h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            margin-bottom: 2rem;
+        }
+
+        .cover .subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 3rem;
+        }
+
+        .cover .agency {
+            position: absolute;
+            bottom: 5vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            color: var(--gray);
+            letter-spacing: 0.2em;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 2vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .controls button {
+            background: rgba(201, 162, 39, 0.2);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .controls button:hover {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .risk-red {
+            color: #E53E3E;
+        }
+
+        .section-divider {
+            text-align: center;
+        }
+
+        .section-divider h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 300;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 5vh 6vw;
+            }
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="deck">
+        <!-- Slide 1: Cover -->
+        <div class="slide cover active">
+            <p class="subtitle">Strategic Transformation Proposal</p>
+            <h1>From Legal News<br>to <span class="gold">Legal Intelligence</span></h1>
+            <p>A framework for capturing the market moment</p>
+            <div class="agency">HIGH ERA AGENCY</div>
+            <span class="slide-number">1/20</span>
+        </div>
+
+        <!-- Slide 2: Inflection Point -->
+        <div class="slide">
+            <h2>The Inflection Point</h2>
+            <p>Five forces converging to create a <strong>once-in-a-decade</strong> strategic opportunity:</p>
+            <ul style="margin-top: 2rem;">
+                <li>Lexis content removal complete</li>
+                <li>Bloomberg Law relationship severed</li>
+                <li>Direct subscriber acquisition now mandatory</li>
+                <li>AI disrupting traditional legal research</li>
+                <li>Law360 aggressive expansion continues</li>
+            </ul>
+            <span class="slide-number">2/20</span>
+        </div>
+
+        <!-- Slide 3: Market Reality -->
+        <div class="slide">
+            <div class="grid-2">
+                <div>
+                    <h2>Market Reality</h2>
+                    <p>Law360 leads in unprompted preference by a factor of 3x across all legal professional segments.</p>
+                    <p style="margin-top: 1.5rem; opacity: 0.7;">This isn't a content problem. It's a positioning problem.</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="stat">3x</div>
+                    <p class="stat-label">Law360 preference gap</p>
+                </div>
+            </div>
+            <span class="slide-number">3/20</span>
+        </div>
+
+        <!-- Slide 4: Conversion Problem -->
+        <div class="slide">
+            <div class="grid-2">
+                <div style="text-align: center;">
+                    <div class="stat">0.13%</div>
+                    <p class="stat-label">Current conversion rate</p>
+                </div>
+                <div>
+                    <h2>The Leak</h2>
+                    <p>Traffic arrives, but value escapes.</p>
+                    <ul style="margin-top: 1.5rem;">
+                        <li>Generic CTAs throughout journey</li>
+                        <li>Friction at every conversion point</li>
+                        <li>Value proposition lost in navigation</li>
+                        <li>SEO content disconnected from commercial intent</li>
+                    </ul>
+                </div>
+            </div>
+            <span class="slide-number">4/20</span>
+        </div>
+
+        <!-- Slide 5: Hidden Assets -->
+        <div class="slide">
+            <h2>The Hidden Truth</h2>
+            <p style="margin-bottom: 2rem;">Law.com possesses three assets that Law360 cannot replicate:</p>
+            <div class="grid-3">
+                <div class="pillar">
+                    <h3>Am Law Rankings</h3>
+                    <p>The definitive measure of law firm prestige for 50+ years.</p>
+                </div>
+                <div class="pillar">
+                    <h3>Legal Compass</h3>
+                    <p>Proprietary data on 3,000+ firms no competitor can access.</p>
+                </div>
+                <div class="pillar">
+                    <h3>NLJ 500</h3>
+                    <p>The benchmark for firm size and growth that defines the market.</p>
+                </div>
+            </div>
+            <p style="margin-top: 3rem; opacity: 0.8;">These assets are currently <em>features</em>. They should be the <em>foundation</em>.</p>
+            <span class="slide-number">5/20</span>
+        </div>
+
+        <!-- Slide 6: Repositioning -->
+        <div class="slide section-divider">
+            <p class="subtitle">The Shift</p>
+            <h2>From <span style="opacity: 0.5;">news platform</span><br>to <span class="gold">intelligence platform</span></h2>
+            <span class="slide-number">6/20</span>
+        </div>
+
+        <!-- Slide 7: Strategy Framework -->
+        <div class="slide">
+            <h2>Three Pillars</h2>
+            <div class="grid-3">
+                <div class="pillar">
+                    <h3>1. Reposition</h3>
+                    <p>Lead with exclusive data and rankings, not news breadth.</p>
+                </div>
+                <div class="pillar">
+                    <h3>2. Convert</h3>
+                    <p>Transform every touchpoint into a value demonstration.</p>
+                </div>
+                <div class="pillar">
+                    <h3>3. Defend</h3>
+                    <p>Build moats around irreplaceable assets.</p>
+                </div>
+            </div>
+            <span class="slide-number">7/20</span>
+        </div>
+
+        <!-- Slide 8: SEO Strategy -->
+        <div class="slide">
+            <h2>Pillar 1: Capture Intent</h2>
+            <ul>
+                <li><strong>47 specific SEO improvements</strong> identified</li>
+                <li>Programmatic pages for every ranked firm</li>
+                <li>Schema markup for rich search results</li>
+                <li>Internal linking architecture rebuild</li>
+                <li>Content hub strategy around exclusive data</li>
+            </ul>
+            <p style="margin-top: 2rem; color: var(--gold);">Projected: +35-50% organic traffic</p>
+            <span class="slide-number">8/20</span>
+        </div>
+
+        <!-- Slide 9: Conversion Strategy -->
+        <div class="slide">
+            <h2>Pillar 2: Convert Intent</h2>
+            <ul>
+                <li><strong>Every CTA</strong> tied to specific value proposition</li>
+                <li>Contextual upsells based on user behavior</li>
+                <li>Reduced friction in trial-to-paid flow</li>
+                <li>Social proof at key decision points</li>
+                <li>Intelligence-first messaging throughout</li>
+            </ul>
+            <p style="margin-top: 2rem; color: var(--gold);">Projected: +40-60% conversion rate</p>
+            <span class="slide-number">9/20</span>
+        </div>
+
+        <!-- Slide 10: Defense Strategy -->
+        <div class="slide">
+            <h2>Pillar 3: Defend Position</h2>
+            <ul>
+                <li><strong>Rankings authority</strong> reinforced with expanded methodology</li>
+                <li>Legal Compass data exclusivity protected</li>
+                <li>Brand associations with "intelligence" established</li>
+                <li>Premium positioning justified through value delivery</li>
+            </ul>
+            <p style="margin-top: 2rem; opacity: 0.8;">When Law360 competes on news, you compete on <em>insight</em>.</p>
+            <span class="slide-number">10/20</span>
+        </div>
+
+        <!-- Slide 11: Transformation -->
+        <div class="slide section-divider">
+            <p class="subtitle">The Transformation</p>
+            <h2><span style="opacity: 0.5;">News commodity</span> →<br><span class="gold">Intelligence necessity</span></h2>
+            <span class="slide-number">11/20</span>
+        </div>
+
+        <!-- Slide 12: Evidence -->
+        <div class="slide">
+            <h2>The Evidence</h2>
+            <div class="grid-3">
+                <div class="pillar">
+                    <h3>SEO Audit</h3>
+                    <p>47 improvements across technical, content, and authority dimensions.</p>
+                </div>
+                <div class="pillar">
+                    <h3>CRO Audit</h3>
+                    <p>Funnel analysis revealing conversion friction at every stage.</p>
+                </div>
+                <div class="pillar">
+                    <h3>Competitive Analysis</h3>
+                    <p>Deep positioning study vs. Law360, Reuters, Bloomberg.</p>
+                </div>
+            </div>
+            <span class="slide-number">12/20</span>
+        </div>
+
+        <!-- Slide 13: Metrics -->
+        <div class="slide">
+            <h2>What We'll Measure</h2>
+            <div class="grid-3">
+                <div style="text-align: center;">
+                    <div class="stat" style="font-size: clamp(2rem, 5vw, 4rem);">+45%</div>
+                    <p class="stat-label">Organic traffic</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="stat" style="font-size: clamp(2rem, 5vw, 4rem);">+50%</div>
+                    <p class="stat-label">Conversion rate</p>
+                </div>
+                <div style="text-align: center;">
+                    <div class="stat" style="font-size: clamp(2rem, 5vw, 4rem);">$1.68M</div>
+                    <p class="stat-label">Revenue impact</p>
+                </div>
+            </div>
+            <span class="slide-number">13/20</span>
+        </div>
+
+        <!-- Slide 14: Timeline -->
+        <div class="slide">
+            <h2>The Timeline</h2>
+            <ul>
+                <li><strong>Weeks 1-4:</strong> Quick wins — technical SEO, CTA optimization</li>
+                <li><strong>Weeks 5-12:</strong> Foundation — content strategy, conversion redesign</li>
+                <li><strong>Weeks 13-24:</strong> Scale — programmatic content, brand positioning</li>
+                <li><strong>Ongoing:</strong> Optimization — test, learn, iterate</li>
+            </ul>
+            <span class="slide-number">14/20</span>
+        </div>
+
+        <!-- Slide 15: Investment -->
+        <div class="slide">
+            <h2>The Investment</h2>
+            <div class="grid-2">
+                <div>
+                    <p class="subtitle">Strategic Engagement</p>
+                    <div class="stat" style="font-size: clamp(2rem, 4vw, 3rem);">$150-250K</div>
+                    <p style="margin-top: 1rem;">6-month transformation program</p>
+                </div>
+                <div>
+                    <p class="subtitle">Projected Return</p>
+                    <div class="stat" style="font-size: clamp(2rem, 4vw, 3rem);">7-11x</div>
+                    <p style="margin-top: 1rem;">First-year ROI</p>
+                </div>
+            </div>
+            <span class="slide-number">15/20</span>
+        </div>
+
+        <!-- Slide 16: ROI -->
+        <div class="slide">
+            <div class="grid-2">
+                <div>
+                    <h2>The Math</h2>
+                    <ul>
+                        <li>Current subscriber revenue: ~$3.2M ARR</li>
+                        <li>Conversion improvement: +50%</li>
+                        <li>Traffic improvement: +45%</li>
+                        <li>Combined impact: +$1.68M Year 1</li>
+                    </ul>
+                </div>
+                <div style="text-align: center;">
+                    <div class="stat">↑</div>
+                    <p class="stat-label">Growth trajectory</p>
+                </div>
+            </div>
+            <span class="slide-number">16/20</span>
+        </div>
+
+        <!-- Slide 17: Risk of Inaction -->
+        <div class="slide">
+            <h2 class="risk-red">The Risk of Waiting</h2>
+            <ul>
+                <li>Law360 continues aggressive content expansion</li>
+                <li>AI-native competitors entering legal intelligence</li>
+                <li>Subscriber attrition accelerates without differentiation</li>
+                <li>Window for "intelligence platform" positioning closes</li>
+            </ul>
+            <p style="margin-top: 2rem; color: #E53E3E;">Every quarter of delay costs opportunity.</p>
+            <span class="slide-number">17/20</span>
+        </div>
+
+        <!-- Slide 18: Why Us -->
+        <div class="slide">
+            <h2>Why High Era</h2>
+            <ul>
+                <li><strong>B2B intelligence platforms</strong> are our specialty</li>
+                <li>Strategy-first approach, not execution-first</li>
+                <li>Full-service: SEO, CRO, content, positioning</li>
+                <li>AI-augmented methodology for speed and depth</li>
+                <li>Outcome-focused engagement structure</li>
+            </ul>
+            <span class="slide-number">18/20</span>
+        </div>
+
+        <!-- Slide 19: Next Steps -->
+        <div class="slide">
+            <h2>Next Steps</h2>
+            <div class="grid-2">
+                <div>
+                    <p style="color: var(--gold); font-weight: 500;">1. Discovery Session</p>
+                    <p style="opacity: 0.8;">Deep dive into current metrics, team, and constraints.</p>
+                </div>
+                <div>
+                    <p style="color: var(--gold); font-weight: 500;">2. Detailed Proposal</p>
+                    <p style="opacity: 0.8;">Custom scope, timeline, and investment structure.</p>
+                </div>
+            </div>
+            <div class="grid-2" style="margin-top: 2rem;">
+                <div>
+                    <p style="color: var(--gold); font-weight: 500;">3. Pilot Program</p>
+                    <p style="opacity: 0.8;">30-day quick wins to prove methodology.</p>
+                </div>
+                <div>
+                    <p style="color: var(--gold); font-weight: 500;">4. Full Engagement</p>
+                    <p style="opacity: 0.8;">6-month strategic transformation.</p>
+                </div>
+            </div>
+            <span class="slide-number">19/20</span>
+        </div>
+
+        <!-- Slide 20: Close -->
+        <div class="slide cover">
+            <p class="subtitle">The Question</p>
+            <h1>Will Law.com lead the <span class="gold">intelligence era</span>?</h1>
+            <p style="margin-top: 2rem;">Or watch someone else define it.</p>
+            <div class="agency">HIGH ERA AGENCY</div>
+            <span class="slide-number">20/20</span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prevSlide()">← Prev</button>
+        <button onclick="nextSlide()">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            currentSlide = ((n % totalSlides) + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            } else if (e.key === 'f') {
+                document.documentElement.requestFullscreen?.();
+            }
+        });
+
+        // Click to advance
+        document.querySelector('.deck').addEventListener('click', (e) => {
+            if (!e.target.closest('.controls')) {
+                nextSlide();
+            }
+        });
+    </script>
+</body>
+</html>
