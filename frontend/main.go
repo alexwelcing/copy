@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -48,6 +47,15 @@ func main() {
 	campData, _ := os.ReadFile("../campaign_data.json")
 	json.Unmarshal(campData, &campaign)
 
+	// Load Law.com case study data
+	var lawVisuals []Scene
+	lawVisualsData, _ := os.ReadFile("../law_campaign_visuals.json")
+	json.Unmarshal(lawVisualsData, &lawVisuals)
+
+	var lawCampaign CampaignData
+	lawCampData, _ := os.ReadFile("../law_campaign_data.json")
+	json.Unmarshal(lawCampData, &lawCampaign)
+
 	// 2. Setup Router
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
@@ -65,6 +73,15 @@ func main() {
 			"Title":    "Case Study: Punch Card Logic",
 			"Campaign": campaign,
 			"Visuals":  visuals,
+		})
+	})
+
+	// Law.com case study route
+	r.GET("/showcase/law", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "showcase-law.html", gin.H{
+			"Title":    "Case Study: Law.com - Intelligence Over Urgency",
+			"Campaign": lawCampaign,
+			"Visuals":  lawVisuals,
 		})
 	})
 

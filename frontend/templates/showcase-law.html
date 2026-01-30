@@ -1,0 +1,156 @@
+{{ define "showcase-law.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div style="margin-bottom: 6rem; border-bottom: 1px solid var(--border); padding-bottom: 4rem;">
+    <span class="section-label">Case Study #002 - Legal Tech</span>
+    <h1>Law.com: Intelligence Over Urgency</h1>
+    <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1rem;">Repositioning a legal directory into an enterprise AI-powered intelligence platform.</p>
+</div>
+
+<!-- The Narrative Section -->
+<div class="grid-2">
+    <div>
+        <h3>The Challenge</h3>
+        <p>Law.com needed to transform from a traditional legal directory into a premium AI-powered legal intelligence platform targeting Fortune 500 General Counsel. The campaign required a sophisticated enterprise positioning that breaks free from typical legal marketing clichés.</p>
+        
+        <h3>The Strategic Approach</h3>
+        <p>We positioned Law.com as "Legal Intelligence Infrastructure" - mission-critical technology that empowers enterprise legal teams with AI-powered insights. The creative direction focused on speed, precision, and strategic advantage, using high-end tech aesthetics instead of traditional legal imagery.</p>
+        
+        <h3>Target Audience</h3>
+        <p><strong>Primary:</strong> General Counsel and Chief Legal Officers at enterprises ($500M+ revenue)</p>
+        <p><strong>Secondary:</strong> Legal Operations Directors and Compliance Heads</p>
+        <p><strong>Key Pain Point:</strong> Drowning in legal research, need faster strategic insights without sacrificing accuracy</p>
+    </div>
+    <div style="padding: 2rem; background: #fafafa; border: 1px solid var(--border);">
+        <h4 style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 1.5rem;">DIRECTOR'S TREATMENT</h4>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #666; max-height: 300px; overflow-y: auto; white-space: pre-wrap;">{{ .Campaign.DirectorTreatment }}</div>
+    </div>
+</div>
+
+<!-- The Visual Engineering -->
+<div style="margin-top: 8rem;">
+    <span class="section-label">Campaign Visuals: Intelligence Architecture</span>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-top: 3rem;">
+        {{ range .Visuals }}
+        <div class="scene-card">
+            <div style="aspect-ratio: 16/9; background: #1a1f36; overflow: hidden; border-radius: 4px; border: 1px solid #2a3f5f;">
+                {{ if .VideoURL }}
+                <video autoplay loop muted playsinline src="{{ .VideoURL }}" style="width: 100%; height: 100%; object-fit: cover;"></video>
+                {{ else if .ImageURL }}
+                <img src="{{ .ImageURL }}" alt="Scene {{ .Scene }}" style="width: 100%; height: 100%; object-fit: cover;">
+                {{ else }}
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #0066ff; font-family: var(--font-mono);">Scene {{ .Scene }}</div>
+                {{ end }}
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: #0066ff;">SCENE 0{{ .Scene }}</span>
+                <p style="font-size: 0.8rem; color: #666; margin-top: 0.5rem; line-height: 1.4;">{{ .Desc }}</p>
+            </div>
+        </div>
+        {{ end }}
+    </div>
+</div>
+
+<!-- Results & Impact -->
+<div style="margin-top: 8rem; padding: 4rem 2rem; background: linear-gradient(135deg, #1a1f36 0%, #0066ff 100%); border-radius: 8px;">
+    <div style="max-width: 800px; margin: 0 auto; color: white;">
+        <h2 style="color: white; margin-bottom: 2rem;">Campaign Strategy</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-top: 2rem;">
+            <div>
+                <div style="font-size: 2rem; font-weight: bold; color: #d4af37;">30 sec</div>
+                <div style="color: #94a3b8; margin-top: 0.5rem;">Hero Video Duration</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: bold; color: #d4af37;">4</div>
+                <div style="color: #94a3b8; margin-top: 0.5rem;">Key Visual Scenes</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: bold; color: #d4af37;">Fortune 500</div>
+                <div style="color: #94a3b8; margin-top: 0.5rem;">Target Audience</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Case Study Insights -->
+<div style="margin-top: 6rem; padding: 3rem; background: #fafafa; border: 1px solid var(--border); border-radius: 4px;">
+    <h3>Key Campaign Insights</h3>
+    <div style="margin-top: 2rem; display: grid; gap: 1.5rem;">
+        <div>
+            <strong style="color: #0066ff;">✓ Speed Without Compromise</strong>
+            <p style="margin-top: 0.5rem; color: #666;">Positioned AI-powered research that delivers both velocity and accuracy - not a tradeoff.</p>
+        </div>
+        <div>
+            <strong style="color: #0066ff;">✓ Strategic Intelligence</strong>
+            <p style="margin-top: 0.5rem; color: #666;">Emphasized insights that drive decisions, not just raw data retrieval.</p>
+        </div>
+        <div>
+            <strong style="color: #0066ff;">✓ Enterprise Grade</strong>
+            <p style="margin-top: 0.5rem; color: #666;">Positioned as mission-critical infrastructure built for Fortune 500 demands.</p>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 10rem; text-align: center; background: var(--text); color: white; padding: 6rem 2rem;">
+    <h2>Built with Agency Studio Infrastructure</h2>
+    <p style="color: #94a3b8; margin: 2rem auto; max-width: 600px;">This case study demonstrates High Era's ability to execute sophisticated B2B campaigns with enterprise-grade positioning and visual excellence.</p>
+    <div style="margin-top: 3rem;">
+        <a href="/showcase" class="btn" style="background: white; color: var(--text); margin-right: 1rem;">View Case Study #001</a>
+        <a href="/" class="btn" style="background: var(--accent);">Start Your Brief</a>
+    </div>
+</div>
+
+<style>
+    :root {
+        --border: #e2e8f0;
+        --muted: #64748b;
+        --text: #0f172a;
+        --accent: #0066ff;
+        --font-mono: 'IBM Plex Mono', monospace;
+    }
+    
+    .section-label {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+    }
+    
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-top: 3rem;
+    }
+    
+    .scene-card { 
+        transition: transform 0.3s; 
+    }
+    
+    .scene-card:hover { 
+        transform: translateY(-10px); 
+    }
+    
+    .btn {
+        display: inline-block;
+        padding: 1rem 2rem;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: 600;
+        transition: opacity 0.2s;
+    }
+    
+    .btn:hover {
+        opacity: 0.9;
+    }
+    
+    @media (max-width: 768px) {
+        .grid-2 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{{ end }}
