@@ -6,10 +6,13 @@ Law.com Strategic Transformation
 Premium visual assets for the executive pitch deck.
 Uses Flux Pro 1.1 for quality that matches the strategy.
 
-Run: python generate_premium.py
+Usage:
+    python generate_premium.py           # Generate all assets
+    python generate_premium.py --preview # Generate single test asset
 """
 
 import os
+import sys
 import json
 import time
 import urllib.request
@@ -18,7 +21,13 @@ from datetime import datetime
 from pathlib import Path
 
 # Configuration
-FAL_KEY = os.getenv("FAL_KEY", "af087bda-e123-4614-a945-02d6c8277a19:cd9aaf828cd2cd1cfc92b98ecaf4e550")
+FAL_KEY = os.getenv("FAL_KEY")
+if not FAL_KEY:
+    print("ERROR: FAL_KEY environment variable required")
+    print("Run: export FAL_KEY='your-key'")
+    print("Get one at: https://fal.ai/dashboard/keys")
+    sys.exit(1)
+
 MODEL = "fal-ai/flux-pro/v1.1"  # Quality matters
 OUTPUT_DIR = Path("./generated_assets")
 
@@ -255,6 +264,9 @@ def generate_image(asset_id: str, spec: dict) -> dict:
 def main():
     OUTPUT_DIR.mkdir(exist_ok=True)
 
+    # Check for preview mode
+    preview_mode = "--preview" in sys.argv
+
     print("=" * 70)
     print("HIGH ERA AGENCY")
     print("Executive Pitch Asset Generation")
@@ -263,13 +275,21 @@ def main():
     print()
     print(f"Model: {MODEL}")
     print(f"Output: {OUTPUT_DIR}")
-    print(f"Assets: {len(ASSETS)}")
+
+    if preview_mode:
+        # Only generate first asset as test
+        assets_to_generate = {"cover": ASSETS["cover"]}
+        print(f"Mode: PREVIEW (1 asset)")
+    else:
+        assets_to_generate = ASSETS
+        print(f"Assets: {len(ASSETS)}")
+
     print()
 
     results = []
 
-    for i, (asset_id, spec) in enumerate(ASSETS.items(), 1):
-        print(f"[{i:2}/{len(ASSETS)}] {asset_id}")
+    for i, (asset_id, spec) in enumerate(assets_to_generate.items(), 1):
+        print(f"[{i:2}/{len(assets_to_generate)}] {asset_id}")
         print(f"       Slide: {spec['slide']}")
 
         result = generate_image(asset_id, spec)
@@ -283,7 +303,7 @@ def main():
         print()
 
         # Brief pause between requests
-        if i < len(ASSETS):
+        if i < len(assets_to_generate):
             time.sleep(1)
 
     # Save manifest
@@ -301,12 +321,18 @@ def main():
 
     # Summary
     success = sum(1 for r in results if r.get("status") == "success")
+    total = len(assets_to_generate)
     print("=" * 70)
-    print(f"COMPLETE: {success}/{len(ASSETS)} assets generated")
+    print(f"COMPLETE: {success}/{total} assets generated")
     print(f"Manifest: {manifest_path}")
     print("=" * 70)
 
-    if success == len(ASSETS):
+    if preview_mode:
+        if success == 1:
+            print("\nPreview successful! Run without --preview for all assets.")
+        else:
+            print("\nPreview failed - check errors above.")
+    elif success == total:
         print("\nAll assets ready for pitch deck.")
     else:
         print("\nSome assets failed - check errors above.")

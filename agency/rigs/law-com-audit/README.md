@@ -128,8 +128,15 @@ This rig can serve as a template for future marketing audits:
 ### Generate Pitch Assets
 ```bash
 cd pitch/assets
-export FAL_KEY=your_key_here
-python generate_pitch_assets.py --all
+export FAL_KEY='your-key-here'
+
+# Quick start with make
+make setup    # Verify environment
+make preview  # Test with one asset
+make generate # Generate all 14 premium assets
+
+# Or directly with Python
+python generate_premium.py
 ```
 
 ---

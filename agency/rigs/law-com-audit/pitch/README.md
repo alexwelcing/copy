@@ -87,35 +87,50 @@ Before presenting, customize:
 
 ## Asset Generation
 
-### Quick Start
+### Quick Start (Recommended)
 ```bash
 cd pitch/assets
-export FAL_KEY=your_key_here
-python generate_pitch_assets.py --all
+export FAL_KEY='your-key-here'
+
+# Verify setup
+make setup
+
+# Test with one asset first
+make preview
+
+# Generate all 14 premium assets
+make generate
+```
+
+### Direct Python
+```bash
+python generate_premium.py           # All 14 assets with Flux Pro 1.1
+python generate_premium.py --preview # Single test asset
 ```
 
 ### Expected Output
 ```
-generated/
-├── cover-bg.png
-├── timeline-convergence.png
-├── market-comparison.png
-├── funnel-leak.png
-├── exclusive-assets.png
-├── positioning-map.png
-├── strategy-pillars.png
-├── competitive-moat.png
-├── transformation-split.png
-├── roi-growth.png
-├── risk-decline.png
-├── divider-strategy.png
-├── divider-execution.png
-├── divider-investment.png
-├── chart-bg-dark.png
-├── hero-intelligence.png
-├── hero-benchmark.png
-└── manifest.json
+generated_assets/
+├── cover.png              # Title background
+├── inflection.png         # Convergence moment
+├── dominance.png          # Market gap (3x)
+├── leaking_value.png      # Conversion funnel
+├── three_assets.png       # Exclusive assets
+├── repositioning.png      # Strategy journey
+├── foundation.png         # Three pillars
+├── fortress.png           # Competitive moat
+├── transformation.png     # Before/after
+├── growth.png             # ROI curve
+├── decline.png            # Risk trajectory
+├── section_break.png      # Section dividers
+├── intelligence.png       # Platform hero
+├── rankings.png           # Benchmarking hero
+└── manifest.json          # Generation metadata
 ```
+
+### Model Options
+- **generate_premium.py** — Flux Pro 1.1 (highest quality, ~$0.05/image)
+- **generate_all_assets.sh** — Flux Schnell (faster, lower quality)
 
 ---
 

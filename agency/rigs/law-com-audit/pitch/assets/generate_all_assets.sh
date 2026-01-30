@@ -18,7 +18,12 @@
 set -e
 
 # Configuration
-FAL_KEY="${FAL_KEY:-af087bda-e123-4614-a945-02d6c8277a19:cd9aaf828cd2cd1cfc92b98ecaf4e550}"
+if [ -z "$FAL_KEY" ]; then
+    echo "ERROR: FAL_KEY environment variable required"
+    echo "Run: export FAL_KEY='your-key'"
+    echo "Get one at: https://fal.ai/dashboard/keys"
+    exit 1
+fi
 MODEL="fal-ai/flux/schnell"
 OUTPUT_DIR="./generated_assets"
 MANIFEST_FILE="$OUTPUT_DIR/manifest.json"
