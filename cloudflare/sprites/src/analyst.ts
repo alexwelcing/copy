@@ -11,6 +11,12 @@ import {
   generateQuickScan,
   generateComparisonMatrix,
 } from "./templates";
+import {
+  EnhancedScraper,
+  IntelligenceExtractor,
+  SearchEngine,
+  TechDetectorFree,
+} from "./free-tools";
 
 // ============================================================================
 // TYPES
@@ -580,19 +586,33 @@ export class ContentAnalyzer {
  * Orchestrates research tools and AI analysis for competitive intelligence.
  */
 export class CompetitiveAnalyst extends DurableObject<Env> {
+  // Original tools (use paid APIs if available)
   private fetcher: WebFetcher;
   private seoResearcher: SEOResearcher;
   private pricingResearcher: PricingResearcher;
   private techDetector: TechDetector;
   private contentAnalyzer: ContentAnalyzer;
 
+  // Free tools (no API keys required)
+  private scraper: EnhancedScraper;
+  private extractor: IntelligenceExtractor;
+  private searchEngine: SearchEngine;
+  private freeTechDetector: TechDetectorFree;
+
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
+    // Original tools
     this.fetcher = new WebFetcher();
     this.seoResearcher = new SEOResearcher(env, this.fetcher);
     this.pricingResearcher = new PricingResearcher(env, this.fetcher);
     this.techDetector = new TechDetector(env, this.fetcher);
     this.contentAnalyzer = new ContentAnalyzer(env, this.fetcher);
+
+    // Free tools
+    this.scraper = new EnhancedScraper();
+    this.extractor = new IntelligenceExtractor(env);
+    this.searchEngine = new SearchEngine();
+    this.freeTechDetector = new TechDetectorFree();
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -671,7 +691,338 @@ export class CompetitiveAnalyst extends DurableObject<Env> {
       return Response.json({ target: targetProfile, competitors: competitorProfiles });
     }
 
+    // Deep scan using free tools (no API keys needed)
+    if (url.pathname === "/deep-scan" && request.method === "POST") {
+      const { domain } = (await request.json()) as { domain: string };
+      const result = await this.deepScan(domain);
+      return Response.json(result);
+    }
+
+    // Full intelligence using free tools
+    if (url.pathname === "/intelligence" && request.method === "POST") {
+      const { domain, industry } = (await request.json()) as {
+        domain: string;
+        industry?: string;
+      };
+      const result = await this.gatherIntelligence(domain, industry);
+
+      if (format === "markdown") {
+        return new Response(this.formatIntelligenceReport(result), {
+          headers: { "Content-Type": "text/markdown" },
+        });
+      }
+
+      return Response.json(result);
+    }
+
+    // SWOT analysis
+    if (url.pathname === "/swot" && request.method === "POST") {
+      const { target, competitors } = (await request.json()) as {
+        target: string;
+        competitors: string[];
+      };
+      const swot = await this.generateSWOTAnalysis(target, competitors);
+      return Response.json(swot);
+    }
+
     return new Response("Not found", { status: 404 });
+  }
+
+  /**
+   * Deep scan using free tools - no API keys required
+   */
+  async deepScan(domain: string): Promise<{
+    profile: CompanyProfile;
+    intelligence: {
+      positioning: string;
+      targetAudience: string[];
+      valuePropositions: string[];
+      keyFeatures: string[];
+      differentiators: string[];
+      pricingSignals: string[];
+      techStack: {
+        frameworks: string[];
+        analytics: string[];
+        marketing: string[];
+        hosting: string[];
+      };
+      seoEstimate: {
+        estimatedAuthority: string;
+        contentDepth: string;
+        keywordTargeting: string[];
+      };
+    };
+  }> {
+    // Clean domain
+    domain = domain.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
+
+    // Scrape multiple pages
+    const pages = await this.scraper.scrapeMultiplePages(domain);
+
+    if (pages.length === 0) {
+      throw new Error(`Could not scrape ${domain}`);
+    }
+
+    // Extract intelligence using Claude
+    const intelligence = await this.extractor.extractIntelligence(pages);
+
+    // Detect tech from HTML
+    const techFromHTML = this.freeTechDetector.detectFromHTML(
+      pages.map((p) => p.html).join("\n")
+    );
+
+    // Estimate SEO metrics
+    const seoEstimate = await this.extractor.estimateSEOMetrics(pages);
+
+    // Extract pricing if pricing page exists
+    const pricingPage = pages.find(
+      (p) => p.url.includes("/pricing") || p.url.includes("/plans")
+    );
+    let pricing;
+    if (pricingPage) {
+      pricing = await this.extractor.extractPricing(pricingPage);
+    }
+
+    // Build profile
+    const homepage = pages.find((p) => p.url.endsWith(domain) || p.url.endsWith(domain + "/"));
+    const profile: CompanyProfile = {
+      domain,
+      name: homepage?.metadata.title?.split("|")[0]?.split("-")[0]?.trim() || domain,
+      tagline: homepage?.metadata.description,
+      positioning: intelligence.positioning,
+      technology: {
+        stack: techFromHTML.frameworks,
+        analytics: techFromHTML.analytics,
+        marketing: techFromHTML.marketing,
+      },
+      pricing: pricing ? {
+        model: pricing.model as "freemium" | "subscription" | "usage" | "enterprise" | "hybrid",
+        tiers: pricing.tiers?.map(t => ({
+          name: t.name,
+          price: parseInt(t.price.replace(/\D/g, "")) || 0,
+          billing: "monthly" as const,
+          features: t.features,
+        })),
+        freeTrialDays: pricing.freeTrialDays,
+      } : undefined,
+    };
+
+    return {
+      profile,
+      intelligence: {
+        positioning: intelligence.positioning,
+        targetAudience: intelligence.targetAudience,
+        valuePropositions: intelligence.valuePropositions,
+        keyFeatures: intelligence.keyFeatures,
+        differentiators: intelligence.differentiators,
+        pricingSignals: intelligence.pricingSignals,
+        techStack: techFromHTML,
+        seoEstimate: {
+          estimatedAuthority: seoEstimate.estimatedDomainAuthority,
+          contentDepth: seoEstimate.contentDepth,
+          keywordTargeting: seoEstimate.keywordTargeting,
+        },
+      },
+    };
+  }
+
+  /**
+   * Full competitive intelligence using free tools
+   */
+  async gatherIntelligence(
+    domain: string,
+    industry?: string
+  ): Promise<{
+    target: CompanyProfile;
+    competitors: CompanyProfile[];
+    swot: {
+      strengths: string[];
+      weaknesses: string[];
+      opportunities: string[];
+      threats: string[];
+    };
+    insights: string[];
+  }> {
+    // Deep scan target
+    const targetScan = await this.deepScan(domain);
+
+    // Find competitors using search
+    const searchCompetitors = await this.searchEngine.searchCompetitors(
+      `${domain} competitors alternatives ${industry || ""}`
+    );
+
+    // Also use Claude to find competitors
+    const pages = await this.scraper.scrapeMultiplePages(domain);
+    const aiCompetitors = await this.extractor.findCompetitors(pages, industry);
+
+    // Combine and dedupe
+    const allCompetitors = [...new Set([...searchCompetitors, ...aiCompetitors])]
+      .filter((c) => c !== domain && !c.includes(domain))
+      .slice(0, 5);
+
+    // Scan top competitors
+    const competitorScans = await Promise.all(
+      allCompetitors.map(async (comp) => {
+        try {
+          const scan = await this.deepScan(comp);
+          return scan.profile;
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    const validCompetitors = competitorScans.filter((c): c is CompanyProfile => c !== null);
+
+    // Generate SWOT using Claude
+    const targetIntel = await this.extractor.extractIntelligence(pages);
+    const competitorIntels = await Promise.all(
+      validCompetitors.slice(0, 3).map(async (comp) => {
+        const compPages = await this.scraper.scrapeMultiplePages(comp.domain);
+        return this.extractor.extractIntelligence(compPages);
+      })
+    );
+
+    const swot = await this.extractor.generateSWOT(targetIntel, competitorIntels);
+
+    // Generate insights
+    const insights = await this.generateAIInsights(targetScan.profile, validCompetitors);
+
+    return {
+      target: targetScan.profile,
+      competitors: validCompetitors,
+      swot,
+      insights,
+    };
+  }
+
+  /**
+   * Generate SWOT analysis
+   */
+  async generateSWOTAnalysis(
+    target: string,
+    competitors: string[]
+  ): Promise<{
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+  }> {
+    const targetPages = await this.scraper.scrapeMultiplePages(target);
+    const targetIntel = await this.extractor.extractIntelligence(targetPages);
+
+    const competitorIntels = await Promise.all(
+      competitors.slice(0, 3).map(async (comp) => {
+        const pages = await this.scraper.scrapeMultiplePages(comp);
+        return this.extractor.extractIntelligence(pages);
+      })
+    );
+
+    return this.extractor.generateSWOT(targetIntel, competitorIntels);
+  }
+
+  /**
+   * Generate AI insights from profiles
+   */
+  private async generateAIInsights(
+    target: CompanyProfile,
+    competitors: CompanyProfile[]
+  ): Promise<string[]> {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": this.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: `You are a competitive analyst. Generate 5-7 actionable insights based on competitive data.
+Return a JSON array of strings only.`,
+        messages: [
+          {
+            role: "user",
+            content: `Generate insights for ${target.name} vs competitors: ${competitors.map(c => c.name).join(", ")}\n\nTarget: ${JSON.stringify(target)}\n\nCompetitors: ${JSON.stringify(competitors)}`,
+          },
+        ],
+      }),
+    });
+
+    const data = (await response.json()) as { content: Array<{ type: string; text: string }> };
+    try {
+      const text = data.content.find((c) => c.type === "text")?.text || "[]";
+      return JSON.parse(text);
+    } catch {
+      return [];
+    }
+  }
+
+  /**
+   * Format intelligence report as markdown
+   */
+  private formatIntelligenceReport(intel: {
+    target: CompanyProfile;
+    competitors: CompanyProfile[];
+    swot: { strengths: string[]; weaknesses: string[]; opportunities: string[]; threats: string[] };
+    insights: string[];
+  }): string {
+    return `# Competitive Intelligence Report
+## ${intel.target.name}
+
+**Generated:** ${new Date().toLocaleDateString()}
+
+---
+
+## Target Profile
+
+**Domain:** ${intel.target.domain}
+**Positioning:** ${intel.target.positioning || "N/A"}
+**Tagline:** ${intel.target.tagline || "N/A"}
+
+### Technology Stack
+${intel.target.technology?.stack?.join(", ") || "Not detected"}
+
+### Analytics & Marketing
+- Analytics: ${intel.target.technology?.analytics?.join(", ") || "Not detected"}
+- Marketing: ${intel.target.technology?.marketing?.join(", ") || "Not detected"}
+
+---
+
+## Competitors (${intel.competitors.length} found)
+
+${intel.competitors.map((c) => `### ${c.name}
+**Domain:** ${c.domain}
+**Positioning:** ${c.positioning || "N/A"}
+**Tech:** ${c.technology?.stack?.join(", ") || "N/A"}
+`).join("\n")}
+
+---
+
+## SWOT Analysis
+
+### Strengths
+${intel.swot.strengths.map((s) => `- ${s}`).join("\n")}
+
+### Weaknesses
+${intel.swot.weaknesses.map((w) => `- ${w}`).join("\n")}
+
+### Opportunities
+${intel.swot.opportunities.map((o) => `- ${o}`).join("\n")}
+
+### Threats
+${intel.swot.threats.map((t) => `- ${t}`).join("\n")}
+
+---
+
+## Key Insights
+
+${intel.insights.map((i, idx) => `${idx + 1}. ${i}`).join("\n\n")}
+
+---
+
+*Generated by High Era Agency (Free Tools)*
+`;
   }
 
   /**
