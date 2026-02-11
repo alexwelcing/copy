@@ -20,10 +20,18 @@ class_name = "Sprite"
 name = "SWARM"
 class_name = "SwarmCoordinator"
 
+[[durable_objects.bindings]]
+name = "ANALYST"
+class_name = "CompetitiveAnalyst"
+
 # Migrations for Durable Objects
 [[migrations]]
 tag = "v1"
 new_classes = ["Sprite", "SwarmCoordinator"]
+
+[[migrations]]
+tag = "v2"
+new_classes = ["CompetitiveAnalyst"]
 
 # R2 bucket for assets
 [[r2_buckets]]

@@ -11,15 +11,25 @@
  */
 
 import { DurableObject } from "cloudflare:workers";
+import { CompetitiveAnalyst } from "./analyst";
+
+// Re-export for wrangler
+export { CompetitiveAnalyst };
 
 // Types
 export interface Env {
   SPRITES: DurableObjectNamespace<Sprite>;
   SWARM: DurableObjectNamespace<SwarmCoordinator>;
+  ANALYST: DurableObjectNamespace<CompetitiveAnalyst>;
   ASSETS: R2Bucket;
   DB: D1Database;
   ANTHROPIC_API_KEY: string;
   FAL_API_KEY: string;
+  // Optional research API keys
+  AHREFS_API_KEY?: string;
+  SEMRUSH_API_KEY?: string;
+  SIMILARWEB_API_KEY?: string;
+  BUILTWITH_API_KEY?: string;
 }
 
 export interface SpriteConfig {
@@ -630,6 +640,25 @@ export default {
       newUrl.pathname = "/" + parts.slice(4).join("/");
 
       return sprite.fetch(new Request(newUrl.toString(), request));
+    }
+
+    // Route to competitive analyst
+    // /analyst/{tenant}/research - full competitive research
+    // /analyst/{tenant}/scan - quick competitor scan
+    // /analyst/{tenant}/find-competitors - discover competitors
+    // /analyst/{tenant}/seo-gap - SEO gap analysis
+    if (url.pathname.startsWith("/analyst/")) {
+      const parts = url.pathname.split("/");
+      const tenantId = parts[2];
+
+      const analyst = env.ANALYST.get(
+        env.ANALYST.idFromName(`analyst:${tenantId}`)
+      );
+
+      const newUrl = new URL(request.url);
+      newUrl.pathname = "/" + parts.slice(3).join("/");
+
+      return analyst.fetch(new Request(newUrl.toString(), request));
     }
 
     return new Response("High Era Agency - Sprite Runtime", {
