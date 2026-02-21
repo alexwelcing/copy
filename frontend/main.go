@@ -4,9 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,24 +39,45 @@ func main() {
 
 	// 1. Load Local Data for the Showcase
 	var visuals []Scene
-	visualsData, _ := os.ReadFile("../campaign_visuals_updated.json")
-	if len(visualsData) == 0 {
-		visualsData, _ = os.ReadFile("../campaign_visuals.json")
+	visualsData, err := os.ReadFile("./data/campaign_visuals_updated.json")
+	if err != nil {
+		log.Printf("WARNING: could not read campaign_visuals_updated.json: %v", err)
+		visualsData, err = os.ReadFile("./data/campaign_visuals.json")
+		if err != nil {
+			log.Printf("WARNING: could not read campaign_visuals.json: %v", err)
+		}
 	}
-	json.Unmarshal(visualsData, &visuals)
+	if err := json.Unmarshal(visualsData, &visuals); err != nil && len(visualsData) > 0 {
+		log.Printf("WARNING: could not parse campaign visuals JSON: %v", err)
+	}
 
 	var campaign CampaignData
-	campData, _ := os.ReadFile("../campaign_data.json")
-	json.Unmarshal(campData, &campaign)
+	campData, err := os.ReadFile("./data/campaign_data.json")
+	if err != nil {
+		log.Printf("WARNING: could not read campaign_data.json: %v", err)
+	}
+	if err := json.Unmarshal(campData, &campaign); err != nil && len(campData) > 0 {
+		log.Printf("WARNING: could not parse campaign_data.json: %v", err)
+	}
 
 	// Load Law.com case study data
 	var lawVisuals []Scene
-	lawVisualsData, _ := os.ReadFile("../law_campaign_visuals.json")
-	json.Unmarshal(lawVisualsData, &lawVisuals)
+	lawVisualsData, err := os.ReadFile("./data/law_campaign_visuals.json")
+	if err != nil {
+		log.Printf("WARNING: could not read law_campaign_visuals.json: %v", err)
+	}
+	if err := json.Unmarshal(lawVisualsData, &lawVisuals); err != nil && len(lawVisualsData) > 0 {
+		log.Printf("WARNING: could not parse law_campaign_visuals.json: %v", err)
+	}
 
 	var lawCampaign CampaignData
-	lawCampData, _ := os.ReadFile("../law_campaign_data.json")
-	json.Unmarshal(lawCampData, &lawCampaign)
+	lawCampData, err := os.ReadFile("./data/law_campaign_data.json")
+	if err != nil {
+		log.Printf("WARNING: could not read law_campaign_data.json: %v", err)
+	}
+	if err := json.Unmarshal(lawCampData, &lawCampaign); err != nil && len(lawCampData) > 0 {
+		log.Printf("WARNING: could not parse law_campaign_data.json: %v", err)
+	}
 
 	// 2. Setup Router
 	r := gin.Default()
@@ -90,15 +113,39 @@ func main() {
 	})
 
 	// API Proxy
+	proxyClient := &http.Client{Timeout: 30 * time.Second}
+
+	// Safe headers to forward to the backend
+	safeHeaders := map[string]bool{
+		"Content-Type":    true,
+		"Accept":          true,
+		"Authorization":   true,
+		"Accept-Language": true,
+		"Accept-Encoding": true,
+		"X-Request-Id":    true,
+	}
+
 	r.Any("/api/*path", func(c *gin.Context) {
 		proxyPath := c.Param("path")
 		target := fmt.Sprintf("%s%s", strings.TrimRight(apiURL, "/"), proxyPath)
-		req, _ := http.NewRequest(c.Request.Method, target, c.Request.Body)
-		for k, v := range c.Request.Header {
-			req.Header[k] = v
+		req, err := http.NewRequest(c.Request.Method, target, c.Request.Body)
+		if err != nil {
+			log.Printf("ERROR: failed to create proxy request: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error"})
+			return
 		}
-		client := &http.Client{}
-		resp, err := client.Do(req)
+		// Copy only safe headers
+		for k, v := range c.Request.Header {
+			if safeHeaders[http.CanonicalHeaderKey(k)] {
+				req.Header[k] = v
+			}
+		}
+		// Set forwarded-for header
+		if clientIP := c.ClientIP(); clientIP != "" {
+			req.Header.Set("X-Forwarded-For", clientIP)
+		}
+
+		resp, err := proxyClient.Do(req)
 		if err != nil {
 			c.JSON(http.StatusBadGateway, gin.H{"error": "Backend unreachable"})
 			return

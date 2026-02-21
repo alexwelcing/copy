@@ -25,14 +25,15 @@ services:
   # Frontend UI
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
         - VITE_API_URL=http://localhost:8080
     ports:
-      - "3000:3000"
+      - "3000:8080"
     environment:
       - ORIGIN=http://localhost:3000
-      - VITE_API_URL=http://api:8080
+      - API_URL=http://api:8080
       - API_SECRET=dev_secret
     depends_on:
       api:

@@ -176,8 +176,6 @@ class SkillExecutor:
             messages=messages
         )
 
-        print(f"DEBUG: Model response content: {message.content}")
-
         # Extract text content from all blocks (handling both TextBlock and ThinkingBlock)
         output_parts = []
         for block in message.content:
@@ -227,8 +225,6 @@ class SkillExecutor:
                 current_section = line[3:].strip()
                 current_content = []
             elif line.startswith("### ") and not current_section:
-                if current_section:
-                    sections[current_section] = "\n".join(current_content).strip()
                 current_section = line[4:].strip()
                 current_content = []
             elif current_section:

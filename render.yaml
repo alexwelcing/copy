@@ -24,11 +24,11 @@ services:
     name: marketing-agency-frontend
     runtime: docker
     plan: free
-    dockerContext: frontend
+    dockerContext: .
     dockerfilePath: frontend/Dockerfile
     envVars:
-      - key: VITE_API_URL
-        value: http://marketing-agency-api:8080
+      - key: API_URL
+        value: https://marketing-agency-api.onrender.com
       - key: API_SECRET
         fromService:
           type: web
