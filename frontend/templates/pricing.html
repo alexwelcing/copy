@@ -3,51 +3,178 @@
 {{ end }}
 
 {{ define "content" }}
-<div style="margin-bottom: 6rem; border-bottom: 1px solid var(--border); padding-bottom: 4rem;">
+<div style="margin-bottom: 4rem; text-align: center;">
     <span class="section-label">Pricing</span>
-    <h1>Choose Your Plan</h1>
-    <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1rem; max-width: 700px;">Select the tier that fits your team. All plans include access to the full agent swarm.</p>
+    <h1>Ship Campaigns,<br>Not Meetings.</h1>
+    <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1rem; max-width: 650px; margin-left: auto; margin-right: auto;">Every plan includes the full skill library. Pick the tier that matches your volume.</p>
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem;">
     <!-- Starter -->
     <div style="border: 1px solid var(--border); padding: 3rem 2rem; border-radius: 4px;">
         <span class="section-label">Starter</span>
-        <div style="font-size: 3rem; font-weight: 800; margin: 1rem 0;">$—</div>
-        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">For solo founders testing the system.</p>
-        <ul style="list-style: none; padding: 0; font-size: 0.85rem; line-height: 2.2; color: var(--muted);">
-            <li>— briefs / month</li>
-            <li>— skills included</li>
+        <div style="margin: 1rem 0;">
+            <span style="font-size: 3rem; font-weight: 800;">$49</span>
+            <span style="color: var(--muted); font-size: 0.9rem;">/month</span>
+        </div>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">For solo founders turning ideas into campaigns.</p>
+        <ul style="list-style: none; padding: 0; font-size: 0.85rem; line-height: 2.4; color: var(--text);">
+            <li>1M tokens included</li>
+            <li>100 agent runs / month</li>
+            <li>2 agents working at once</li>
+            <li>3 core agents (Director, Copywriter, Editor)</li>
+            <li>All 24 skills</li>
             <li>Email support</li>
         </ul>
-        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem;">Get Started</a>
+        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem;">Start Building</a>
     </div>
 
-    <!-- Pro -->
+    <!-- Growth -->
     <div style="border: 2px solid var(--accent); padding: 3rem 2rem; border-radius: 4px; position: relative;">
         <span style="position: absolute; top: -12px; left: 2rem; background: var(--accent); color: white; font-size: 0.7rem; font-weight: 700; padding: 0.3rem 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Most Popular</span>
-        <span class="section-label">Pro</span>
-        <div style="font-size: 3rem; font-weight: 800; margin: 1rem 0;">$—</div>
-        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">For teams shipping campaigns weekly.</p>
-        <ul style="list-style: none; padding: 0; font-size: 0.85rem; line-height: 2.2; color: var(--muted);">
-            <li>— briefs / month</li>
-            <li>All skills included</li>
+        <span class="section-label">Growth</span>
+        <div style="margin: 1rem 0;">
+            <span style="font-size: 3rem; font-weight: 800;">$199</span>
+            <span style="color: var(--muted); font-size: 0.9rem;">/month</span>
+        </div>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">For teams shipping campaigns every week.</p>
+        <ul style="list-style: none; padding: 0; font-size: 0.85rem; line-height: 2.4; color: var(--text);">
+            <li><strong>10M tokens included</strong></li>
+            <li>500 agent runs / month</li>
+            <li>4 agents working at once</li>
+            <li><strong>All 6 agents</strong> (+ Strategist, Optimizer, Analyst)</li>
+            <li>All 24 skills</li>
+            <li>Overage at $8 / 1M tokens</li>
             <li>Priority support</li>
         </ul>
-        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem; background: var(--accent);">Get Started</a>
+        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem; background: var(--accent);">Start Building</a>
     </div>
 
     <!-- Enterprise -->
     <div style="border: 1px solid var(--border); padding: 3rem 2rem; border-radius: 4px;">
         <span class="section-label">Enterprise</span>
-        <div style="font-size: 3rem; font-weight: 800; margin: 1rem 0;">Custom</div>
-        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">For orgs with custom workflows.</p>
-        <ul style="list-style: none; padding: 0; font-size: 0.85rem; line-height: 2.2; color: var(--muted);">
-            <li>Unlimited briefs</li>
-            <li>Custom skills</li>
+        <div style="margin: 1rem 0;">
+            <span style="font-size: 3rem; font-weight: 800;">$999</span>
+            <span style="color: var(--muted); font-size: 0.9rem;">/month</span>
+        </div>
+        <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem;">For agencies and orgs running at scale.</p>
+        <ul style="list-style: none; padding: 0; font-size: 0.85rem; line-height: 2.4; color: var(--text);">
+            <li><strong>100M tokens included</strong></li>
+            <li>2,000 agent runs / month</li>
+            <li>10 agents working at once</li>
+            <li>All 6 agents</li>
+            <li>All 24 skills</li>
+            <li>Lowest overage: $5 / 1M tokens</li>
             <li>Dedicated support</li>
         </ul>
-        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem;">Contact Sales</a>
+        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem;">Start Building</a>
     </div>
+</div>
+
+<!-- Feature Comparison -->
+<div style="margin-top: 8rem;">
+    <span class="section-label">Compare Plans</span>
+    <h2 style="margin-bottom: 3rem;">What's included</h2>
+    <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                <th style="padding: 1rem 0; width: 40%;"></th>
+                <th style="padding: 1rem; text-align: center;">Starter</th>
+                <th style="padding: 1rem; text-align: center; color: var(--accent);">Growth</th>
+                <th style="padding: 1rem; text-align: center;">Enterprise</th>
+            </tr>
+        </thead>
+        <tbody style="color: var(--muted);">
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Monthly tokens</td>
+                <td style="padding: 1rem; text-align: center;">1M</td>
+                <td style="padding: 1rem; text-align: center;">10M</td>
+                <td style="padding: 1rem; text-align: center;">100M</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Agent runs / month</td>
+                <td style="padding: 1rem; text-align: center;">100</td>
+                <td style="padding: 1rem; text-align: center;">500</td>
+                <td style="padding: 1rem; text-align: center;">2,000</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Concurrent agents</td>
+                <td style="padding: 1rem; text-align: center;">2</td>
+                <td style="padding: 1rem; text-align: center;">4</td>
+                <td style="padding: 1rem; text-align: center;">10</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Agent team</td>
+                <td style="padding: 1rem; text-align: center;">Director, Copywriter, Editor</td>
+                <td style="padding: 1rem; text-align: center;">All 6 agents</td>
+                <td style="padding: 1rem; text-align: center;">All 6 agents</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Skills library</td>
+                <td style="padding: 1rem; text-align: center;">All 24</td>
+                <td style="padding: 1rem; text-align: center;">All 24</td>
+                <td style="padding: 1rem; text-align: center;">All 24</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Overage billing</td>
+                <td style="padding: 1rem; text-align: center;">Hard cap</td>
+                <td style="padding: 1rem; text-align: center;">$8 / 1M tokens</td>
+                <td style="padding: 1rem; text-align: center;">$5 / 1M tokens</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">URL analysis (vision)</td>
+                <td style="padding: 1rem; text-align: center;">&mdash;</td>
+                <td style="padding: 1rem; text-align: center;">Included</td>
+                <td style="padding: 1rem; text-align: center;">Included</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Asset generation</td>
+                <td style="padding: 1rem; text-align: center;">&mdash;</td>
+                <td style="padding: 1rem; text-align: center;">Images &amp; video</td>
+                <td style="padding: 1rem; text-align: center;">Images, video &amp; audio</td>
+            </tr>
+            <tr>
+                <td style="padding: 1rem 0; color: var(--text); font-weight: 600;">Support</td>
+                <td style="padding: 1rem; text-align: center;">Email</td>
+                <td style="padding: 1rem; text-align: center;">Priority</td>
+                <td style="padding: 1rem; text-align: center;">Dedicated</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- FAQ -->
+<div style="margin-top: 8rem;">
+    <span class="section-label">Questions</span>
+    <h2 style="margin-bottom: 3rem;">Frequently Asked</h2>
+    <div style="max-width: 800px;">
+        <div style="border-bottom: 1px solid var(--border); padding: 2rem 0;">
+            <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600;">What are tokens?</h3>
+            <p style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Tokens are the unit of AI processing. A typical campaign brief uses 2,000&ndash;5,000 tokens. The Starter plan's 1M tokens covers roughly 200&ndash;500 campaign executions per month.</p>
+        </div>
+        <div style="border-bottom: 1px solid var(--border); padding: 2rem 0;">
+            <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600;">What happens when I hit my token limit?</h3>
+            <p style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">On Starter, execution pauses until your next billing cycle. On Growth and Enterprise, you keep working and overage is billed at your plan's rate&mdash;no interruptions.</p>
+        </div>
+        <div style="border-bottom: 1px solid var(--border); padding: 2rem 0;">
+            <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600;">Which agents do I get on Starter?</h3>
+            <p style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Director, Copywriter, and Editor&mdash;the core execution team. Upgrade to Growth to unlock the Strategist, Optimizer, and Analyst for full-stack campaign intelligence.</p>
+        </div>
+        <div style="border-bottom: 1px solid var(--border); padding: 2rem 0;">
+            <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600;">Can I switch plans?</h3>
+            <p style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Yes, upgrade or downgrade anytime. Changes take effect on your next billing cycle. Upgrades apply immediately with prorated billing.</p>
+        </div>
+        <div style="padding: 2rem 0;">
+            <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600;">What counts as an "agent run"?</h3>
+            <p style="color: var(--muted); margin-top: 0.5rem; font-size: 0.9rem;">Each time you spawn an agent to execute a skill&mdash;writing copy, auditing a page, building an email sequence&mdash;that's one run. Concurrent agents let you run multiple in parallel.</p>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div style="margin-top: 8rem; text-align: center; background: var(--text); color: white; padding: 6rem 2rem;">
+    <h2>Try it free. 5 runs a day, no card required.</h2>
+    <p style="color: #94a3b8; margin: 2rem auto; max-width: 550px;">See what the swarm builds before you commit. Every plan starts with a free trial.</p>
+    <a href="/" class="btn" style="background: var(--accent); margin-top: 2rem;">Initialize Your First Brief</a>
 </div>
 {{ end }}
