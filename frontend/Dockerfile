@@ -4,20 +4,15 @@ FROM golang:1.24-bookworm AS builder
 WORKDIR /app
 
 # Dependencies
-COPY frontend/go.mod frontend/go.sum ./
+COPY go.mod go.sum ./
 RUN go mod download
 
 # Source
-COPY frontend/ ./
+COPY . .
 
 # Build
 # CGO_ENABLED=0 for static binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o server main.go
-
-# Data files
-WORKDIR /data
-COPY campaign_data.json campaign_visuals.json campaign_visuals_updated.json ./
-COPY law_campaign_data.json law_campaign_visuals.json ./
 
 # Run Stage
 FROM debian:bookworm-slim
@@ -27,11 +22,11 @@ WORKDIR /app
 # Install CA certs for HTTPS calls to API
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Copy Binary, Assets, and Data Files
+# Copy Binary, Templates, Assets, and Data Files
 COPY --from=builder /app/server .
 COPY --from=builder /app/templates ./templates
 COPY --from=builder /app/assets ./assets
-COPY --from=builder /data ./data
+COPY --from=builder /app/data ./data
 
 # Env
 ENV PORT=8080

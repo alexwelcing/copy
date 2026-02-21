@@ -24,7 +24,7 @@ services:
     name: marketing-agency-frontend
     runtime: docker
     plan: free
-    dockerContext: .
+    dockerContext: frontend
     dockerfilePath: frontend/Dockerfile
     envVars:
       - key: API_URL
