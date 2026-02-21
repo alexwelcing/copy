@@ -1,25 +1,28 @@
 # Marketing Agency API Service Dependencies
+# Pinned for reproducible builds — update intentionally, not accidentally.
 
 # Web framework
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
+fastapi==0.129.2
+uvicorn[standard]==0.41.0
 
 # Claude API
-anthropic>=0.18.0
+anthropic==0.83.0
 
 # Data validation
-pydantic>=2.5.0
+pydantic==2.12.5
 
-# HTTP client (for anthropic)
-httpx>=0.26.0
-gunicorn>=21.2.0
+# HTTP client
+httpx==0.28.1
+gunicorn==25.1.0
 
-# Cloud & Utils
-google-cloud-storage>=2.14.0
-python-dotenv>=1.0.0
-fal-client>=0.5.0
-google-cloud-firestore>=2.14.0
-google-cloud-pubsub>=2.19.0
-firebase-admin>=6.4.0
-google-cloud-aiplatform>=1.38.0
-playwright>=1.40.0
+# Google Cloud
+google-cloud-storage==3.9.0
+google-cloud-firestore==2.23.0
+google-cloud-pubsub==2.35.0
+google-cloud-aiplatform==1.138.0
+firebase-admin==7.1.0
+
+# Utils
+python-dotenv==1.2.1
+fal-client==0.13.1
+playwright==1.58.0

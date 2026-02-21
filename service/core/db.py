@@ -16,6 +16,15 @@ class FirestoreClient:
 
         self.briefs_collection = self.db.collection('briefs')
 
+    def check_connectivity(self) -> bool:
+        """Test Firestore connectivity with a lightweight read."""
+        try:
+            # Limit 1 is the cheapest possible query
+            list(self.briefs_collection.limit(1).stream())
+            return True
+        except Exception:
+            return False
+
     def save_brief(self, brief_data: Dict[str, Any]) -> str:
         """
         Save a brief to Firestore.

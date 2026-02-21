@@ -1,0 +1,17 @@
+# Git
+.git
+.gitignore
+
+# Binaries (don't send 26MB test binary to Docker)
+frontend-test
+
+# IDE
+.vscode
+.idea
+
+# Dependencies (rebuilt in container)
+vendor/
+
+# Docs
+*.md
+LICENSE

@@ -1,13 +1,16 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -114,12 +117,29 @@ func main() {
 		})
 	})
 
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"status": "ok"})
-	})
-
-	// API Proxy
+	// Health check — validates backend reachability
 	proxyClient := &http.Client{Timeout: 30 * time.Second}
+	healthClient := &http.Client{Timeout: 5 * time.Second}
+
+	r.GET("/health", func(c *gin.Context) {
+		status := "healthy"
+
+		// Check backend API reachability
+		backendURL := fmt.Sprintf("%s/health", strings.TrimRight(apiURL, "/"))
+		resp, err := healthClient.Get(backendURL)
+		backendOK := err == nil && resp != nil && resp.StatusCode == 200
+		if resp != nil {
+			resp.Body.Close()
+		}
+		if !backendOK {
+			status = "degraded"
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status":  status,
+			"backend": backendOK,
+		})
+	})
 
 	// Safe headers to forward to the backend
 	safeHeaders := map[string]bool{
@@ -131,6 +151,7 @@ func main() {
 		"X-Request-Id":    true,
 	}
 
+	// API Proxy
 	r.Any("/api/*path", func(c *gin.Context) {
 		proxyPath := c.Param("path")
 		target := fmt.Sprintf("%s%s", strings.TrimRight(apiURL, "/"), proxyPath)
@@ -164,5 +185,30 @@ func main() {
 		io.Copy(c.Writer, resp.Body)
 	})
 
-	r.Run(":" + port)
+	// Graceful shutdown — Cloud Run sends SIGTERM with 10s grace period
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: r,
+	}
+
+	go func() {
+		log.Printf("Frontend listening on :%s", port)
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server error: %v", err)
+		}
+	}()
+
+	// Wait for SIGTERM or SIGINT
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutting down gracefully...")
+
+	// Give in-flight requests 8 seconds to complete (Cloud Run gives 10s)
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Printf("Forced shutdown: %v", err)
+	}
+	log.Println("Server stopped")
 }

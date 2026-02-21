@@ -5,11 +5,16 @@ HTTP service that exposes marketing skills via REST API.
 Designed for deployment on Google Cloud Run.
 """
 
+import logging
 import os
+import signal
+import sys
 from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Security, Depends, status
+
+logger = logging.getLogger(__name__)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -56,26 +61,62 @@ async def verify_api_secret(token: HTTPAuthorizationCredentials = Security(api_k
         )
 
 
+def _validate_env():
+    """Validate critical environment variables at startup. Fail fast, not on first request."""
+    required = {
+        "ANTHROPIC_API_KEY": "Required for LLM skill execution",
+    }
+    warned = {
+        "GCP_PROJECT_ID": "Needed for Firestore/GCS in Cloud Run (ok if using service.json locally)",
+        "CORS_ORIGINS": "Defaults to '*' which is insecure in production",
+    }
+    missing = []
+    for var, desc in required.items():
+        if not os.getenv(var):
+            missing.append(f"  {var} — {desc}")
+    if missing:
+        logger.error("Missing required environment variables:\n%s", "\n".join(missing))
+        sys.exit(1)
+    for var, desc in warned.items():
+        if not os.getenv(var):
+            logger.warning("Environment variable %s not set: %s", var, desc)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Startup and shutdown events."""
+    # Validate environment before anything else
+    _validate_env()
+
     # Startup: warm up the executor and validate skills
     executor = get_executor()
-    print(f"Marketing Agency API v{VERSION} starting...")
-    print(f"Skills path: {executor.skills_path}")
-    print(f"Default Model: {executor.default_model}")
+    logger.info("Marketing Agency API v%s starting...", VERSION)
+    logger.info("Skills path: %s", executor.skills_path)
+    logger.info("Default Model: %s", executor.default_model)
 
     # Validate all skills are loadable
     for skill in SkillName:
         try:
             executor.load_skill(skill)
         except FileNotFoundError:
-            print(f"Warning: Skill not found: {skill.value}")
+            logger.warning("Skill not found: %s", skill.value)
 
-    print(f"Loaded {len(executor._skill_cache)} skills")
+    logger.info("Loaded %d skills", len(executor._skill_cache))
+
+    # Validate Firestore connectivity
+    try:
+        db = get_db()
+        if db.check_connectivity():
+            logger.info("Firestore connectivity: OK")
+        else:
+            logger.warning("Firestore connectivity: FAILED — database queries will error")
+    except Exception as e:
+        logger.warning("Firestore init failed: %s", e)
+
     yield
-    # Shutdown
-    print("Shutting down...")
+
+    # Graceful shutdown — Cloud Run sends SIGTERM with 10s grace period
+    logger.info("Shutting down gracefully...")
 
 
 app = FastAPI(
@@ -137,10 +178,20 @@ except ImportError as e:
 
 @app.get("/", response_model=HealthResponse)
 async def health_check():
-    """Health check endpoint."""
+    """Health check endpoint — validates core dependencies."""
     executor = get_executor()
+    checks = {"skills": len(executor._skill_cache) > 0}
+
+    # Firestore check (cached singleton, cheap)
+    try:
+        db = get_db()
+        checks["firestore"] = db.check_connectivity()
+    except Exception:
+        checks["firestore"] = False
+
+    all_healthy = all(checks.values())
     return HealthResponse(
-        status="healthy",
+        status="healthy" if all_healthy else "degraded",
         version=VERSION,
         skills_available=len(SkillName),
     )
@@ -508,12 +559,13 @@ async def email_sequence(
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request, exc):
-    """Handle unexpected errors."""
+    """Handle unexpected errors. Never leak stack traces to clients."""
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=500,
         content=ErrorResponse(
             error="Internal server error",
-            detail=str(exc) if os.getenv("DEBUG") else None,
+            detail=None,
         ).model_dump(),
     )
 

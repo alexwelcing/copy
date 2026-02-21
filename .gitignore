@@ -62,3 +62,6 @@ node_modules/
 frontend/package-lock.json
 
 service.json
+
+# Frontend build artifacts
+frontend/frontend-test

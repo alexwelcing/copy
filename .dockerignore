@@ -33,6 +33,9 @@ agency/
 templates/
 workflows/
 
+# Frontend (separate container)
+frontend/
+
 # Deploy scripts (not needed in container)
 deploy/
 

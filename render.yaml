@@ -13,7 +13,7 @@ services:
       - key: CLAUDE_MODEL
         value: claude-sonnet-4-5-20250929
       - key: CORS_ORIGINS
-        value: "*"
+        value: "https://marketing-agency-frontend.onrender.com"
       - key: DEBUG
         value: "false"
       - key: API_SECRET
