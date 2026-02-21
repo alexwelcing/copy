@@ -274,6 +274,43 @@ Page View → Signup Click → Form Start → Form Complete → Activation
 - [ ] New features tracked
 - [ ] Team trained
 
+## Platform Monitoring (Render MCP)
+
+When the service runs on Render, use the Render MCP server to track infrastructure metrics alongside marketing analytics. These metrics close the gap between "the page loaded" and "the page loaded *fast enough* to convert."
+
+### Available Metrics
+- **Response counts by status code** — track 4xx/5xx error rates that silently kill conversions
+- **Response times** — correlate slow pages with conversion drop-offs (Professional plan+)
+- **CPU/memory usage** — detect resource constraints before users notice
+- **Outbound bandwidth** — monitor API proxy and asset delivery volume
+- **Deploy history** — correlate deploys with metric changes
+
+### Infrastructure-to-Conversion Correlation
+
+```
+Deploy event → Response time spike → Conversion rate drop
+                                    ↑
+                          This is invisible without
+                          platform metrics
+```
+
+Track these as deployment events in your analytics:
+```javascript
+// After each deploy, log to your analytics
+gtag('event', 'deploy_completed', {
+  'deploy_id': 'dep-abc123',
+  'service': 'frontend',
+  'timestamp': '2026-02-21T19:18:15Z'
+});
+```
+
+### Health Monitoring Checklist
+- [ ] Health endpoint returns 200 (`/health`)
+- [ ] Response time p95 < 500ms for marketing pages
+- [ ] Error rate (5xx) < 0.1% of total requests
+- [ ] No memory/CPU saturation during traffic spikes
+- [ ] Deploy success rate tracked over time
+
 ## Output Format
 
 When setting up tracking, provide:
@@ -290,3 +327,4 @@ When setting up tracking, provide:
 - `ab-test-setup` - For experiment tracking
 - `page-cro` - For conversion optimization
 - `seo-audit` - For organic tracking
+- `deployment` - For deploy verification and infrastructure monitoring
