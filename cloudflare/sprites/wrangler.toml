@@ -1,0 +1,75 @@
+# HIGH ERA AGENCY - Cloudflare Sprite Runtime
+#
+# Deploy: npx wrangler deploy
+# Dev:    npx wrangler dev
+
+name = "highera-sprites"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account/zone (set via env or wrangler login)
+# account_id = ""
+
+# Durable Objects
+[[durable_objects.bindings]]
+name = "SPRITES"
+class_name = "Sprite"
+
+[[durable_objects.bindings]]
+name = "SWARM"
+class_name = "SwarmCoordinator"
+
+[[durable_objects.bindings]]
+name = "ANALYST"
+class_name = "CompetitiveAnalyst"
+
+# Migrations for Durable Objects
+[[migrations]]
+tag = "v1"
+new_classes = ["Sprite", "SwarmCoordinator"]
+
+[[migrations]]
+tag = "v2"
+new_classes = ["CompetitiveAnalyst"]
+
+# R2 bucket for assets
+[[r2_buckets]]
+binding = "ASSETS"
+bucket_name = "highera-assets"
+
+# D1 database (optional, for structured queries)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "highera-db"
+# database_id = ""
+
+# Secrets (set via wrangler secret put)
+# - ANTHROPIC_API_KEY
+# - FAL_API_KEY
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# Development overrides
+[env.dev]
+name = "highera-sprites-dev"
+
+[env.dev.vars]
+ENVIRONMENT = "development"
+
+# Staging
+[env.staging]
+name = "highera-sprites-staging"
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+
+# Observability
+[observability]
+enabled = true
+
+# Limits
+[limits]
+cpu_ms = 30000  # 30 second CPU time per request

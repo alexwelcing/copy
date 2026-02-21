@@ -1,0 +1,21 @@
+{
+  "name": "highera-sprites",
+  "version": "1.0.0",
+  "description": "High Era Agency - Cloudflare Sprite Runtime",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:dev": "wrangler deploy --env dev",
+    "tail": "wrangler tail",
+    "types": "wrangler types",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241018.0",
+    "typescript": "^5.5.0",
+    "vitest": "^1.6.0",
+    "wrangler": "^3.80.0"
+  }
+}
