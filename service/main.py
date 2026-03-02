@@ -169,6 +169,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Log every request with its status code and duration."""
+    start_time = time.time()
+    response = await call_next(request)
+    duration = time.time() - start_time
+    
+    # Get identity if possible
+    auth_header = request.headers.get("Authorization")
+    anon_id = request.cookies.get("ajs_anonymous_id") or request.headers.get("X-Anonymous-ID")
+    identity = "authenticated" if auth_header else (f"anon:{anon_id}" if anon_id else "guest")
+    
+    logger.info(
+        f"Method: {request.method} Path: {request.url.path} "
+        f"Status: {response.status_code} Duration: {duration:.3f}s Identity: {identity}"
+    )
+    return response
+
 # Include swarm router for sprite management
 try:
     from service.api.swarm import router as swarm_router
@@ -355,15 +373,15 @@ async def list_briefs(
     user_info: tuple[str, bool] = Depends(get_current_user)
 ):
     """List recent strategic briefs for the current user."""
-    user_id, _ = user_info
+    user_id, is_anon = user_info
     db = get_db()
     
-    # We need to update db.py to support filtering by user_id
-    # For now, let's assume list_briefs can take a user_id filter
-    # If not, we'll filter in memory (inefficient but works for Phase 2 prototype)
-    
-    all_briefs = db.list_briefs(limit=100) # Fetch more, filter here
-    user_briefs = [b for b in all_briefs if b.get("user_id") == user_id]
+    # We fetch briefs for the specific identity
+    all_briefs = db.list_briefs(limit=100)
+    if is_anon:
+        user_briefs = [b for b in all_briefs if b.get("anonymous_id") == user_id]
+    else:
+        user_briefs = [b for b in all_briefs if b.get("user_id") == user_id]
     
     return {"briefs": user_briefs[:limit], "total": len(user_briefs)}
 
@@ -374,15 +392,20 @@ async def get_brief(
     user_info: tuple[str, bool] = Depends(get_current_user)
 ):
     """Get a specific brief by ID."""
-    user_id, _ = user_info
+    user_id, is_anon = user_info
     db = get_db()
     brief = db.get_brief(brief_id)
     
     if not brief:
         raise HTTPException(status_code=404, detail="Brief not found")
         
-    if brief.get("user_id") != user_id:
-        raise HTTPException(status_code=403, detail="Not authorized to access this brief")
+    # Check ownership (either anonymous_id or user_id)
+    if is_anon:
+        if brief.get("anonymous_id") != user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to access this brief")
+    else:
+        if brief.get("user_id") != user_id:
+            raise HTTPException(status_code=403, detail="Not authorized to access this brief")
         
     return brief
 
