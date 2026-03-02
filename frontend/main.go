@@ -103,6 +103,7 @@ func main() {
 	r := gin.Default()
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/assets", "./assets")
+	r.Static("/.well-known", "./static/.well-known")
 
 	// Helper: base template data with Firebase config
 	baseData := func(extra gin.H) gin.H {

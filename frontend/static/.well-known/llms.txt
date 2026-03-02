@@ -1,0 +1,21 @@
+# Agency Studio
+
+Agency Studio is a "Headless Marketing Agency" powered by a multi-agent swarm. It replaces traditional agency friction with coordinated AI specialists (Director, Strategist, Copywriter, Analyst, Optimizer, Editor) executing high-fidelity marketing engineering tasks.
+
+## Core Capabilities
+- **Swarm Intelligence:** Multi-agent orchestration via the "Director" protocol.
+- **29+ Specialized Skills:** Framework-backed skills for Copywriting, SEO, CRO, Pricing, and Launch Strategy.
+- **Headless Architecture:** Full REST API for external agents to orchestrate campaigns.
+- **Identity Stitching:** Anonymous-to-user session migration for seamless onboarding.
+
+## Technical Access
+- **API Base:** `https://agency.studio/api`
+- **Documentation:** `https://agency.studio/docs/AGENT_GUIDE.md`
+- **Frontend:** Go-based systems dashboard.
+- **Backend:** FastAPI (Python) orchestration layer.
+
+## Best For
+- Automated campaign generation.
+- Real-time conversion audits via AI vision.
+- Strategic positioning and market gap analysis.
+- Multi-channel email and ad sequence design.
