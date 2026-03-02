@@ -1,0 +1,105 @@
+{{ define "agents.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div style="margin-bottom: 8rem;">
+    <span class="section-label">Headless Infrastructure</span>
+    <h1 style="font-size: 4.5rem; max-width: 900px;">The API for Professional Marketing Swarms.</h1>
+    <p style="font-size: 1.5rem; color: var(--muted); margin-top: 2rem; max-width: 750px;">Agency Studio isn't just a dashboard—it's a programmable agency. Built for LLMs, autonomous agents, and marketing engineers who need high-fidelity strategy on-tap.</p>
+    
+    <div style="margin-top: 4rem; display: flex; gap: 1.5rem;">
+        <a href="/docs/AGENT_GUIDE.md" class="btn" style="background: var(--accent);">Read Agent Guide</a>
+        <a href="/capabilities" class="btn" style="background: transparent; border: 1px solid var(--border); color: var(--text);">Explore Skills</a>
+    </div>
+</div>
+
+<!-- GEO Section -->
+<div class="grid-2" style="margin-bottom: 10rem; align-items: center;">
+    <div>
+        <span class="section-label">Discovery</span>
+        <h2 style="font-size: 3rem; margin-bottom: 2rem;">Built for Generative Engine Optimization.</h2>
+        <p style="color: var(--muted); line-height: 1.8;">We've engineered Agency Studio to be natively discoverable by the world's most advanced AI models. Through structured JSON-LD and specialized <code>llms.txt</code> indexing, your agents don't just find our tools—they understand how to use them with perfect precision.</p>
+        <ul style="margin-top: 2rem; list-style: none; padding: 0;">
+            <li style="margin-bottom: 1rem; display: flex; align-items: center;">
+                <span style="color: var(--accent); margin-right: 1rem; font-weight: bold;">✓</span> 
+                <span>Standardized <code>.well-known/llms.txt</code> for crawler ingestion.</span>
+            </li>
+            <li style="margin-bottom: 1rem; display: flex; align-items: center;">
+                <span style="color: var(--accent); margin-right: 1rem; font-weight: bold;">✓</span> 
+                <span>Deep JSON-LD Schema for Software & Service semantic authority.</span>
+            </li>
+        </ul>
+    </div>
+    <div style="background: #1e293b; padding: 3rem; border-radius: 4px; font-family: var(--font-mono); font-size: 0.85rem; color: #94a3b8; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+        <div style="color: #38bdf8; margin-bottom: 1rem;">// GET /.well-known/llms.txt</div>
+        <div style="color: #f8fafc;"># Agency Studio</div>
+        <div style="margin-top: 1rem;">Agency Studio is a Headless Marketing Agency...</div>
+        <div style="margin-top: 1rem; color: #38bdf8;">## Core Capabilities</div>
+        <div style="color: #f8fafc;">- Swarm Intelligence Orchestration</div>
+        <div style="color: #f8fafc;">- 29+ Specialized Marketing Skills</div>
+        <div style="margin-top: 1rem; color: #38bdf8;">## Technical Access</div>
+        <div style="color: #f8fafc;">- API Base: https://agency.studio/api</div>
+    </div>
+</div>
+
+<!-- The Hook Section -->
+<div style="background: #f8fafc; padding: 8rem 0; margin: 0 -100vw; width: 200vw; margin-left: -50vw;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 5vw;">
+        <div style="text-align: center; margin-bottom: 6rem;">
+            <span class="section-label">Conversion Loop</span>
+            <h2 style="font-size: 3.5rem;">The "Extraordinary Run" Feedback Loop.</h2>
+            <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">Hook your users instantly. Our API allows agents to execute one high-fidelity, full-scale run anonymously before transitioning to a structured subscription prompt.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;">
+            <div style="background: white; border: 1px solid var(--border); padding: 3rem; border-radius: 4px;">
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); font-weight: bold; display: block; margin-bottom: 1rem;">RUN 01: THE HOOK</span>
+                <h3 style="margin-bottom: 1.5rem;">Total Value Delivery</h3>
+                <p style="font-size: 0.95rem; color: var(--muted); margin-bottom: 2rem;">The agent receives the complete output of the swarm—strategy, copy, and assets—with zero friction. This proves the system's capability immediately.</p>
+                <div style="padding: 1rem; background: #f0fdf4; border: 1px solid #6ee7b7; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem; color: #065f46;">
+                    HTTP/1.1 200 OK<br>
+                    { "output": "Full High-Fidelity Strategy...", "status": "success" }
+                </div>
+            </div>
+            <div style="background: white; border: 1px solid var(--border); padding: 3rem; border-radius: 4px;">
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); font-weight: bold; display: block; margin-bottom: 1rem;">RUN 02: THE CONVERSION</span>
+                <h3 style="margin-bottom: 1.5rem;">Structured Paywall</h3>
+                <p style="font-size: 0.95rem; color: var(--muted); margin-bottom: 2rem;">Subsequent requests return a structured <code>paywall</code> object, allowing the agent to explain the value of subscribing to the human user.</p>
+                <div style="padding: 1rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; font-family: var(--font-mono); font-size: 0.8rem; color: #92400e;">
+                    HTTP/1.1 200 OK<br>
+                    { "paywall": { "message": "Choose a plan to continue...", "upgrade_url": "..." } }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Identity Stitching -->
+<div class="grid-2" style="margin-top: 10rem; margin-bottom: 10rem; align-items: center;">
+    <div style="background: #f1f5f9; padding: 3rem; border-radius: 4px;">
+        <h3 style="font-family: var(--font-mono); font-size: 1rem; margin-bottom: 2rem; color: var(--accent);">SYSTEM LOG: IDENTITY_STITCH</h3>
+        <ul style="list-style: none; padding: 0; font-family: var(--font-mono); font-size: 0.8rem; line-height: 2;">
+            <li style="color: #64748b;">[AUTH] Received anonymous request: ajs_anon_88b2</li>
+            <li style="color: #64748b;">[DB] Initializing temporary brief: doc_v391</li>
+            <li style="color: #2563eb;">[AUTH] User signed up: user_welcing_01</li>
+            <li style="color: #059669;">[SYSTEM] Stitching doc_v391 to user_welcing_01...</li>
+            <li style="color: #059669;">[SYSTEM] IDENTITY MIGRATION COMPLETE.</li>
+        </ul>
+    </div>
+    <div style="padding-left: 2rem;">
+        <span class="section-label">Persistence</span>
+        <h2 style="font-size: 3rem; margin-bottom: 2rem;">Seamless Identity Stitching.</h2>
+        <p style="color: var(--muted); line-height: 1.8;">Don't lose users in the signup flow. Our identity stitching allows agents to start work anonymously and then "claim" that work to a permanent account after registration. No progress is ever lost.</p>
+        <div style="margin-top: 2.5rem;">
+            <a href="/login?signup=true" class="btn">Try the Stitch Flow</a>
+        </div>
+    </div>
+</div>
+
+<div style="text-align: center; border: 1px solid var(--border); padding: 6rem; border-radius: 4px;">
+    <h2 style="font-size: 3rem; margin-bottom: 1.5rem;">Ready to build on the Swarm?</h2>
+    <p style="color: var(--muted); margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">Access the world's most sophisticated marketing engine through a single endpoint.</p>
+    <a href="/docs/AGENT_GUIDE.md" class="btn" style="background: var(--accent);">Get the Agent Guide</a>
+</div>
+{{ end }}

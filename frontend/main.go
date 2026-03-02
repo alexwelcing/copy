@@ -148,6 +148,12 @@ func main() {
 		}))
 	})
 
+	r.GET("/agents", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "agents.html", baseData(gin.H{
+			"Title": "For Agents | Headless Marketing Infrastructure",
+		}))
+	})
+
 	r.GET("/welcome", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "welcome.html", baseData(gin.H{
 			"Title": "Welcome to the Swarm",
