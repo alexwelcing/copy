@@ -35,13 +35,25 @@ const AgencyAuth = {
     }
   },
 
-  /** Get anonymous ID from localStorage */
+  /** Get anonymous ID from cookie or localStorage */
   getAnonymousId() {
+    // Check for standard Segment cookie first
+    const cookieValue = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("ajs_anonymous_id="))
+      ?.split("=")[1];
+
+    if (cookieValue) return cookieValue.replace(/"/g, "");
+
     let id = localStorage.getItem("agency_anon_id");
     if (!id) {
-      id = "anon_" + crypto.randomUUID();
+      id = crypto.randomUUID();
       localStorage.setItem("agency_anon_id", id);
     }
+    
+    // Sync to cookie for backend visibility if not already there
+    document.cookie = `ajs_anonymous_id=${id}; path=/; max-age=31536000; SameSite=Lax`;
+    
     return id;
   },
 

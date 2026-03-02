@@ -210,6 +210,7 @@ func main() {
 		"Accept-Encoding": true,
 		"X-Request-Id":    true,
 		"X-Anonymous-Id":  true,
+		"Cookie":          true,
 	}
 
 	// API Proxy

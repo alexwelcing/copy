@@ -279,17 +279,22 @@ async def claim_work(
     request: Request,
     user_info: tuple[str, bool] = Depends(get_current_user)
 ):
-    """Claim work done anonymously using X-Anonymous-ID header."""
+    """Claim work done anonymously using Cookie or X-Anonymous-ID header."""
     user_id, is_anon = user_info
     if is_anon:
         raise HTTPException(401, "Only signed-in users can claim work")
 
-    anon_id = request.headers.get("X-Anonymous-ID")
+    anon_id = request.cookies.get("ajs_anonymous_id") or request.headers.get("X-Anonymous-ID")
     if not anon_id:
+        logger.info(f"User {user_id} tried to claim work but no anonymous ID found in cookies or headers.")
         return {"status": "no_anon_id"}
 
+    # Normalize anon_id (strip quotes from cookie)
+    anon_id = str(anon_id).strip('"')
+    
     db = get_db()
-    db.claim_anonymous_work(anon_id, user_id)
+    logger.info(f"Claiming work: Transferring from anon_{anon_id} to {user_id}")
+    db.claim_anonymous_work(f"anon_{anon_id}", user_id)
     return {"status": "claimed", "user_id": user_id}
 
 
