@@ -1,0 +1,273 @@
+{{ define "dashboard.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div id="dashboard-loading" style="text-align: center; padding: 4rem 0; color: var(--muted);">Loading dashboard...</div>
+
+<div id="dashboard-auth" style="display: none; text-align: center; padding: 4rem 0;">
+    <span class="section-label">Account Required</span>
+    <h2 style="margin-bottom: 1rem;">Sign in to view your dashboard</h2>
+    <a href="/login?redirect=/dashboard" class="btn" style="margin-top: 1rem;">Sign In</a>
+</div>
+
+<div id="dashboard-content" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;">
+        <div>
+            <span class="section-label">Dashboard</span>
+            <h1 style="font-size: 2.5rem;">Your Studio</h1>
+        </div>
+        <div id="checkout-success" style="display: none; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 0.8rem 1.5rem; font-size: 0.85rem; border-radius: 4px;">
+            Subscription activated. Welcome aboard.
+        </div>
+    </div>
+
+    <div id="welcome-banner" style="display: none; background: #ecfdf5; border: 1px solid #6ee7b7; color: #065f46; padding: 2rem; border-radius: 4px; margin-bottom: 3rem;">
+        <h3 style="margin-bottom: 0.5rem; color: #065f46;">Welcome to Agency Studio.</h3>
+        <p style="font-size: 0.9rem; margin: 0;">Your first run is initializing. The swarm is currently analyzing your brief. You'll see the results in your Recent Briefs list below shortly.</p>
+    </div>
+
+    <!-- Activation Banner -->
+    <div id="activation-banner" style="display: none; background: #fffbeb; border: 1px solid #fde68a; color: #92400e; padding: 2rem; border-radius: 4px; margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin-bottom: 0.5rem; color: #92400e;">Complete Your Activation</h3>
+                <p style="font-size: 0.9rem; margin: 0;">You haven't defined your brand DNA yet. Help the swarm understand your mission to get better results.</p>
+            </div>
+            <a href="/welcome" class="btn" style="background: #d97706; white-space: nowrap; margin-left: 2rem;">Initialize DNA</a>
+        </div>
+    </div>
+
+    <!-- Plan Card -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+        <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted);">Current Plan</span>
+                <span id="plan-badge" style="background: var(--accent); color: white; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;">Free</span>
+            </div>
+            <h2 id="plan-name" style="font-size: 1.8rem; margin-bottom: 0.5rem;">Free</h2>
+            <p id="plan-status" style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1.5rem;">5 runs per day, no card required</p>
+            <a href="/pricing" class="btn" id="upgrade-cta" style="display: inline-block; font-size: 0.8rem; padding: 0.8rem 1.5rem;">Upgrade Plan</a>
+        </div>
+
+        <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 4px;">
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; font-weight: bold; text-transform: uppercase; letter-spacing: 0.2em; color: var(--muted); display: block; margin-bottom: 1rem;">Quick Actions</span>
+            <div style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <a href="/" class="btn" style="text-align: center; font-size: 0.8rem; padding: 0.8rem 1.5rem;">New Brief</a>
+                <a href="/account" style="text-align: center; text-decoration: none; color: var(--accent); font-weight: 600; font-size: 0.85rem; padding: 0.5rem;">Manage Account</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Bars -->
+    <div style="margin-bottom: 3rem;">
+        <span class="section-label">Usage This Period</span>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1rem;">
+            <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600;">Tokens</span>
+                    <span id="tokens-text" style="color: var(--muted);">0 / 50,000</span>
+                </div>
+                <div style="background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="tokens-bar" style="background: var(--accent); height: 100%; width: 0%; transition: width 0.5s;"></div>
+                </div>
+            </div>
+            <div style="border: 1px solid var(--border); padding: 1.5rem; border-radius: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600;">Agent Runs</span>
+                    <span id="sprites-text" style="color: var(--muted);">0 / 5</span>
+                </div>
+                <div style="background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="sprites-bar" style="background: var(--accent); height: 100%; width: 0%; transition: width 0.5s;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Swarm Capabilities -->
+    <div style="margin-bottom: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span class="section-label">Available Capabilities</span>
+            <a href="/capabilities" style="font-size: 0.8rem; color: var(--accent); text-decoration: none; font-weight: 600;">View All</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
+            <div style="border: 1px solid var(--border); padding: 1.2rem; border-radius: 4px; text-align: center;">
+                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.3rem;">Analyst</div>
+                <div style="font-size: 0.75rem; color: var(--muted);">Data & Stats</div>
+            </div>
+            <div style="border: 1px solid var(--border); padding: 1.2rem; border-radius: 4px; text-align: center;">
+                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.3rem;">Strategist</div>
+                <div style="font-size: 0.75rem; color: var(--muted);">Market Positioning</div>
+            </div>
+            <div style="border: 1px solid var(--border); padding: 1.2rem; border-radius: 4px; text-align: center;">
+                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.3rem;">Copywriter</div>
+                <div style="font-size: 0.75rem; color: var(--muted);">Conversion Copy</div>
+            </div>
+            <div style="border: 1px solid var(--border); padding: 1.2rem; border-radius: 4px; text-align: center;">
+                <div style="font-weight: bold; font-size: 0.9rem; margin-bottom: 0.3rem;">Director</div>
+                <div style="font-size: 0.75rem; color: var(--muted);">Brand Guard</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Briefs -->
+    <div>
+        <span class="section-label">Recent Briefs</span>
+        <div id="briefs-list" style="margin-top: 1rem;">
+            <p style="color: var(--muted); font-size: 0.9rem;">No briefs yet. <a href="/" style="color: var(--accent);">Create your first brief</a> to get started.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Check for checkout success param
+if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
+    // Clean URL
+    history.replaceState({}, '', '/dashboard');
+}
+
+AgencyAuth.onAuthStateChanged(async function(user) {
+    document.getElementById('dashboard-loading').style.display = 'none';
+
+    if (!user) {
+        document.getElementById('dashboard-auth').style.display = 'block';
+        return;
+    }
+
+    document.getElementById('dashboard-content').style.display = 'block';
+
+    // Show checkout success banner if just came from Stripe
+    if (new URLSearchParams(window.location.search).get('checkout') === 'success') {
+        document.getElementById('checkout-success').style.display = 'block';
+        setTimeout(function() {
+            document.getElementById('checkout-success').style.display = 'none';
+        }, 8000);
+    }
+
+    // Fetch usage
+    try {
+        const res = await AgencyAuth.fetch('/api/usage');
+        if (res.ok) {
+            const data = await res.json();
+            updateUsage(data);
+        }
+    } catch (e) {
+        console.error('Failed to fetch usage:', e);
+    }
+
+    // Fetch billing status
+    try {
+        const res = await AgencyAuth.fetch('/api/billing/status');
+        if (res.ok) {
+            const data = await res.json();
+            updatePlan(data);
+        }
+    } catch (e) {
+        console.error('Failed to fetch billing:', e);
+    }
+
+    // Fetch recent briefs
+    try {
+        const res = await AgencyAuth.fetch('/api/briefs?limit=5');
+        if (res.ok) {
+            const data = await res.json();
+            updateBriefs(data.briefs || []);
+        }
+    } catch (e) {
+        console.error('Failed to fetch briefs:', e);
+    }
+
+    // Check for pending job from homepage
+    const pendingJobId = localStorage.getItem('pending_job_id');
+    if (pendingJobId) {
+        localStorage.removeItem('pending_job_id');
+        
+        // Claim the work
+        try {
+            const claimRes = await AgencyAuth.fetch('/api/user/claim', { method: 'POST' });
+            if (claimRes.ok) {
+                // Refresh everything to show the claimed work
+                window.location.reload(); 
+                return; // Let the reload handle it
+            }
+        } catch (e) {
+            console.error('Failed to claim work:', e);
+        }
+    }
+
+    // Check profile
+    try {
+        const res = await AgencyAuth.fetch('/api/user/profile');
+        if (res.ok) {
+            const data = await res.json();
+            if (!data || !data.name) {
+                // Check if user is on a paid plan
+                const billingRes = await AgencyAuth.fetch('/api/billing/status');
+                if (billingRes.ok) {
+                    const billingData = await billingRes.json();
+                    if (billingData.plan !== 'free') {
+                        document.getElementById('activation-banner').style.display = 'block';
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.error('Failed to fetch profile:', e);
+    }
+});
+
+function formatNumber(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
+    return n.toLocaleString();
+}
+
+function updateUsage(data) {
+    var tokensUsed = data.tokens.used || 0;
+    var tokensLimit = data.tokens.limit || 50000;
+    var tokensPct = Math.min(100, data.tokens.percentage || 0);
+    document.getElementById('tokens-text').textContent = formatNumber(tokensUsed) + ' / ' + formatNumber(tokensLimit);
+    document.getElementById('tokens-bar').style.width = tokensPct + '%';
+    if (tokensPct > 80) document.getElementById('tokens-bar').style.background = '#f59e0b';
+    if (tokensPct >= 100) document.getElementById('tokens-bar').style.background = '#ef4444';
+
+    var spritesUsed = data.sprites.spawned_this_period || 0;
+    var spritesLimit = data.sprites.period_limit || 5;
+    var spritesPct = spritesLimit > 0 ? Math.min(100, (spritesUsed / spritesLimit) * 100) : 0;
+    document.getElementById('sprites-text').textContent = spritesUsed + ' / ' + spritesLimit;
+    document.getElementById('sprites-bar').style.width = spritesPct + '%';
+    if (spritesPct > 80) document.getElementById('sprites-bar').style.background = '#f59e0b';
+    if (spritesPct >= 100) document.getElementById('sprites-bar').style.background = '#ef4444';
+}
+
+function updatePlan(data) {
+    var planNames = { free: 'Free', starter: 'Starter', growth: 'Growth', enterprise: 'Enterprise' };
+    var name = planNames[data.plan] || data.plan;
+    document.getElementById('plan-name').textContent = name;
+    document.getElementById('plan-badge').textContent = name;
+
+    if (data.plan === 'free') {
+        document.getElementById('plan-status').textContent = '5 runs per day, no card required';
+        document.getElementById('upgrade-cta').style.display = 'inline-block';
+    } else {
+        var statusText = data.status === 'active' ? 'Active' : data.status;
+        document.getElementById('plan-status').textContent = statusText;
+        document.getElementById('upgrade-cta').textContent = 'Manage Plan';
+        document.getElementById('upgrade-cta').href = '/account';
+    }
+}
+
+function updateBriefs(briefs) {
+    if (!briefs.length) return;
+    var html = '';
+    briefs.forEach(function(b) {
+        html += '<div style="border-bottom: 1px solid var(--border); padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">';
+        html += '<div><strong style="font-size: 0.9rem;">' + (b.title || 'Untitled') + '</strong>';
+        html += '<span style="color: var(--muted); font-size: 0.8rem; margin-left: 1rem;">' + (b.product || '') + '</span></div>';
+        html += '<span style="color: var(--muted); font-size: 0.75rem;">' + (b.updated_at ? new Date(b.updated_at).toLocaleDateString() : '') + '</span>';
+        html += '</div>';
+    });
+    document.getElementById('briefs-list').innerHTML = html;
+}
+</script>
+{{ end }}

@@ -1,0 +1,199 @@
+{{ define "account.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div id="account-loading" style="text-align: center; padding: 4rem 0; color: var(--muted);">Loading account...</div>
+
+<div id="account-auth" style="display: none; text-align: center; padding: 4rem 0;">
+    <span class="section-label">Account Required</span>
+    <h2 style="margin-bottom: 1rem;">Sign in to manage your account</h2>
+    <a href="/login?redirect=/account" class="btn" style="margin-top: 1rem;">Sign In</a>
+</div>
+
+<div id="account-content" style="display: none;">
+    <div style="margin-bottom: 3rem;">
+        <span class="section-label">Account</span>
+        <h1 style="font-size: 2.5rem;">Settings</h1>
+    </div>
+
+    <!-- Profile Section -->
+    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 4px; margin-bottom: 2rem;">
+        <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem;">Profile</h3>
+        <form id="profile-form" onsubmit="saveProfile(event)" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Name</label>
+                <input type="text" id="profile-name" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border); font-family: var(--font-sans); font-size: 0.9rem; border-radius: 2px;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Email</label>
+                <input type="email" id="profile-email" disabled style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border); font-family: var(--font-sans); font-size: 0.9rem; border-radius: 2px; background: #f8fafc; color: var(--muted);">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Company</label>
+                <input type="text" id="profile-company" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border); font-family: var(--font-sans); font-size: 0.9rem; border-radius: 2px;">
+            </div>
+            <div>
+                <label style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 0.5rem;">Product Name</label>
+                <input type="text" id="profile-product" style="width: 100%; padding: 0.6rem 0.8rem; border: 1px solid var(--border); font-family: var(--font-sans); font-size: 0.9rem; border-radius: 2px;">
+            </div>
+            <div style="grid-column: span 2;">
+                <button type="submit" class="btn" id="profile-save" style="font-size: 0.8rem; padding: 0.6rem 1.5rem; cursor: pointer; border: none; font-family: var(--font-sans);">Save Profile</button>
+                <span id="profile-saved" style="display: none; color: #059669; font-size: 0.85rem; margin-left: 1rem;">Saved</span>
+            </div>
+        </form>
+    </div>
+
+    <!-- Plan Section -->
+    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 4px; margin-bottom: 2rem;">
+        <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem;">Plan & Billing</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+            <div>
+                <span style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem;">Plan</span>
+                <span id="account-plan" style="font-weight: 600; font-size: 1.1rem;">Free</span>
+            </div>
+            <div>
+                <span style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem;">Status</span>
+                <span id="account-status" style="font-weight: 600; font-size: 1.1rem;">Active</span>
+            </div>
+            <div>
+                <span style="font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem;">Renews</span>
+                <span id="account-renews" style="font-weight: 600; font-size: 1.1rem;">&mdash;</span>
+            </div>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <a href="/pricing" class="btn" style="font-size: 0.8rem; padding: 0.6rem 1.5rem;">Change Plan</a>
+            <button onclick="openBillingPortal()" id="manage-billing-btn" class="btn" style="font-size: 0.8rem; padding: 0.6rem 1.5rem; background: white; color: var(--text); border: 1px solid var(--border); cursor: pointer; font-family: var(--font-sans); display: none;">Manage Billing</button>
+        </div>
+    </div>
+
+    <!-- Usage Summary -->
+    <div style="border: 1px solid var(--border); padding: 2rem; border-radius: 4px; margin-bottom: 2rem;">
+        <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600; margin-bottom: 1.5rem;">Usage This Period</h3>
+        <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.8rem 0; font-weight: 600;">Tokens used</td>
+                <td style="padding: 0.8rem 0; text-align: right; color: var(--muted);" id="account-tokens">0 / 50,000</td>
+            </tr>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.8rem 0; font-weight: 600;">Agent runs</td>
+                <td style="padding: 0.8rem 0; text-align: right; color: var(--muted);" id="account-sprites">0 / 5</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.8rem 0; font-weight: 600;">Available agents</td>
+                <td style="padding: 0.8rem 0; text-align: right; color: var(--muted);" id="account-agents">Director, Copywriter, Editor</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Danger Zone -->
+    <div style="border: 1px solid #fca5a5; padding: 2rem; border-radius: 4px;">
+        <h3 style="font-family: var(--font-sans); font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; color: #991b1b;">Danger Zone</h3>
+        <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem;">Cancel your subscription through the Stripe billing portal. You'll keep access until the end of the current period.</p>
+        <button onclick="openBillingPortal()" style="padding: 0.6rem 1.5rem; font-size: 0.8rem; background: white; color: #991b1b; border: 1px solid #fca5a5; cursor: pointer; font-family: var(--font-sans); font-weight: 600;">Cancel Subscription</button>
+    </div>
+</div>
+
+<script>
+AgencyAuth.onAuthStateChanged(async function(user) {
+    document.getElementById('account-loading').style.display = 'none';
+
+    if (!user) {
+        document.getElementById('account-auth').style.display = 'block';
+        return;
+    }
+
+    document.getElementById('account-content').style.display = 'block';
+    document.getElementById('profile-email').value = user.email || '';
+
+    // Fetch profile
+    try {
+        var res = await AgencyAuth.fetch('/api/user/profile');
+        if (res.ok) {
+            var profile = await res.json();
+            if (profile) {
+                document.getElementById('profile-name').value = profile.name || '';
+                document.getElementById('profile-company').value = profile.company || '';
+                document.getElementById('profile-product').value = profile.product_name || '';
+            }
+        }
+    } catch (e) {}
+
+    // Fetch billing status
+    try {
+        var res = await AgencyAuth.fetch('/api/billing/status');
+        if (res.ok) {
+            var data = await res.json();
+            var planNames = { free: 'Free', starter: 'Starter', growth: 'Growth', enterprise: 'Enterprise' };
+            document.getElementById('account-plan').textContent = planNames[data.plan] || data.plan;
+            document.getElementById('account-status').textContent = (data.status || 'active').charAt(0).toUpperCase() + (data.status || 'active').slice(1);
+            if (data.current_period_end) {
+                document.getElementById('account-renews').textContent = new Date(data.current_period_end).toLocaleDateString();
+            }
+            if (data.plan !== 'free') {
+                document.getElementById('manage-billing-btn').style.display = 'inline-block';
+            }
+        }
+    } catch (e) {}
+
+    // Fetch usage
+    try {
+        var res = await AgencyAuth.fetch('/api/usage');
+        if (res.ok) {
+            var data = await res.json();
+            document.getElementById('account-tokens').textContent = formatNum(data.tokens.used) + ' / ' + formatNum(data.tokens.limit);
+            document.getElementById('account-sprites').textContent = data.sprites.spawned_this_period + ' / ' + data.sprites.period_limit;
+            if (data.enabled_agents) {
+                document.getElementById('account-agents').textContent = data.enabled_agents.map(function(a) {
+                    return a.charAt(0).toUpperCase() + a.slice(1);
+                }).join(', ');
+            }
+        }
+    } catch (e) {}
+});
+
+function formatNum(n) {
+    if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return (n / 1000).toFixed(0) + 'K';
+    return n.toLocaleString();
+}
+
+async function saveProfile(e) {
+    e.preventDefault();
+    var btn = document.getElementById('profile-save');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+
+    try {
+        var res = await AgencyAuth.fetch('/api/user/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: document.getElementById('profile-name').value,
+                company: document.getElementById('profile-company').value,
+                product_name: document.getElementById('profile-product').value,
+            }),
+        });
+        if (res.ok) {
+            document.getElementById('profile-saved').style.display = 'inline';
+            setTimeout(function() {
+                document.getElementById('profile-saved').style.display = 'none';
+            }, 3000);
+        }
+    } catch (e) {
+        alert('Failed to save profile');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Save Profile';
+}
+
+async function openBillingPortal() {
+    try {
+        await AgencyAuth.openBillingPortal();
+    } catch (err) {
+        alert(err.message || 'Could not open billing portal');
+    }
+}
+</script>
+{{ end }}

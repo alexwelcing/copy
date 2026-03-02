@@ -1,0 +1,124 @@
+{{ define "welcome.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <span class="section-label">Activation</span>
+        <h1 style="font-size: 3.5rem;">Welcome to the Swarm.</h1>
+        <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1.5rem;">Your subscription is active. Let's initialize your studio and get your first campaign moving.</p>
+    </div>
+
+    <div style="display: grid; gap: 2rem;">
+        <!-- Step 1: Profile -->
+        <div id="step-profile" style="border: 1px solid var(--border); padding: 3rem; border-radius: 4px; background: white; transition: all 0.3s;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                <div>
+                    <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); font-weight: bold;">STEP 01</span>
+                    <h2 style="margin-top: 0.5rem;">Define Your Brand DNA</h2>
+                </div>
+                <div id="profile-status" style="display: none; background: #ecfdf5; color: #065f46; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: bold;">COMPLETED</div>
+            </div>
+            <p style="color: var(--muted); margin-bottom: 2rem;">The agents need to understand your voice, audience, and value proposition to ensure every asset is perfectly aligned.</p>
+            
+            <form id="profile-form">
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Company / Product Name</label>
+                    <input type="text" id="company_name" required style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: var(--font-sans);">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Core Value Proposition</label>
+                    <textarea id="value_prop" required placeholder="What problem do you solve, and for whom?" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: var(--font-sans); height: 100px; resize: vertical;"></textarea>
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">Target Audience</label>
+                    <input type="text" id="target_audience" placeholder="e.g., Early-stage SaaS founders, Fortune 500 CMOs" style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: var(--font-sans);">
+                </div>
+                <button type="submit" class="btn" style="width: 100%; border: none; cursor: pointer;">Save Brand Profile</button>
+            </form>
+        </div>
+
+        <!-- Step 2: First Brief -->
+        <div id="step-brief" style="border: 1px solid var(--border); padding: 3rem; border-radius: 4px; background: #f8fafc; opacity: 0.5; pointer-events: none; transition: all 0.3s;">
+            <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); font-weight: bold;">STEP 02</span>
+            <h2 style="margin-top: 0.5rem; margin-bottom: 1rem;">Initialize Your First Brief</h2>
+            <p style="color: var(--muted); margin-bottom: 2rem;">Ready to ship? Tell the swarm what you want to build—a landing page, an email sequence, or a full campaign strategy.</p>
+            <a href="/" class="btn" style="display: inline-block;">Create My First Brief</a>
+        </div>
+    </div>
+
+    <div style="margin-top: 4rem; text-align: center;">
+        <a href="/dashboard" style="color: var(--muted); text-decoration: none; font-size: 0.9rem;">Skip for now and go to Dashboard</a>
+    </div>
+</div>
+
+<script>
+document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.textContent;
+    btn.textContent = 'Saving DNA...';
+    btn.disabled = true;
+
+    const profile = {
+        name: document.getElementById('company_name').value,
+        value_prop: document.getElementById('value_prop').value,
+        target_audience: document.getElementById('target_audience').value
+    };
+
+    try {
+        const res = await AgencyAuth.fetch('/api/user/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profile)
+        });
+
+        if (res.ok) {
+            // Success! Unlock step 2
+            document.getElementById('profile-status').style.display = 'block';
+            document.getElementById('step-profile').style.borderColor = '#6ee7b7';
+            document.getElementById('step-profile').style.background = '#f0fdf4';
+            document.getElementById('profile-form').style.display = 'none';
+            
+            document.getElementById('step-brief').style.opacity = '1';
+            document.getElementById('step-brief').style.pointerEvents = 'auto';
+            document.getElementById('step-brief').style.background = 'white';
+            document.getElementById('step-brief').style.borderColor = 'var(--accent)';
+            
+            // Scroll to next step
+            setTimeout(() => {
+                document.getElementById('step-brief').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 500);
+        } else {
+            alert('Failed to save profile. Please try again.');
+        }
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred.');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+});
+
+// Pre-load profile if it exists
+AgencyAuth.onAuthStateChanged(async (user) => {
+    if (user) {
+        try {
+            const res = await AgencyAuth.fetch('/api/user/profile');
+            if (res.ok) {
+                const profile = await res.json();
+                if (profile && profile.name) {
+                    document.getElementById('company_name').value = profile.name || '';
+                    document.getElementById('value_prop').value = profile.value_prop || '';
+                    document.getElementById('target_audience').value = profile.target_audience || '';
+                }
+            }
+        } catch (e) {
+            console.error('Failed to load profile:', e);
+        }
+    }
+});
+</script>
+{{ end }}

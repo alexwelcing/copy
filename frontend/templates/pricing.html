@@ -26,7 +26,7 @@
             <li>All 24 skills</li>
             <li>Email support</li>
         </ul>
-        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem;">Start Building</a>
+        <button onclick="handleCheckout('starter')" class="btn" style="display: block; text-align: center; margin-top: 2rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-sans);">Start Building</button>
     </div>
 
     <!-- Growth -->
@@ -47,7 +47,7 @@
             <li>Overage at $8 / 1M tokens</li>
             <li>Priority support</li>
         </ul>
-        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem; background: var(--accent);">Start Building</a>
+        <button onclick="handleCheckout('growth')" class="btn" style="display: block; text-align: center; margin-top: 2rem; background: var(--accent); width: 100%; border: none; cursor: pointer; font-family: var(--font-sans);">Start Building</button>
     </div>
 
     <!-- Enterprise -->
@@ -67,7 +67,7 @@
             <li>Lowest overage: $5 / 1M tokens</li>
             <li>Dedicated support</li>
         </ul>
-        <a href="#" class="btn" style="display: block; text-align: center; margin-top: 2rem;">Start Building</a>
+        <button onclick="handleCheckout('enterprise')" class="btn" style="display: block; text-align: center; margin-top: 2rem; width: 100%; border: none; cursor: pointer; font-family: var(--font-sans);">Start Building</button>
     </div>
 </div>
 
@@ -175,6 +175,16 @@
 <div style="margin-top: 8rem; text-align: center; background: var(--text); color: white; padding: 6rem 2rem;">
     <h2>Try it free. 5 runs a day, no card required.</h2>
     <p style="color: #94a3b8; margin: 2rem auto; max-width: 550px;">See what the swarm builds before you commit. Every plan starts with a free trial.</p>
-    <a href="/" class="btn" style="background: var(--accent); margin-top: 2rem;">Initialize Your First Brief</a>
+    <a href="/login" class="btn" style="background: var(--accent); margin-top: 2rem;">Initialize Your First Brief</a>
 </div>
+
+<script>
+async function handleCheckout(plan) {
+    try {
+        await AgencyAuth.checkout(plan);
+    } catch (err) {
+        alert(err.message || 'Checkout failed. Please try again.');
+    }
+}
+</script>
 {{ end }}

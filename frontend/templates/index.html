@@ -9,9 +9,129 @@
     <p style="font-size: 1.5rem; color: var(--muted); margin-top: 2rem; max-width: 800px;">We replace the traditional agency friction with a coordinated swarm of specialized AI agents. Strategy, brand guardianship, and cinematic direction—unified into a single, high-velocity system.</p>
     
     <div style="margin-top: 4rem;">
-        <a href="/pricing" class="btn" style="background: var(--accent);">See Pricing</a>
-        <a href="/showcase" class="btn" style="margin-left: 1rem;">Explore Case Study #001</a>
-        <a href="/showcase/law" class="btn" style="margin-left: 1rem; background: #0066ff;">View Law.com Case Study</a>
+        <div id="quick-brief-container" style="background: white; border: 1px solid var(--border); padding: 2.5rem; border-radius: 4px; max-width: 600px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);">
+            <div style="margin-bottom: 1.5rem;">
+                <span class="section-label" style="margin-bottom: 0.5rem;">Initialize Your First Brief</span>
+                <p style="font-size: 0.9rem; color: var(--muted); margin: 0;">Try the swarm for free. What are you building?</p>
+            </div>
+            <form id="quick-brief-form">
+                <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                    <input type="text" id="qb_product" placeholder="Product Name (e.g., Tesla Bot)" required style="flex: 1; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: var(--font-sans);">
+                </div>
+                <textarea id="qb_task" placeholder="e.g., Audit our landing page or Create a 3-email sequence for Gen Z founders" required style="width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 4px; font-family: var(--font-sans); height: 80px; resize: none; margin-bottom: 1rem;"></textarea>
+                <button type="submit" class="btn" style="width: 100%; border: none; cursor: pointer; background: var(--accent);">Initialize Run</button>
+            </form>
+            <div id="quick-brief-status" style="display: none; text-align: center; padding: 1rem 0;">
+                <div class="loader" style="margin: 0 auto 1rem;"></div>
+                <p id="qb-status-text" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent);">[SYSTEM] ALLOCATING AGENTS...</p>
+                <div style="background: var(--border); height: 4px; width: 100%; border-radius: 2px; margin-top: 1rem; overflow: hidden;">
+                    <div id="qb-progress" style="background: var(--accent); height: 100%; width: 0%; transition: width 0.5s;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 2rem;">
+            <a href="/pricing" style="color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 600; margin-right: 2rem;">View Pricing</a>
+            <a href="/capabilities" style="color: var(--muted); text-decoration: none; font-size: 0.85rem; font-weight: 600;">Full Capabilities</a>
+        </div>
+    </div>
+</div>
+
+<style>
+.loader {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--border);
+    border-bottom-color: var(--accent);
+    border-radius: 50%;
+    display: inline-block;
+    animation: rotation 1s linear infinite;
+}
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+document.getElementById('quick-brief-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const product = document.getElementById('qb_product').value;
+    const task = document.getElementById('qb_task').value;
+    
+    // Switch UI to status mode
+    document.getElementById('quick-brief-form').style.display = 'none';
+    document.getElementById('quick-brief-status').style.display = 'block';
+    
+    const statusText = document.getElementById('qb-status-text');
+    const progress = document.getElementById('qb-progress');
+    
+    // Simulate orchestration
+    const steps = [
+        { text: "[SYSTEM] ALLOCATING AGENTS...", p: 15 },
+        { text: "[DIRECTOR] ANALYZING BRIEF...", p: 30 },
+        { text: "[STRATEGIST] MAPPING MARKET SPACE...", p: 45 },
+        { text: "[COPYWRITER] DRAFTING FRAMEWORKS...", p: 65 },
+        { text: "[EDITOR] POLISHING OUTPUT...", p: 85 },
+        { text: "[SYSTEM] RUN COMPLETE. SAVING RESULTS...", p: 100 }
+    ];
+    
+    for (let i = 0; i < steps.length; i++) {
+        statusText.textContent = steps[i].text;
+        progress.style.width = steps[i].p + '%';
+        
+        if (i === 1) {
+            // Actually trigger the run in the background
+            try {
+                const res = await AgencyAuth.fetch('/api/work/async', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        skill: 'marketing-ideas',
+                        task: task,
+                        context: { product: product }
+                    })
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem('pending_job_id', data.job_id);
+                }
+            } catch (e) {
+                console.error('Failed to trigger background run:', e);
+            }
+        }
+        
+        await new Promise(r => setTimeout(r, 2000));
+    }
+    
+    // Redirect to signup to see results
+    window.location.href = '/login?signup=true&redirect=/dashboard&reason=view_results';
+});
+</script>
+
+<div style="margin-top: 8rem;">
+    <span class="section-label">The Swarm</span>
+    <h2 style="font-size: 3rem; margin-bottom: 3rem;">Specialized intelligence for every stage.</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 2rem;">
+        <div style="border-top: 2px solid var(--accent); padding-top: 1.5rem;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Analyst</h3>
+            <p style="font-size: 0.9rem; color: var(--muted);">Turning raw data into strategic decisions and statistical certainty.</p>
+        </div>
+        <div style="border-top: 2px solid var(--accent); padding-top: 1.5rem;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Strategist</h3>
+            <p style="font-size: 0.9rem; color: var(--muted);">Identifying market gaps and engineering unique positioning for your brand.</p>
+        </div>
+        <div style="border-top: 2px solid var(--accent); padding-top: 1.5rem;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Copywriter</h3>
+            <p style="font-size: 0.9rem; color: var(--muted);">Generating high-conversion copy using proven psychological frameworks.</p>
+        </div>
+        <div style="border-top: 2px solid var(--accent); padding-top: 1.5rem;">
+            <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">Director</h3>
+            <p style="font-size: 0.9rem; color: var(--muted);">Orchestrating the swarm and maintaining cinematic brand standards.</p>
+        </div>
+    </div>
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="/capabilities" style="color: var(--accent); text-decoration: none; font-weight: 600; font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em;">Explore all 29+ skills &rarr;</a>
     </div>
 </div>
 

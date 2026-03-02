@@ -40,6 +40,23 @@ func main() {
 		apiURL = "http://localhost:8080"
 	}
 
+	// Firebase config (public keys, safe to inline)
+	firebaseAPIKey := os.Getenv("FIREBASE_API_KEY")
+	if firebaseAPIKey == "" {
+		firebaseAPIKey = "AIzaSyDEFAULT"
+	}
+	firebaseAuthDomain := os.Getenv("FIREBASE_AUTH_DOMAIN")
+	if firebaseAuthDomain == "" {
+		firebaseAuthDomain = "agency-studio.firebaseapp.com"
+	}
+	firebaseProjectID := os.Getenv("FIREBASE_PROJECT_ID")
+	if firebaseProjectID == "" {
+		firebaseProjectID = os.Getenv("GCP_PROJECT_ID")
+		if firebaseProjectID == "" {
+			firebaseProjectID = "agency-studio"
+		}
+	}
+
 	// 1. Load Local Data for the Showcase
 	var visuals []Scene
 	visualsData, err := os.ReadFile("./data/campaign_visuals_updated.json")
@@ -87,34 +104,77 @@ func main() {
 	r.LoadHTMLGlob("templates/*")
 	r.Static("/assets", "./assets")
 
+	// Helper: base template data with Firebase config
+	baseData := func(extra gin.H) gin.H {
+		data := gin.H{
+			"FirebaseAPIKey":    firebaseAPIKey,
+			"FirebaseAuthDomain": firebaseAuthDomain,
+			"FirebaseProjectID": firebaseProjectID,
+		}
+		for k, v := range extra {
+			data[k] = v
+		}
+		return data
+	}
+
 	// 3. Routes
 	r.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{
+		c.HTML(http.StatusOK, "index.html", baseData(gin.H{
 			"Title": "Agency Studio | Systems Over Story",
-		})
+		}))
 	})
 
 	r.GET("/showcase", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "showcase.html", gin.H{
+		c.HTML(http.StatusOK, "showcase.html", baseData(gin.H{
 			"Title":    "Case Study: Punch Card Logic",
 			"Campaign": campaign,
 			"Visuals":  visuals,
-		})
+		}))
 	})
 
 	// Law.com case study route
 	r.GET("/showcase/law", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "showcase-law.html", gin.H{
+		c.HTML(http.StatusOK, "showcase-law.html", baseData(gin.H{
 			"Title":    "Case Study: Law.com - Intelligence Over Urgency",
 			"Campaign": lawCampaign,
 			"Visuals":  lawVisuals,
-		})
+		}))
+	})
+
+	r.GET("/capabilities", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "capabilities.html", baseData(gin.H{
+			"Title": "Capabilities",
+		}))
+	})
+
+	r.GET("/welcome", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "welcome.html", baseData(gin.H{
+			"Title": "Welcome to the Swarm",
+		}))
 	})
 
 	r.GET("/pricing", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "pricing.html", gin.H{
+		c.HTML(http.StatusOK, "pricing.html", baseData(gin.H{
 			"Title": "Pricing",
-		})
+		}))
+	})
+
+	r.GET("/login", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "login.html", baseData(gin.H{
+			"Title": "Sign In",
+		}))
+	})
+
+	r.GET("/dashboard", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "dashboard.html", baseData(gin.H{
+			"Title": "Dashboard",
+		}))
+	})
+
+	r.GET("/account", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "account.html", baseData(gin.H{
+			"Title": "Account",
+		}))
 	})
 
 	// Health check — validates backend reachability
@@ -149,6 +209,7 @@ func main() {
 		"Accept-Language": true,
 		"Accept-Encoding": true,
 		"X-Request-Id":    true,
+		"X-Anonymous-Id":  true,
 	}
 
 	// API Proxy

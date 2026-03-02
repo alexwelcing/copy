@@ -165,6 +165,44 @@ class StripeClient:
             stripe.Customer.modify(customer_id, **updates)
 
     # =========================================================================
+    # Checkout & Portal Sessions
+    # =========================================================================
+
+    def create_checkout_session(
+        self,
+        customer_id: str,
+        price_id: str,
+        success_url: str,
+        cancel_url: str,
+        tenant_id: str,
+        plan: str,
+    ) -> str:
+        """Create a Stripe Checkout Session for new subscriptions. Returns the session URL."""
+        session = stripe.checkout.Session.create(
+            customer=customer_id,
+            mode="subscription",
+            line_items=[{"price": price_id, "quantity": 1}],
+            success_url=success_url,
+            cancel_url=cancel_url,
+            subscription_data={
+                "metadata": {
+                    "tenant_id": tenant_id,
+                    "plan": plan,
+                }
+            },
+        )
+        logger.info(f"Created checkout session {session.id} for customer {customer_id}")
+        return session.url
+
+    def create_portal_session(self, customer_id: str, return_url: str) -> str:
+        """Create a Stripe Customer Portal session. Returns the portal URL."""
+        session = stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url=return_url,
+        )
+        return session.url
+
+    # =========================================================================
     # Subscription Management
     # =========================================================================
 

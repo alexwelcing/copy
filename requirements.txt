@@ -22,6 +22,9 @@ google-cloud-pubsub==2.35.0
 google-cloud-aiplatform==1.138.0
 firebase-admin==7.1.0
 
+# Stripe billing
+stripe==8.4.0
+
 # Utils
 python-dotenv==1.2.1
 fal-client==0.13.1

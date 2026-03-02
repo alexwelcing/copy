@@ -12,7 +12,7 @@ import sys
 from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Security, Depends, status
+from fastapi import FastAPI, HTTPException, Security, Depends, Request, status
 
 logger = logging.getLogger(__name__)
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +41,8 @@ from service.core.assets import get_asset_manager
 from service.core.auth import get_current_user
 from service.core.limiter import get_limiter
 from service.core.models import ImageModels, VideoModels, AudioModels
+from service.billing.stripe_client import get_stripe_client, PLANS
+from service.billing.enforcement import get_enforcement, PLAN_LIMITS
 
 
 VERSION = "1.0.0"
@@ -272,6 +274,25 @@ async def get_user_profile(
     return profile
 
 
+@app.post("/user/claim")
+async def claim_work(
+    request: Request,
+    user_info: tuple[str, bool] = Depends(get_current_user)
+):
+    """Claim work done anonymously using X-Anonymous-ID header."""
+    user_id, is_anon = user_info
+    if is_anon:
+        raise HTTPException(401, "Only signed-in users can claim work")
+
+    anon_id = request.headers.get("X-Anonymous-ID")
+    if not anon_id:
+        return {"status": "no_anon_id"}
+
+    db = get_db()
+    db.claim_anonymous_work(anon_id, user_id)
+    return {"status": "claimed", "user_id": user_id}
+
+
 @app.post("/user/profile", response_model=UserProfile)
 async def save_user_profile(
     profile: UserProfile,
@@ -294,18 +315,24 @@ async def save_brief(
     user_info: tuple[str, bool] = Depends(get_current_user)
 ):
     """Save or update a strategic brief."""
-    user_id, _ = user_info
+    user_id, is_anon = user_info
     db = get_db()
     
     # Check ownership if updating
     if brief.id:
         existing = db.get_brief(brief.id)
-        if existing and existing.get("user_id") != user_id:
-            raise HTTPException(status_code=403, detail="Not authorized to edit this brief")
+        if existing:
+            if is_anon and existing.get("anonymous_id") != user_id:
+                raise HTTPException(status_code=403, detail="Not authorized to edit this brief")
+            elif not is_anon and existing.get("user_id") != user_id:
+                raise HTTPException(status_code=403, detail="Not authorized to edit this brief")
     
     # Convert Pydantic model to dict
     data = brief.model_dump()
-    data["user_id"] = user_id # Attach owner
+    if is_anon:
+        data["anonymous_id"] = user_id # Track by anonymous ID
+    else:
+        data["user_id"] = user_id # Attach owner
     
     doc_id = db.save_brief(data)
     
@@ -431,15 +458,31 @@ async def execute_work(
     Execute a marketing skill synchronously.
     """
     user_id, is_anon = user_info
-    
+
     # Rate Limit Check
     limiter = get_limiter()
     if not limiter.check_limit(user_id, is_anon):
         limit = limiter.daily_limit_anon if is_anon else limiter.daily_limit_user
         raise HTTPException(
-            status_code=429, 
+            status_code=429,
             detail=f"Daily limit exceeded ({limit} requests/day). {'Sign in for more.' if is_anon else 'Upgrade plan for more.'}"
         )
+
+    # Billing enforcement for paid users
+    if not is_anon:
+        try:
+            db = get_db()
+            tenant = db.get_tenant_by_user(user_id)
+            if tenant and tenant.get("plan", "free") != "free":
+                enforcement = get_enforcement()
+                status = await enforcement.check_billing_status(tenant["id"])
+                if status not in ("active", "past_due"):
+                    raise HTTPException(402, f"Billing status: {status}. Please update your payment method.")
+                await enforcement.check_can_spawn_sprite(tenant["id"], request.skill.value)
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.warning(f"Billing enforcement check failed (allowing): {e}")
 
     try:
         executor = get_executor()
@@ -461,15 +504,31 @@ async def execute_work_async(
     Returns a Job ID that can be tracked via GET /briefs/{id}.
     """
     user_id, is_anon = user_info
-    
+
     # Rate Limit Check
     limiter = get_limiter()
     if not limiter.check_limit(user_id, is_anon):
         limit = limiter.daily_limit_anon if is_anon else limiter.daily_limit_user
         raise HTTPException(
-            status_code=429, 
+            status_code=429,
             detail=f"Daily limit exceeded ({limit} requests/day). {'Sign in for more.' if is_anon else 'Upgrade plan for more.'}"
         )
+
+    # Billing enforcement for paid users
+    if not is_anon:
+        try:
+            db_check = get_db()
+            tenant = db_check.get_tenant_by_user(user_id)
+            if tenant and tenant.get("plan", "free") != "free":
+                enforcement = get_enforcement()
+                status = await enforcement.check_billing_status(tenant["id"])
+                if status not in ("active", "past_due"):
+                    raise HTTPException(402, f"Billing status: {status}. Please update your payment method.")
+                await enforcement.check_can_spawn_sprite(tenant["id"], request.skill.value)
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.warning(f"Billing enforcement check failed (allowing): {e}")
 
     try:
         db = get_db()
@@ -484,8 +543,12 @@ async def execute_work_async(
             "description": request.task,
             "status": "pending",
             "type": "async_job",
-            "user_id": user_id # Track ownership
         }
+        if is_anon:
+            brief_data["anonymous_id"] = user_id
+        else:
+            brief_data["user_id"] = user_id # Track ownership
+        
         job_id = db.save_brief(brief_data)
         
         # Publish to queue
@@ -555,6 +618,264 @@ async def email_sequence(
         context=context,
     )
     return await execute_work(request, user_info)
+
+
+# =============================================================================
+# Billing & Checkout Endpoints
+# =============================================================================
+
+from pydantic import BaseModel
+
+class CheckoutRequest(BaseModel):
+    plan: str
+
+@app.post("/checkout")
+async def create_checkout(
+    req: CheckoutRequest,
+    user_info: tuple[str, bool] = Depends(get_current_user),
+    request: Request = None,
+):
+    """Create a Stripe Checkout Session for a plan."""
+    user_id, is_anon = user_info
+    if is_anon:
+        raise HTTPException(401, "Sign in to subscribe to a plan")
+
+    if req.plan not in PLANS:
+        raise HTTPException(400, f"Invalid plan: {req.plan}. Choose from: {list(PLANS.keys())}")
+
+    db = get_db()
+    tenant = db.get_or_create_tenant(user_id)
+    stripe_client = get_stripe_client()
+
+    # Get or create Stripe customer
+    customer_id = tenant.get("billing", {}).get("stripe_customer_id")
+    if not customer_id:
+        customer = stripe_client.create_customer(
+            tenant_id=tenant["id"],
+            email=tenant.get("email", ""),
+            name=tenant.get("email", ""),
+        )
+        customer_id = customer.id
+        db.update_tenant(tenant["id"], {"billing.stripe_customer_id": customer_id})
+
+    plan_config = PLANS[req.plan]
+    base_url = str(request.base_url).rstrip("/") if request else ""
+
+    url = stripe_client.create_checkout_session(
+        customer_id=customer_id,
+        price_id=plan_config["stripe_price_id"],
+        success_url=f"{base_url}/welcome?checkout=success",
+        cancel_url=f"{base_url}/pricing",
+        tenant_id=tenant["id"],
+        plan=req.plan,
+    )
+
+    return {"url": url}
+
+
+@app.post("/billing/portal")
+async def billing_portal(
+    user_info: tuple[str, bool] = Depends(get_current_user),
+    request: Request = None,
+):
+    """Create a Stripe Customer Portal session."""
+    user_id, is_anon = user_info
+    if is_anon:
+        raise HTTPException(401, "Sign in to manage billing")
+
+    db = get_db()
+    tenant = db.get_tenant_by_user(user_id)
+    if not tenant:
+        raise HTTPException(404, "No billing account found")
+
+    customer_id = tenant.get("billing", {}).get("stripe_customer_id")
+    if not customer_id:
+        raise HTTPException(404, "No Stripe customer found. Subscribe to a plan first.")
+
+    stripe_client = get_stripe_client()
+    base_url = str(request.base_url).rstrip("/") if request else ""
+
+    url = stripe_client.create_portal_session(
+        customer_id=customer_id,
+        return_url=f"{base_url}/account",
+    )
+
+    return {"url": url}
+
+
+@app.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events."""
+    import stripe as _stripe
+
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature")
+
+    webhook_secret = os.getenv("STRIPE_WEBHOOK_SECRET")
+    if not webhook_secret:
+        try:
+            from google.cloud import secretmanager
+            sm = secretmanager.SecretManagerServiceClient()
+            project_id = os.getenv("GCP_PROJECT_ID")
+            name = f"projects/{project_id}/secrets/stripe-webhook-secret/versions/latest"
+            resp = sm.access_secret_version(request={"name": name})
+            webhook_secret = resp.payload.data.decode("UTF-8")
+        except Exception:
+            logger.warning("Stripe webhook secret not available")
+
+    try:
+        event = _stripe.Webhook.construct_event(payload, sig_header, webhook_secret)
+    except (ValueError, _stripe.error.SignatureVerificationError) as e:
+        logger.error(f"Webhook verification failed: {e}")
+        raise HTTPException(400, "Invalid webhook payload or signature")
+
+    event_type = event["type"]
+    data = event["data"]["object"]
+    db = get_db()
+
+    logger.info(f"Stripe webhook: {event_type}")
+
+    if event_type == "customer.subscription.created":
+        tenant_id = data["metadata"].get("tenant_id")
+        if tenant_id:
+            plan = data["metadata"].get("plan", "starter")
+            db.update_tenant(tenant_id, {
+                "billing.status": "active",
+                "billing.stripe_subscription_id": data["id"],
+                "billing.stripe_customer_id": data["customer"],
+                "billing.current_period_start": datetime.fromtimestamp(data["current_period_start"]),
+                "billing.current_period_end": datetime.fromtimestamp(data["current_period_end"]),
+                "plan": plan,
+            })
+
+    elif event_type == "customer.subscription.updated":
+        tenant_id = data["metadata"].get("tenant_id")
+        if tenant_id:
+            updates = {
+                "billing.status": "active" if data["status"] == "active" else data["status"],
+                "billing.current_period_start": datetime.fromtimestamp(data["current_period_start"]),
+                "billing.current_period_end": datetime.fromtimestamp(data["current_period_end"]),
+            }
+            plan = data["metadata"].get("plan")
+            if plan:
+                updates["plan"] = plan
+            if data.get("cancel_at_period_end"):
+                updates["billing.canceling"] = True
+            db.update_tenant(tenant_id, updates)
+
+    elif event_type == "customer.subscription.deleted":
+        tenant_id = data["metadata"].get("tenant_id")
+        if tenant_id:
+            db.update_tenant(tenant_id, {
+                "billing.status": "cancelled",
+                "plan": "free",
+            })
+
+    elif event_type == "invoice.paid":
+        customer_id = data["customer"]
+        tenant = db.get_tenant_by_stripe_customer(customer_id)
+        if tenant:
+            db.update_tenant(tenant["id"], {"billing.status": "active"})
+
+    elif event_type == "invoice.payment_failed":
+        customer_id = data["customer"]
+        tenant = db.get_tenant_by_stripe_customer(customer_id)
+        if tenant:
+            attempt_count = data.get("attempt_count", 1)
+            new_status = "suspended" if attempt_count >= 3 else "past_due"
+            db.update_tenant(tenant["id"], {"billing.status": new_status})
+
+    return {"status": "ok"}
+
+
+# =============================================================================
+# Usage & Billing Status Endpoints
+# =============================================================================
+
+from datetime import datetime
+
+@app.get("/usage")
+async def get_usage(
+    user_info: tuple[str, bool] = Depends(get_current_user),
+):
+    """Get current billing period usage summary."""
+    user_id, is_anon = user_info
+    if is_anon:
+        raise HTTPException(401, "Sign in to view usage")
+
+    db = get_db()
+    tenant = db.get_tenant_by_user(user_id)
+    if not tenant:
+        return {
+            "plan": "free",
+            "tokens": {"used": 0, "limit": 50000, "percentage": 0},
+            "sprites": {"spawned_this_period": 0, "period_limit": 5, "active": 0, "concurrent_limit": 1},
+            "enabled_agents": ["director", "copywriter", "editor"],
+        }
+
+    plan = tenant.get("plan", "free")
+    usage = tenant.get("usage", {})
+
+    if plan == "free":
+        limits = {"tokens_per_period": 50000, "sprites_per_period": 5, "max_concurrent_sprites": 1,
+                  "enabled_agents": ["director", "copywriter", "editor"]}
+    else:
+        limits = PLAN_LIMITS.get(plan, PLAN_LIMITS.get("starter", {}))
+
+    tokens_used = usage.get("tokens_this_period", 0)
+    token_limit = limits.get("tokens_per_period", 50000)
+
+    return {
+        "plan": plan,
+        "tokens": {
+            "used": tokens_used,
+            "limit": token_limit,
+            "percentage": round(tokens_used / token_limit * 100, 1) if token_limit > 0 else 0,
+        },
+        "sprites": {
+            "spawned_this_period": usage.get("sprites_spawned_this_period", 0),
+            "period_limit": limits.get("sprites_per_period", 5),
+            "active": 0,
+            "concurrent_limit": limits.get("max_concurrent_sprites", 1),
+        },
+        "enabled_agents": limits.get("enabled_agents", ["director", "copywriter", "editor"]),
+    }
+
+
+@app.get("/billing/status")
+async def billing_status(
+    user_info: tuple[str, bool] = Depends(get_current_user),
+):
+    """Get plan and subscription info."""
+    user_id, is_anon = user_info
+    if is_anon:
+        raise HTTPException(401, "Sign in to view billing")
+
+    db = get_db()
+    tenant = db.get_tenant_by_user(user_id)
+
+    if not tenant:
+        return {
+            "plan": "free",
+            "status": "active",
+            "current_period_end": None,
+            "limits": {"tokens_per_period": 50000, "sprites_per_period": 5, "max_concurrent_sprites": 1},
+        }
+
+    plan = tenant.get("plan", "free")
+    billing = tenant.get("billing", {})
+
+    if plan == "free":
+        plan_limits = {"tokens_per_period": 50000, "sprites_per_period": 5, "max_concurrent_sprites": 1}
+    else:
+        plan_limits = PLAN_LIMITS.get(plan, {})
+
+    return {
+        "plan": plan,
+        "status": billing.get("status", "active"),
+        "current_period_end": billing.get("current_period_end"),
+        "limits": plan_limits,
+    }
 
 
 @app.exception_handler(Exception)

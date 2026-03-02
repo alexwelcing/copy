@@ -51,9 +51,13 @@
             <a href="/" class="logo">AGENCY STUDIO</a>
             <nav>
                 <a href="/">Systems</a>
+                <a href="/capabilities">Capabilities</a>
                 <a href="/showcase">Case Study</a>
                 <a href="/pricing">Pricing</a>
-                <a href="/api/health">Status</a>
+                <a href="/health">Status</a>
+                <span id="nav-auth" style="display: inline;">
+                    <a href="/login">Sign In</a>
+                </span>
             </nav>
         </div>
     </header>
@@ -63,6 +67,17 @@
             {{ template "content" . }}
         </div>
     </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script>
+        window.__FIREBASE_CONFIG__ = {
+            apiKey: "{{ .FirebaseAPIKey }}",
+            authDomain: "{{ .FirebaseAuthDomain }}",
+            projectId: "{{ .FirebaseProjectID }}"
+        };
+    </script>
+    <script src="/assets/auth.js"></script>
 
     <footer>
         <div class="container">
