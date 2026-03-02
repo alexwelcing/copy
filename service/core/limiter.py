@@ -16,10 +16,10 @@ class RateLimiter:
             "enterprise": 2000,
         }
 
-    def check_limit(self, user_id: str, is_anonymous: bool) -> bool:
+    def check_limit(self, user_id: str, is_anonymous: bool) -> tuple[bool, int]:
         """
         Check if the user has exceeded their daily limit.
-        Returns True if allowed, False if limit exceeded.
+        Returns (is_allowed, current_count).
         """
         today = datetime.utcnow().strftime("%Y-%m-%d")
 
@@ -45,16 +45,16 @@ class RateLimiter:
                     pass  # Fall back to default if tenant lookup fails
 
             if current_count >= limit:
-                return False
+                return False, current_count
 
             # Increment
             usage_ref.set({"count": current_count + 1}, merge=True)
-            return True
+            return True, current_count + 1
 
         except Exception as e:
             print(f"Rate limiter error: {e}")
             # Fail open to not block users on infra glitches
-            return True
+            return True, 0
 
 _limiter: Optional[RateLimiter] = None
 

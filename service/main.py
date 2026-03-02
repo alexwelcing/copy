@@ -489,11 +489,22 @@ async def execute_work(
 
     # Rate Limit Check
     limiter = get_limiter()
-    if not limiter.check_limit(user_id, is_anon):
-        limit = limiter.daily_limit_anon if is_anon else limiter.daily_limit_user
-        raise HTTPException(
-            status_code=429,
-            detail=f"Daily limit exceeded ({limit} requests/day). {'Sign in for more.' if is_anon else 'Upgrade plan for more.'}"
+    is_allowed, count = limiter.check_limit(user_id, is_anon)
+    
+    if not is_allowed:
+        # Trigger the "extraordinary feedback loop"
+        # Instead of a 429 error, we return a structured Paywall object
+        return WorkResult(
+            paywall=Paywall(
+                message="You've experienced the speed of the swarm. To unlock your next campaign, choose a plan.",
+                upgrade_url="https://agency.studio/pricing",
+                plan_options={
+                    "Starter": "$49/mo - 1M tokens, 3 Agents",
+                    "Growth": "$199/mo - 10M tokens, All Agents",
+                    "Enterprise": "Custom - Unlimited Scale"
+                },
+                runs_remaining=0
+            )
         )
 
     # Billing enforcement for paid users
@@ -535,11 +546,12 @@ async def execute_work_async(
 
     # Rate Limit Check
     limiter = get_limiter()
-    if not limiter.check_limit(user_id, is_anon):
-        limit = limiter.daily_limit_anon if is_anon else limiter.daily_limit_user
+    is_allowed, count = limiter.check_limit(user_id, is_anon)
+    
+    if not is_allowed:
         raise HTTPException(
-            status_code=429,
-            detail=f"Daily limit exceeded ({limit} requests/day). {'Sign in for more.' if is_anon else 'Upgrade plan for more.'}"
+            status_code=402,
+            detail="Limit reached. To unlock your next campaign, choose a plan: https://agency.studio/pricing"
         )
 
     # Billing enforcement for paid users

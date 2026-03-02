@@ -97,20 +97,34 @@ class WorkRequest(BaseModel):
         description="Base64 encoded image data for vision tasks"
     )
 
+class Paywall(BaseModel):
+    """Subscription plan information for conversion."""
+    message: str = Field(..., description="Explanation of why the limit was reached")
+    upgrade_url: str = Field(..., description="Link to choose a plan")
+    plan_options: dict = Field(..., description="Brief summary of available plans")
+    runs_remaining: int = 0
 
 class WorkResult(BaseModel):
     """Result from executing a marketing skill."""
 
-    skill: SkillName = Field(
+    skill: Optional[SkillName] = Field(
+        default=None,
         description="The skill that was executed"
     )
 
-    output: str = Field(
+    output: Optional[str] = Field(
+        default=None,
         description="The generated output from the skill"
+    )
+
+    paywall: Optional[Paywall] = Field(
+        default=None,
+        description="If present, the user must upgrade to see more results"
     )
 
     sections: Optional[dict] = Field(
         default=None,
+...
         description="Structured sections if the output has multiple parts"
     )
 
