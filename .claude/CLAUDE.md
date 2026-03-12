@@ -40,7 +40,7 @@ Read agency/agents/copywriter.md
 
 ## Skills Library
 
-Agents draw from 24 specialized skills:
+Agents draw from 25 specialized skills:
 
 **Writing:** `copywriting` `copy-editing` `email-sequence` `social-content`
 
@@ -48,7 +48,7 @@ Agents draw from 24 specialized skills:
 
 **SEO:** `seo-audit` `programmatic-seo` `schema-markup`
 
-**Strategy:** `marketing-ideas` `marketing-psychology` `pricing-strategy` `launch-strategy` `competitor-alternatives` `referral-program` `free-tool-strategy`
+**Strategy:** `marketing-ideas` `marketing-psychology` `pricing-strategy` `launch-strategy` `competitor-alternatives` `referral-program` `free-tool-strategy` `creative-strategist`
 
 **Measurement:** `ab-test-setup` `analytics-tracking` `paid-ads`
 

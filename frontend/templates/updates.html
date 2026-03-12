@@ -1,0 +1,79 @@
+{{ define "updates.html" }}
+{{ template "layout" . }}
+{{ end }}
+
+{{ define "content" }}
+<div style="margin-bottom: 6rem;">
+    <span class="section-label">System Updates</span>
+    <h1>What's New</h1>
+    <p style="font-size: 1.25rem; color: var(--muted); margin-top: 1rem; max-width: 800px;">New capabilities, skills, and improvements to the swarm.</p>
+</div>
+
+<!-- Featured Update -->
+<div style="border: 2px solid var(--accent); padding: 3rem; border-radius: 4px; margin-bottom: 4rem;">
+    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+        <span style="background: var(--accent); color: white; font-family: var(--font-mono); font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.1em;">New Skill</span>
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted);">March 12, 2026</span>
+    </div>
+
+    <h2 style="font-size: 2.5rem; margin-bottom: 1.5rem;">Creative Strategist</h2>
+    <p style="font-size: 1.1rem; color: var(--muted); max-width: 700px; margin-bottom: 2rem;">Diagnose and fix the #1 reason ads underperform: state mismatch between your creative and the viewer's mindset at the moment of impression.</p>
+
+    <div class="grid-2" style="margin-bottom: 3rem;">
+        <div>
+            <h3 style="font-size: 1.5rem; margin-bottom: 1rem;">The Problem</h3>
+            <p style="color: var(--muted);">~90% of ads are built for <strong style="color: var(--text);">pain-state</strong> viewers &mdash; people actively feeling a problem. But most ad impressions land on <strong style="color: var(--text);">prospective-state</strong> viewers &mdash; people <em>thinking</em> about the problem while scrolling a feed.</p>
+            <p style="color: var(--muted); margin-top: 1rem;">This mismatch is invisible in most creative reviews, but it's the single biggest source of wasted ad spend. Meta's Andromeda system evaluates creative first and matches it to behavioral signals, which means pain-state creative gets unstable delivery by design.</p>
+        </div>
+        <div style="background: #f8fafc; padding: 2rem; border-radius: 4px;">
+            <h4 style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 1.5rem; text-transform: uppercase; color: var(--accent);">Two States of Mind</h4>
+            <div style="margin-bottom: 1.5rem;">
+                <p style="font-weight: 600; margin-bottom: 0.25rem;">Pain-State</p>
+                <p style="font-size: 0.85rem; color: var(--muted); font-style: italic;">"I'm so tired of this. Nothing works."</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">Feeling the problem right now. Reactive, urgent.</p>
+            </div>
+            <div>
+                <p style="font-weight: 600; margin-bottom: 0.25rem;">Prospective-State</p>
+                <p style="font-size: 0.85rem; color: var(--accent); font-style: italic;">"I keep imagining what it would look like if..."</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">Thinking about the problem. Reflective, curious.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 3rem;">
+        <h3 style="font-size: 1.5rem; margin-bottom: 1.5rem;">The 20-Minute Diagnostic</h3>
+        <p style="color: var(--muted); margin-bottom: 2rem;">The skill includes a complete diagnostic framework you can run on any ad account in under 20 minutes.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.5rem;">
+            <div style="border-top: 2px solid var(--accent); padding-top: 1rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);">STEP 01</span>
+                <p style="font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem;">Pull the Metrics</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">Hook Rate and Hold Rate, side by side, for every active creative.</p>
+            </div>
+            <div style="border-top: 2px solid var(--accent); padding-top: 1rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);">STEP 02</span>
+                <p style="font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem;">Read the Pattern</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">High Hook + Low Hold? Your body pivots to features too fast. Stay in the movie.</p>
+            </div>
+            <div style="border-top: 2px solid var(--accent); padding-top: 1rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);">STEP 03</span>
+                <p style="font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem;">Retention Curves</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">Sharp drop at 3-6s? State mismatch. Gradual decline? Wrong register. Drop at end? CTA state break.</p>
+            </div>
+            <div style="border-top: 2px solid var(--accent); padding-top: 1rem;">
+                <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--accent);">STEP 04</span>
+                <p style="font-size: 0.9rem; font-weight: 600; margin: 0.5rem 0 0.25rem;">Pre-Flight Check</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">Three questions before anything goes live: state, register, and close.</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="background: var(--text); color: white; padding: 2.5rem; border-radius: 4px;">
+        <h4 style="font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 1rem; color: var(--accent);">THE BOTTOM LINE</h4>
+        <p style="font-size: 1.1rem; line-height: 1.7; margin: 0;">The ad creative winning right now is <em>prospective</em> &mdash; it sounds like someone thinking out loud, not pitching. Pain-based concepts are unstable in the ad account because delivery systems match creative to organic behavioral signals, and organic behavior is overwhelmingly reflective, not reactive.</p>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <p style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">Load this skill: <code style="background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 2px;">skills/creative-strategist/SKILL.md</code></p>
+    </div>
+</div>
+{{ end }}
