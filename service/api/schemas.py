@@ -124,7 +124,6 @@ class WorkResult(BaseModel):
 
     sections: Optional[dict] = Field(
         default=None,
-...
         description="Structured sections if the output has multiple parts"
     )
 
