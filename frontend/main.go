@@ -154,6 +154,12 @@ func main() {
 		}))
 	})
 
+	r.GET("/updates", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "updates.html", baseData(gin.H{
+			"Title": "What's New",
+		}))
+	})
+
 	r.GET("/welcome", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "welcome.html", baseData(gin.H{
 			"Title": "Welcome to the Swarm",
