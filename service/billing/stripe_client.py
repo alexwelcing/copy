@@ -11,7 +11,6 @@ from datetime import datetime
 from dataclasses import dataclass
 
 import stripe
-from google.cloud import secretmanager
 
 logger = logging.getLogger(__name__)
 
@@ -97,6 +96,7 @@ class StripeClient:
 
     def _get_secret(self, secret_id: str) -> str:
         """Get secret from Secret Manager."""
+        from google.cloud import secretmanager
         client = secretmanager.SecretManagerServiceClient()
         project_id = os.environ.get("GCP_PROJECT_ID")
         name = f"projects/{project_id}/secrets/{secret_id}/versions/latest"
