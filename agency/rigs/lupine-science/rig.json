@@ -1,0 +1,24 @@
+{
+  "name": "lupine-science",
+  "client": "Internal (Case Study)",
+  "created": "2026-04-24",
+  "status": "active",
+  "brief": "./brief/PROJECT_BRIEF.md",
+  "brand": {
+    "voice": "Technical credibility meets accessibility. We respect the researcher's intelligence but eliminate their friction. Precise, confident, zero hype."
+  },
+  "team": {
+    "lead": "director",
+    "polecats": [
+      "strategist",
+      "copywriter",
+      "optimizer",
+      "analyst"
+    ]
+  },
+  "settings": {
+    "autoReview": true,
+    "requireApproval": false,
+    "dogfoodMode": true
+  }
+}

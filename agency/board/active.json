@@ -1,3 +1,21 @@
 {
-  "projects": []
+  "projects": [
+    {
+      "id": "lupine-science",
+      "name": "Lupine Materials Science — Positioning, Copy & SEO",
+      "client": "Internal (Case Study)",
+      "status": "active",
+      "phase": "analysis",
+      "rig": "agency/rigs/lupine-science",
+      "created": "2026-04-24",
+      "team": ["strategist", "copywriter", "optimizer", "analyst"],
+      "deliverables": {
+        "positioning_brief": "complete",
+        "competitive_analysis": "complete",
+        "seo_audit": "complete",
+        "copy_recommendations": "pending",
+        "launch_sequence": "pending"
+      }
+    }
+  ]
 }

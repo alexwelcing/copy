@@ -1,6 +1,6 @@
 {
   "agency": "High Era",
-  "last_updated": null,
+  "last_updated": "2026-04-24",
   "agents": {
     "director": {
       "status": "idle",
@@ -10,7 +10,7 @@
     "strategist": {
       "status": "idle",
       "current": null,
-      "last_completed": null
+      "last_completed": "lupine-science: positioning brief + competitive analysis"
     },
     "copywriter": {
       "status": "idle",
@@ -25,7 +25,7 @@
     "optimizer": {
       "status": "idle",
       "current": null,
-      "last_completed": null
+      "last_completed": "lupine-science: SEO audit + pSEO plan"
     },
     "analyst": {
       "status": "idle",
