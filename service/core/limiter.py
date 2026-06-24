@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from service.core.db import get_db
 
@@ -21,7 +21,7 @@ class RateLimiter:
         Check if the user has exceeded their daily limit.
         Returns (is_allowed, current_count).
         """
-        today = datetime.utcnow().strftime("%Y-%m-%d")
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
         usage_ref = self.db.db.collection('users').document(user_id).collection('usage').document(today)
 
