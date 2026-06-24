@@ -201,7 +201,7 @@ except ImportError as e:
 async def health_check():
     """Health check endpoint — validates core dependencies."""
     executor = get_executor()
-    checks = {"skills": executor.skills_path.exists() and any(executor.skills_path.iterdir())}
+    checks = {"skills": executor.skills_path.exists() and next(executor.skills_path.iterdir(), None) is not None}
 
     # Firestore check (cached singleton, cheap)
     try:

@@ -42,7 +42,7 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.return_value = mock_doc
             
             limiter = RateLimiter()
-            is_allowed, count = limiter.check_limit("test-user", is_anonymous=False)
+            is_allowed, _ = limiter.check_limit("test-user", is_anonymous=False)
             
             assert is_allowed is True
     
@@ -61,7 +61,7 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.return_value = mock_doc
             
             limiter = RateLimiter()
-            is_allowed, count = limiter.check_limit("test-user", is_anonymous=False)
+            is_allowed, _ = limiter.check_limit("test-user", is_anonymous=False)
             
             assert is_allowed is False
     
@@ -80,7 +80,7 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.return_value = mock_doc
             
             limiter = RateLimiter()
-            is_allowed, count = limiter.check_limit("anon-user", is_anonymous=True)
+            is_allowed, _ = limiter.check_limit("anon-user", is_anonymous=True)
             
             assert is_allowed is False
     
@@ -96,7 +96,7 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.side_effect = Exception("DB Error")
             
             limiter = RateLimiter()
-            is_allowed, count = limiter.check_limit("test-user", is_anonymous=False)
+            is_allowed, _ = limiter.check_limit("test-user", is_anonymous=False)
             
             # Should fail open
             assert is_allowed is True
