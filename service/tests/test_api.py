@@ -1,7 +1,12 @@
+from unittest.mock import patch, MagicMock
 from service.api.schemas import SkillName, WorkRequest
 
 def test_health_check(api_client):
-    response = api_client.get("/health")
+    with patch("service.main.get_db") as mock_get_db:
+        mock_db = MagicMock()
+        mock_db.check_connectivity.return_value = True
+        mock_get_db.return_value = mock_db
+        response = api_client.get("/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"

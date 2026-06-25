@@ -9,6 +9,7 @@ import logging
 import os
 import signal
 import sys
+import time
 from contextlib import asynccontextmanager
 from typing import Optional
 
@@ -200,7 +201,7 @@ except ImportError as e:
 async def health_check():
     """Health check endpoint — validates core dependencies."""
     executor = get_executor()
-    checks = {"skills": len(executor._skill_cache) > 0}
+    checks = {"skills": executor.skills_path.exists() and next(executor.skills_path.iterdir(), None) is not None}
 
     # Firestore check (cached singleton, cheap)
     try:

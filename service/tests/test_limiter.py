@@ -42,9 +42,9 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.return_value = mock_doc
             
             limiter = RateLimiter()
-            result = limiter.check_limit("test-user", is_anonymous=False)
+            is_allowed, _ = limiter.check_limit("test-user", is_anonymous=False)
             
-            assert result is True
+            assert is_allowed is True
     
     def test_rate_limiter_blocks_over_limit(self):
         """Test that rate limiter blocks requests over the limit."""
@@ -61,9 +61,9 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.return_value = mock_doc
             
             limiter = RateLimiter()
-            result = limiter.check_limit("test-user", is_anonymous=False)
+            is_allowed, _ = limiter.check_limit("test-user", is_anonymous=False)
             
-            assert result is False
+            assert is_allowed is False
     
     def test_rate_limiter_anon_lower_limit(self):
         """Test that anonymous users have lower limits."""
@@ -80,9 +80,9 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.return_value = mock_doc
             
             limiter = RateLimiter()
-            result = limiter.check_limit("anon-user", is_anonymous=True)
+            is_allowed, _ = limiter.check_limit("anon-user", is_anonymous=True)
             
-            assert result is False
+            assert is_allowed is False
     
     def test_rate_limiter_fails_open_on_error(self):
         """Test that rate limiter fails open (allows request) on DB errors."""
@@ -96,10 +96,10 @@ class TestRateLimiterLogic:
             mock_db.db.collection.return_value.document.return_value.collection.return_value.document.return_value.get.side_effect = Exception("DB Error")
             
             limiter = RateLimiter()
-            result = limiter.check_limit("test-user", is_anonymous=False)
+            is_allowed, _ = limiter.check_limit("test-user", is_anonymous=False)
             
             # Should fail open
-            assert result is True
+            assert is_allowed is True
 
 
 @requires_gcp
